@@ -466,7 +466,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <h3 id="nl-title">Abonează-te</h3>
       <p class="note" id="nl-done" hidden style="margin:0"></p>
       <div id="nl-box" style="display:flex;flex-direction:column;gap:12px">
-      <p class="note" style="margin:0">Programul săptămânii, în fiecare miercuri, direct în inbox.</p>
+      <p class="note" style="margin:0">Programul săptămânii, direct în inbox.</p>
       <form id="nl-form" class="inline" novalidate style="padding:0;background:transparent;grid-template-columns:1fr auto">
         <label for="nl-mail">E-mail<input id="nl-mail" type="email"></label>
         <button class="btn btn-main" type="submit">Mă abonez</button>
@@ -835,7 +835,7 @@ function age(b){const d=dt(b);let y=TODAY.getFullYear()-d.getFullYear(),m=TODAY.
 function syncKidsChip(){const c=document.getElementById("age-kids");c.hidden=!kids.length;if(!kids.length&&state.age==="kids"){state.age="";document.querySelectorAll("#f-age .chip").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===""?"true":"false"));render()}}
 function renderSub(){const on=!!(sub&&sub.email);document.getElementById("nl-box").hidden=on;const d=document.getElementById("nl-done");d.hidden=!on;
   document.getElementById("nl-title").textContent=on?"Ești abonat":"Abonează-te";
-  if(on)d.textContent=`Primești programul în fiecare miercuri pe ${sub.email}${sub.offers?", plus reduceri și oferte speciale":""}.`}
+  if(on)d.textContent=`Primești programul în fiecare săptămână pe ${sub.email}${sub.offers?", plus reduceri și oferte speciale":""}.`}
 function renderProfile(){
   syncKidsChip();renderSub();
   const sv=saved.filter(id=>BYID[id]&&!went.includes(id)).map(id=>BYID[id]).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));

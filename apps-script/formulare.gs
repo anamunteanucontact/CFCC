@@ -57,7 +57,7 @@ function trimite_confirmare(tip, c) {
     subiect = 'Bine ai venit la Ce facem cu copiii?';
     continut =
       '<p>Ceau!</p>' +
-      '<p>Mulțumim că te-ai abonat. De acum, în fiecare miercuri îți trimitem programul săptămânii: spectacole, ateliere, concerte și ieșiri pentru copii din Timișoara.</p>' +
+      '<p>Mulțumim că te-ai abonat. De acum, în fiecare săptămână îți trimitem programul: spectacole, ateliere, concerte și ieșiri pentru copii din Timișoara.</p>' +
       (c['Vrea oferte de la parteneri'] === 'Da' ? '<p>Ai ales să primești și reduceri și oferte speciale pentru familii, de la organizatorii și brandurile cu care colaborăm. Le trimitem doar când merită.</p>' : '') +
       '<p>Până la primul e-mail, tot calendarul e pe <a href="' + SITE + '">cefacemcucopiii.ro</a>, iar noutățile zilnice pe <a href="' + INSTAGRAM + '">Instagram</a>.</p>' +
       '<p>Cu drag,<br>Ana, de la Ce facem cu copiii?</p>' +
@@ -66,7 +66,7 @@ function trimite_confirmare(tip, c) {
     subiect = 'Am primit evenimentul tău: ' + (c['Nume eveniment'] || '');
     continut =
       '<p>Bună!</p>' +
-      '<p>Mulțumim că ne-ai trimis <strong>' + esc(c['Nume eveniment']) + '</strong>. Îl verificăm și îl adăugăm în calendarul de pe <a href="' + SITE + '">cefacemcucopiii.ro</a>. Programul nou apare în fiecare miercuri.</p>' +
+      '<p>Mulțumim că ne-ai trimis <strong>' + esc(c['Nume eveniment']) + '</strong>. Îl verificăm și îl adăugăm în calendarul de pe <a href="' + SITE + '">cefacemcucopiii.ro</a>. Programul nou apare în fiecare săptămână.</p>' +
       '<p>Dacă ai întrebări sau vrei să schimbi ceva, răspunde la acest e-mail.</p>' +
       '<p>Cu drag,<br>Ana, de la Ce facem cu copiii?</p>';
   } else if (tip === 'colaborare') {
