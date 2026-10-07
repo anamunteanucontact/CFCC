@@ -962,8 +962,8 @@ function renderOrg(sl){
     ${o.foto?`<img class="org-photo" src="${esc(o.foto)}" alt="" loading="lazy">`:""}
     ${o.desc?`<p class="org-desc">${esc(o.desc)}</p>`:""}
     <div class="org-acts">
-      ${btn(o.web,"Site",true,"Organizator: site")}
-      ${btn(o.ad?mapUrl(o):"","Hartă",false,"Organizator: hartă")}
+      ${o.pro?btn(o.web,"Site",false,"Organizator: site"):""}
+      ${btn(o.ad?mapUrl(o):"","Hartă",true,"Organizator: hartă")}
       ${btn(o.ig,"Instagram",false,"Organizator: Instagram")}
       ${btn(o.fb,"Facebook",false,"Organizator: Facebook")}
     </div>
@@ -977,7 +977,7 @@ function renderOrg(sl){
       ${o.ad?`<dt>Adresa</dt><dd>${esc(o.ad)}</dd>`:""}
       ${o.tel?`<dt>Telefon</dt><dd><a href="tel:${esc(o.tel.replace(/[^\d+]/g,""))}">${esc(o.tel)}</a></dd>`:""}
       ${o.mail?`<dt>E-mail</dt><dd><a href="mailto:${esc(o.mail)}">${esc(o.mail)}</a></dd>`:""}
-      ${o.web?`<dt>Site</dt><dd><a href="${esc(o.web)}" target="_blank" rel="noopener">${esc(o.web.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,""))}</a></dd>`:""}
+      ${o.pro&&o.web?`<dt>Site</dt><dd><a href="${esc(o.web)}" target="_blank" rel="noopener">${esc(o.web.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,""))}</a></dd>`:""}
     </dl><p class="note">Informațiile sunt adunate din surse publice.</p></div>`;
   track("Pagina organizator",null,{organizator:o.n});
 }
