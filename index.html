@@ -13,6 +13,11 @@
 <meta name="theme-color" content="#1F4E5F">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ce facem?">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="d0494fa3-dbd4-4c4f-8466-9cbd233f4dd0" data-domains="cefacemcucopiii.ro,www.cefacemcucopiii.ro"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -226,6 +231,12 @@ textarea{min-height:90px;resize:vertical}
 .about p{max-width:62ch}
 footer{background:var(--head);color:var(--head-fg);padding-block:24px;font-size:.85rem}
 footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;align-items:center}
+.install{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--surface);color:var(--fg);border:2px solid var(--galben);border-radius:18px;padding:14px;display:grid;grid-template-columns:48px 1fr;gap:12px;box-shadow:0 10px 30px rgba(31,78,95,.25);max-width:520px;margin:0 auto}
+.install img{border-radius:12px}
+.install-txt{display:flex;flex-direction:column;gap:4px;font-size:.9rem;min-width:0}
+.install-txt strong{font-size:1rem}
+.install-act{grid-column:1/-1;display:flex;gap:14px;align-items:center}
+.install-steps{margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:2px}
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
 </style>
 </head>
@@ -500,6 +511,17 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
   </div>
 </footer>
 <div class="toast" id="toast" hidden></div>
+<div class="install" id="install" hidden role="dialog" aria-label="Adaugă pe ecranul principal">
+  <img src="assets/icon-192.png" alt="" width="48" height="48">
+  <div class="install-txt">
+    <strong>Pune calendarul pe ecranul telefonului</strong>
+    <span id="install-how">Se deschide ca o aplicație, dintr-o singură atingere.</span>
+  </div>
+  <div class="install-act">
+    <button class="btn btn-main" type="button" id="install-yes">Adaugă</button>
+    <button class="linkbtn" type="button" id="install-no">Nu acum</button>
+  </div>
+</div>
 
 
 
@@ -868,6 +890,32 @@ function initAuth(){
   $a("au-del-yes").addEventListener("click",async()=>{auMsg();try{await db.collection("users").doc(fbUser.uid).delete();await fbUser.delete();auMsg(null,"Contul și datele lui au fost șterse.")}catch(e){auMsg(auErr(e))}});
 }
 initAuth();
+
+/* „Adaugă pe ecranul principal”: pe Android butonul instalează direct, pe iPhone arătăm pașii */
+(function(){
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
+  const box=document.getElementById("install");if(!box)return;
+  const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const mobile=/android|iphone|ipad|ipod/i.test(navigator.userAgent);
+  const later=+(store.get("installLater",0)||0);
+  if(standalone||!mobile||Date.now()<later)return;
+  let deferred=null;
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e});
+  const show=()=>{if(!box.hidden)return;box.hidden=false;track("Banner aplicație afișat")};
+  setTimeout(show,12000);
+  const close=days=>{box.hidden=true;store.set("installLater",Date.now()+days*864e5)};
+  document.getElementById("install-no").addEventListener("click",()=>close(14));
+  document.getElementById("install-yes").addEventListener("click",async()=>{
+    if(deferred){deferred.prompt();const r=await deferred.userChoice;track("Instalare aplicație",null,{rezultat:r.outcome});deferred=null;close(r.outcome==="accepted"?3650:14);return}
+    const how=document.getElementById("install-how");
+    how.innerHTML=ios
+      ?'<ol class="install-steps"><li>Apasă butonul <b>Distribuie</b> (pătratul cu săgeată în sus) din bara browserului.</li><li>Alege <b>Adaugă pe ecranul principal</b> („Add to Home Screen”).</li><li>Apasă <b>Adaugă</b>.</li></ol>'
+      :'<ol class="install-steps"><li>Apasă meniul browserului (cele trei puncte).</li><li>Alege <b>Adaugă pe ecranul principal</b> sau <b>Instalează aplicația</b>.</li></ol>';
+    document.getElementById("install-yes").hidden=true;document.getElementById("install-no").textContent="Am înțeles";track("Instrucțiuni aplicație",null,{sistem:ios?"iOS":"Android"});
+  });
+  window.addEventListener("appinstalled",()=>{track("Aplicație instalată");close(3650)});
+})();
 render();renderProfile();route();
 loadEvents().then(()=>{buildCats();render();renderProfile();if(BYID[location.hash.slice(1)])route()});
 </script>
