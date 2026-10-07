@@ -442,7 +442,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     </div>
 
     <div class="panel">
-      <h3>Programul pe e-mail</h3>
+      <h3 id="nl-title">Abonează-te</h3>
+      <p class="note" id="nl-done" hidden style="margin:0"></p>
+      <div id="nl-box" style="display:flex;flex-direction:column;gap:12px">
       <p class="note" style="margin:0">Programul săptămânii, în fiecare miercuri, direct în inbox.</p>
       <form id="nl-form" class="inline" novalidate style="padding:0;background:transparent;grid-template-columns:1fr auto">
         <label for="nl-mail">E-mail<input id="nl-mail" type="email"></label>
@@ -450,6 +452,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
         <label for="nl-offers" class="check" style="grid-column:1/-1"><input id="nl-offers" type="checkbox"> Vreau să primesc și reduceri și oferte de la partenerii noștri</label>
       </form>
       <p class="note" style="margin:0">Te poți dezabona oricând. Detalii în <a href="#confidentialitate">Politica de confidențialitate</a>.</p>
+      </div>
       <div class="msg" id="nl-ok" hidden></div>
     </div>
   </div>
@@ -561,8 +564,8 @@ const mem={};
 let pushHook=null;
 const store={get(k,f){try{const v=localStorage.getItem("cfcc_"+k);return v?JSON.parse(v):(mem[k]??f)}catch(_){return mem[k]??f}},
              set(k,v){mem[k]=v;try{localStorage.setItem("cfcc_"+k,JSON.stringify(v))}catch(_){}}};
-let saved=store.get("saved",[]), went=store.get("went",[]), kids=store.get("kids",[]);
-const _set=store.set.bind(store);store.set=(k,v)=>{_set(k,v);if(pushHook&&["saved","went","kids"].includes(k))pushHook()};
+let saved=store.get("saved",[]), went=store.get("went",[]), kids=store.get("kids",[]), sub=store.get("sub",null);
+const _set=store.set.bind(store);store.set=(k,v)=>{_set(k,v);if(pushHook&&["saved","went","kids","sub"].includes(k))pushHook()};
 
 function toast(t){const el=document.getElementById("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>el.hidden=true,2200)}
 
@@ -778,8 +781,11 @@ function miniEv(e,mode){
 function kidYears(b){const d=dt(b);return (TODAY-d)/(365.25*864e5)}
 function age(b){const d=dt(b);let y=TODAY.getFullYear()-d.getFullYear(),m=TODAY.getMonth()-d.getMonth();if(TODAY.getDate()<d.getDate())m--;if(m<0){y--;m+=12}return y>=2?y+" ani":(y*12+m)+" luni"}
 function syncKidsChip(){const c=document.getElementById("age-kids");c.hidden=!kids.length;if(!kids.length&&state.age==="kids"){state.age="";document.querySelectorAll("#f-age .chip").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===""?"true":"false"));render()}}
+function renderSub(){const on=!!(sub&&sub.email);document.getElementById("nl-box").hidden=on;const d=document.getElementById("nl-done");d.hidden=!on;
+  document.getElementById("nl-title").textContent=on?"Ești abonat":"Abonează-te";
+  if(on)d.textContent=`Primești programul în fiecare miercuri pe ${sub.email}${sub.offers?", plus reduceri și oferte de la parteneri":""}.`}
 function renderProfile(){
-  syncKidsChip();
+  syncKidsChip();renderSub();
   const sv=saved.filter(id=>BYID[id]&&!went.includes(id)).map(id=>BYID[id]).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
   document.getElementById("saved-list").innerHTML=sv.length?sv.map(e=>miniEv(e,"saved")).join(""):'<p class="note" style="margin:0">Nu ai salvat încă nimic. Deschide un eveniment din <a href="#calendar" data-goto="calendar">Calendar</a> și apasă Salvează.</p>';
   const h=went.filter(id=>BYID[id]).map(id=>BYID[id]);
@@ -789,7 +795,7 @@ function renderProfile(){
 document.getElementById("kid-form").addEventListener("submit",ev=>{ev.preventDefault();const n=document.getElementById("kid-name").value.trim(),b=document.getElementById("kid-bday").value;if(!n||!b){toast("Completează prenumele și data nașterii");return}kids.push({n,b});store.set("kids",kids);ev.target.reset();renderProfile()});
 document.getElementById("nl-form").addEventListener("submit",async ev=>{ev.preventDefault();const m=val("nl-mail");const ok=document.getElementById("nl-ok");if(!/^\S+@\S+\.\S+$/.test(m)){toast("Verifică adresa de e-mail");return}
   const btn=ev.target.querySelector("button[type=submit]");btn.disabled=true;
-  try{await sendForm("abonare",{"E-mail":m,"Vrea oferte de la parteneri":document.getElementById("nl-offers").checked?"Da":"Nu"});ok.textContent="Gata, te-am notat. Primești programul în fiecare miercuri.";ok.hidden=false;ev.target.reset()}
+  try{await sendForm("abonare",{"E-mail":m,"Vrea oferte de la parteneri":document.getElementById("nl-offers").checked?"Da":"Nu"});const offers=document.getElementById("nl-offers").checked;sub={email:m,offers};store.set("sub",sub);ok.textContent="Gata, te-am notat!";ok.hidden=false;ev.target.reset();renderSub()}
   catch(_){toast("Nu s-a putut trimite. Încearcă din nou.")}finally{btn.disabled=false}});
 
 /* navigare */
@@ -819,12 +825,12 @@ function auMsg(err,ok){const e=$a("au-err"),o=$a("au-ok");e.hidden=!err;e.textCo
 const auErr=x=>AU_ERR[x&&x.code]||"Ceva n-a mers. Încearcă din nou.";
 const uniq=a=>[...new Set(a)];
 function mergeKids(a,b){const m={};[...a,...b].forEach(k=>{if(k&&k.n&&k.b)m[k.n+"|"+k.b]=k});return Object.values(m)}
-async function pushNow(){if(!fbUser||!db)return;try{await db.collection("users").doc(fbUser.uid).set({email:fbUser.email||"",saved,went,kids,updated:firebase.firestore.FieldValue.serverTimestamp()})}catch(_){toast("Nu am putut salva în cont. Reîncearcă mai târziu.")}}
+async function pushNow(){if(!fbUser||!db)return;try{await db.collection("users").doc(fbUser.uid).set({email:fbUser.email||"",saved,went,kids,sub,updated:firebase.firestore.FieldValue.serverTimestamp()})}catch(_){toast("Nu am putut salva în cont. Reîncearcă mai târziu.")}}
 pushHook=()=>{clearTimeout(pushTimer);pushTimer=setTimeout(pushNow,600)};
 async function pullAndMerge(){
   try{const snap=await db.collection("users").doc(fbUser.uid).get();const d=snap.exists?snap.data():{};
-    saved=uniq([...(d.saved||[]),...saved]);went=uniq([...(d.went||[]),...went]);kids=mergeKids(d.kids||[],kids);
-    _set("saved",saved);_set("went",went);_set("kids",kids);render();renderProfile();await pushNow();
+    saved=uniq([...(d.saved||[]),...saved]);went=uniq([...(d.went||[]),...went]);kids=mergeKids(d.kids||[],kids);sub=sub||d.sub||null;
+    _set("saved",saved);_set("went",went);_set("kids",kids);_set("sub",sub);render();renderProfile();await pushNow();
   }catch(_){toast("Nu am putut încărca agenda din cont.")}
 }
 function initAuth(){
