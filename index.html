@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ce facem cu copiii? - Timișoara</title>
+<title>Ce facem cu copiii?</title>
 <meta name="description" content="Toate evenimentele, spectacolele, atelierele și ieșirile pentru copii din Timișoara, într-un singur calendar.">
-<meta property="og:title" content="Ce facem cu copiii? - Timișoara">
+<meta property="og:title" content="Ce facem cu copiii?">
+<meta property="og:site_name" content="Ce facem cu copiii?">
 <meta property="og:description" content="Toate evenimentele pentru copii din Timișoara, într-un singur calendar.">
 <meta property="og:image" content="https://cefacemcucopiii.ro/assets/og.png">
 <meta property="og:url" content="https://cefacemcucopiii.ro/">
@@ -925,7 +926,8 @@ initAuth();
     how.innerHTML=ios&&crios
       ?'<ol class="install-steps"><li>Sus, în dreapta adresei, apasă <svg class=ii viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg> <b>Distribuie</b>.</li><li>Alege <svg class=ii viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg> <b>Adaugă pe ecranul principal</b>.</li><li>Apasă <b>Adaugă</b>, sus în dreapta.</li></ol>'
       :ios
-      ?'<ol class="install-steps"><li>Jos, în bara cu adresa site-ului, apasă <svg class=ii viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg> <b>Distribuie</b>. Dacă nu-l vezi, apasă întâi butonul <svg class=ii viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg> sau ☰ de lângă adresă.</li><li>Derulează lista și alege <svg class=ii viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg> <b>Adaugă pe ecranul principal</b>. Dacă nu apare, caută-l la <b>Mai multe</b>.</li><li>Apasă <b>Adaugă</b>, sus în dreapta. Gata, iconița apare pe ecran.</li></ol>'
+      ?'<ol class="install-steps"><li>Apasă <b>☰</b> de lângă adresa site-ului, apoi <svg class=ii viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg> <b>Distribuie</b> <small>(Share)</small>.</li><li>Derulează până jos și alege <svg class=ii viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg> <b>Adaugă pe ecranul principal</b> <small>(Add to Home Screen)</small>. Dacă nu-l vezi, apasă întâi <b>Mai multe</b> <small>(View More)</small>.</li><li>Apasă <b>Adaugă</b> <small>(Add)</small>. O singură dată, și apoi deschizi calendarul direct din iconiță.</li></ol>'
+
       :'<ol class="install-steps"><li>Sus, în dreapta, apasă <svg class=ii viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg> meniul browserului.</li><li>Alege <b>Adaugă pe ecranul principal</b> sau <b>Instalează aplicația</b>.</li><li>Confirmă cu <b>Adaugă</b> sau <b>Instalează</b>.</li></ol>';
     document.getElementById("install-yes").hidden=true;document.getElementById("install-no").textContent="Am înțeles";track("Instrucțiuni aplicație",null,{sistem:ios?"iOS":"Android"});
   });
