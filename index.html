@@ -478,6 +478,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     <p>Datele trimise prin formulare sunt păstrate în Google Workspace (Google Sheets), un serviciu al Google, pe care îl folosim ca furnizor. Nu vindem și nu dăm datele tale altor firme. Păstrăm datele de contact cât timp colaborăm sau ești abonat, iar după aceea cel mult un an.</p>
     <h3>Cookie-uri</h3>
     <p>Site-ul nu folosește cookie-uri de reclamă sau de urmărire. Salvăm în browserul tău doar ce adaugi în Agenda mea.</p>
+    <p>Pentru statistici folosim Umami, un serviciu care nu folosește cookie-uri și nu te identifică. Vedem doar cifre generale, de exemplu câte vizite are site-ul sau de câte ori a fost apăsat butonul de bilete al unui eveniment, ca să le putem arăta organizatorilor cât interes au evenimentele lor.</p>
     <h3>Drepturile tale</h3>
     <p>Ai dreptul să ceri acces la datele tale, corectarea sau ștergerea lor, să restrângi sau să te opui prelucrării și să-ți retragi consimțământul. Ne poți scrie pe Instagram, la @cefacemcucopiii. Dacă nu ești mulțumit de răspuns, te poți plânge la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (www.dataprotection.ro).</p>
   </div>
@@ -643,10 +644,10 @@ function evCard(e){
       </dl>
       ${e.desc?`<p class="desc">${esc(e.desc)}</p>`:""}
       <div class="actions">
-        <a class="act" href="${gcalUrl(e)}" target="_blank" rel="noopener">${I.cal}Adaugă în calendar</a>
+        <a class="act" href="${gcalUrl(e)}" target="_blank" rel="noopener" data-trk="Adaugă în calendar" data-trk-id="${e.id}">${I.cal}Adaugă în calendar</a>
         <button class="act" type="button" data-share="${e.id}">${I.share}Distribuie</button>
         <button class="act${isSaved?" on":""}" type="button" data-save="${e.id}">${isSaved?I.saved:I.save}${isSaved?"Salvat":"Salvează"}</button>
-        ${e.link?`<a class="act act-go" href="${esc(e.link)}" target="_blank" rel="noopener">${I.ticket}${PART_LBL[accKey(e)]||"Participare"}</a>`:""}
+        ${e.link?`<a class="act act-go" href="${esc(e.link)}" target="_blank" rel="noopener" data-trk="Click bilete / înscriere" data-trk-id="${e.id}">${I.ticket}${PART_LBL[accKey(e)]||"Participare"}</a>`:""}
       </div>
       <div class="sharebox" id="sb-${e.id}" hidden>
         <a href="https://wa.me/?text=${encodeURIComponent(shareText(e)+" "+eventLink(e))}" target="_blank" rel="noopener">WhatsApp</a>
@@ -688,15 +689,18 @@ function render(){
 }
 document.getElementById("days").addEventListener("click",ev=>{const b=ev.target.closest("[data-day]");if(!b||b.disabled)return;state.day=b.dataset.day;state.open=null;render()});
 
+/* statistici (Umami, fără cookie-uri): numără click-urile pe acțiunile fiecărui eveniment */
+function track(name,id,extra){try{if(!window.umami)return;const e=id&&BYID[id];const data=Object.assign(e?{eveniment:e.n,organizator:e.o||"",data:e.d,categorie:e.c}:{},extra||{});window.umami.track(name,data)}catch(_){}}
+document.addEventListener("click",ev=>{const a=ev.target.closest("[data-trk]");if(a)track(a.dataset.trk,a.dataset.trkId)},true);
 function toggleSave(id){
-  saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];
+  saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];if(saved.includes(id))track("Salvează",id);
   if(!saved.includes(id))went=went.filter(x=>x!==id);
   store.set("saved",saved);store.set("went",went);
   toast(saved.includes(id)?"Salvat în Agenda mea":"Scos din salvate");
   render();renderProfile();
 }
 async function share(id){
-  const e=BYID[id];
+  const e=BYID[id];track("Distribuie",id);
   if(navigator.share){try{await navigator.share({title:e.n,text:shareText(e),url:eventLink(e)});return}catch(err){if(err&&err.name==="AbortError")return}}
   const sb=document.getElementById("sb-"+id);if(sb)sb.hidden=!sb.hidden;
 }
@@ -747,7 +751,7 @@ function wireForm(fid,req,errId,okId,okText,tip,build){
     const err=document.getElementById(errId),ok=document.getElementById(okId);
     if(missing.length||badMail){err.textContent=badMail?"Verifică adresa de e-mail.":"Completează câmpurile obligatorii.";err.hidden=false;ok.hidden=true;document.getElementById(missing[0]||mailEl.id).focus();return}
     const btn=form.querySelector('button[type=submit]');btn.disabled=true;const lbl=btn.textContent;btn.textContent="Se trimite...";
-    try{await sendForm(tip,build());err.hidden=true;ok.textContent=okText;ok.hidden=false;form.reset();form.dispatchEvent(new Event("sent"))}
+    try{await sendForm(tip,build());track(tip==="eveniment"?"Formular eveniment trimis":"Formular colaborare trimis");err.hidden=true;ok.textContent=okText;ok.hidden=false;form.reset();form.dispatchEvent(new Event("sent"))}
     catch(_){err.textContent="Nu s-a putut trimite. Verifică internetul și încearcă din nou.";err.hidden=false;ok.hidden=true}
     finally{btn.disabled=false;btn.textContent=lbl}
   });
@@ -795,7 +799,7 @@ function renderProfile(){
 document.getElementById("kid-form").addEventListener("submit",ev=>{ev.preventDefault();const n=document.getElementById("kid-name").value.trim(),b=document.getElementById("kid-bday").value;if(!n||!b){toast("Completează prenumele și data nașterii");return}kids.push({n,b});store.set("kids",kids);ev.target.reset();renderProfile()});
 document.getElementById("nl-form").addEventListener("submit",async ev=>{ev.preventDefault();const m=val("nl-mail");const ok=document.getElementById("nl-ok");if(!/^\S+@\S+\.\S+$/.test(m)){toast("Verifică adresa de e-mail");return}
   const btn=ev.target.querySelector("button[type=submit]");btn.disabled=true;
-  try{await sendForm("abonare",{"E-mail":m,"Vrea oferte de la parteneri":document.getElementById("nl-offers").checked?"Da":"Nu"});const offers=document.getElementById("nl-offers").checked;sub={email:m,offers};store.set("sub",sub);ok.textContent="Gata, te-am notat!";ok.hidden=false;ev.target.reset();renderSub()}
+  try{await sendForm("abonare",{"E-mail":m,"Vrea oferte de la parteneri":document.getElementById("nl-offers").checked?"Da":"Nu"});const offers=document.getElementById("nl-offers").checked;sub={email:m,offers};store.set("sub",sub);track("Abonare newsletter",null,{oferte:offers?"da":"nu"});ok.textContent="Gata, te-am notat!";ok.hidden=false;ev.target.reset();renderSub()}
   catch(_){toast("Nu s-a putut trimite. Încearcă din nou.")}finally{btn.disabled=false}});
 
 /* navigare */
@@ -842,7 +846,7 @@ function initAuth(){
     try{await auth.signInWithPopup(pr)}catch(e){if(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment"){try{await auth.signInWithRedirect(pr)}catch(e2){auMsg(auErr(e2))}}else if(e.code!=="auth/cancelled-popup-request")auMsg(auErr(e))}});
   const creds=()=>[$a("au-mail").value.trim(),$a("au-pass").value];
   $a("mail-form").addEventListener("submit",async ev=>{ev.preventDefault();auMsg();const[m,p]=creds();try{await auth.signInWithEmailAndPassword(m,p);$a("mail-form").reset()}catch(e){auMsg(auErr(e))}});
-  $a("au-new").addEventListener("click",async()=>{auMsg();const[m,p]=creds();try{await auth.createUserWithEmailAndPassword(m,p);$a("mail-form").reset();toast("Cont creat. Bine ai venit!")}catch(e){auMsg(auErr(e))}});
+  $a("au-new").addEventListener("click",async()=>{auMsg();const[m,p]=creds();try{await auth.createUserWithEmailAndPassword(m,p);track("Cont creat",null,{metoda:"email"});$a("mail-form").reset();toast("Cont creat. Bine ai venit!")}catch(e){auMsg(auErr(e))}});
   $a("au-reset").addEventListener("click",async()=>{const m=$a("au-mail").value.trim();if(!m){auMsg("Scrie mai întâi adresa de e-mail, apoi apasă din nou „Am uitat parola”.");return}
     try{await auth.sendPasswordResetEmail(m);auMsg(null,"Ți-am trimis pe e-mail un link pentru parolă nouă. Uită-te și în Spam.")}catch(e){auMsg(auErr(e))}});
   $a("au-out").addEventListener("click",async()=>{await auth.signOut();auMsg(null,"Ai ieșit din cont. Ce era salvat rămâne și pe acest telefon.")});
