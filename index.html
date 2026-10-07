@@ -52,7 +52,16 @@ button{font-family:inherit}
 .nav ul a{display:block;padding:7px 10px;border-radius:999px;text-decoration:none;font-weight:600;font-size:.86rem;white-space:nowrap;opacity:.8}
 .nav ul a:hover{opacity:1;background:rgba(255,255,255,.1)}
 .nav ul a[aria-current="page"]{opacity:1;background:var(--galben);color:#1F4E5F}
-@media (max-width:640px){.nav ul{margin:0 -16px;padding:0 16px 2px;width:calc(100% + 32px)}}
+.tabbar{display:none}
+@media (max-width:720px){
+  .nav ul{display:none}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--head);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -2px 10px rgba(0,0,0,.12)}
+  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:12px;text-decoration:none;color:var(--head-fg);opacity:.75;font-size:.68rem;font-weight:600;text-align:center;line-height:1.1}
+  .tabbar a svg{width:22px;height:22px}
+  .tabbar a[aria-current="page"]{opacity:1;color:var(--galben)}
+  body{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  .toast{bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+}
 
 /* hero */
 .hero{background:var(--head);color:var(--head-fg);padding-block:22px 34px;position:relative;overflow:hidden}
@@ -159,7 +168,7 @@ button{font-family:inherit}
 
 /* formulare */
 .tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-form{display:flex;flex-direction:column;gap:12px;background:var(--surface);border-radius:16px;padding:18px}
+form{scroll-margin-top:90px;display:flex;flex-direction:column;gap:12px;background:var(--surface);border-radius:16px;padding:18px}
 label{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:.88rem}
 label small{font-weight:400;color:var(--muted)}
 input,textarea,select{font:inherit;font-weight:400;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);width:100%}
@@ -170,8 +179,12 @@ textarea{min-height:90px;resize:vertical}
 .err{color:var(--accent);font-size:.86rem;font-weight:600}
 .rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
 @media (max-width:620px){.rules{grid-template-columns:1fr}}
-.rule{background:var(--surface);border-radius:16px;padding:16px;border:2px solid var(--line)}
-.rule.free{border-color:var(--galben)}
+.rule{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border-radius:16px;padding:16px;border:2px solid var(--line);display:flex;flex-direction:column;gap:6px;color:var(--fg);font-family:var(--body)}
+.rule:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+.rule[aria-pressed="true"]{border-color:var(--galben);box-shadow:0 0 0 2px var(--galben)}
+.rule .pick{margin-top:auto;padding-top:6px;font-size:.85rem;font-weight:700;color:var(--muted)}
+.rule[aria-pressed="true"] .pick{color:var(--accent)}
+.rule[aria-pressed="true"] .pick::after{content:" ↓"}
 .rule h3{font-size:1.2rem;font-weight:800;margin-bottom:4px}
 .rule .who{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
 
@@ -304,13 +317,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <h2>Pentru organizatori și branduri</h2>
       <p>Alege ce ai nevoie și completează formularul. Revenim noi cu răspuns.</p>
     </div>
-    <div class="rules">
-      <div class="rule free"><span class="who">Evenimente cu dată</span><h3>Adăugare în calendar</h3><p class="note" style="margin:0">Spectacole, ateliere, lansări, sesiuni demo. Listarea în calendar este și rămâne gratuită.</p></div>
-      <div class="rule"><span class="who">Cursuri, cluburi, abonamente, branduri</span><h3>Colaborări de promovare</h3><p class="note" style="margin:0">Postări dedicate, reels, articole pe site. După ce ne cunoaștem, revenim cu oferte și pachete personalizate.</p></div>
-    </div>
-    <div class="tabs" id="f-type" role="group" aria-label="Tip formular">
-      <button class="chip" type="button" data-v="ev" aria-pressed="true">Adaug un eveniment în calendar</button>
-      <button class="chip" type="button" data-v="pr" aria-pressed="false">Vreau o colaborare de promovare</button>
+    <div class="rules" id="f-type" role="group" aria-label="Ce vrei să ne trimiți">
+      <button class="rule" type="button" data-v="ev" aria-pressed="true"><span class="who">Evenimente cu dată</span><h3>Adaug un eveniment în calendar</h3><span class="note">Spectacole, ateliere, lansări, sesiuni demo. Listarea în calendar este și rămâne gratuită.</span><span class="pick">Completează formularul</span></button>
+      <button class="rule" type="button" data-v="pr" aria-pressed="false"><span class="who">Cursuri, cluburi, abonamente, branduri</span><h3>Vreau o colaborare de promovare</h3><span class="note">Postări dedicate, reels, articole pe site. După ce ne cunoaștem, revenim cu oferte și pachete personalizate.</span><span class="pick">Completează formularul</span></button>
     </div>
 
     <form id="form-ev" novalidate>
@@ -369,13 +378,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <h2>Agenda familiei tale</h2>
       <p>Salvează evenimentele care îți plac și la care vrei să mergi. Adaugă-ți copiii, ca să-ți putem arăta ce li se potrivește. Și nu uita să te abonezi la newsletter, ca să primești programul săptămânal pe e-mail, plus reduceri și oferte de la partenerii noștri.</p>
     </div>
-    <div class="login">
-      <button class="gbtn" type="button" disabled>
-        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.2l7.8 6C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.8A14.5 14.5 0 0 1 9.5 24c0-1.7.3-3.3.9-4.8l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.2-13.5-9.9l-7.9 6C6.6 42.6 14.6 48 24 48z"/></svg>
-        Intră cu Google
-      </button>
-      <p class="note" style="margin:0">Logarea cu Google vine în curând. Până atunci, ce salvezi aici rămâne doar pe acest telefon.</p>
-    </div>
+    <p class="note" style="margin:0 0 16px">Ce salvezi aici rămâne pe acest telefon.</p>
 
     <div class="panel">
       <h3>Evenimente salvate</h3>
@@ -445,6 +448,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
   </div>
 </footer>
 <div class="toast" id="toast" hidden></div>
+<nav class="tabbar" aria-label="Meniu"><a href="#calendar" data-view="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Calendar</span></a><a href="#profil" data-view="profil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Agenda mea</span></a><a href="#recomandari" data-view="recomandari"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/></svg><span>Recomandări</span></a><a href="#colaborari" data-view="colaborari"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12l3 3 5-6"/><circle cx="12" cy="12" r="9"/></svg><span>Colaborări</span></a><a href="#despre" data-view="despre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span>Despre</span></a></nav>
+
 
 <script>
 // Sursa datelor: fila „Site" din centralizator, publicată ca CSV
@@ -676,7 +681,10 @@ document.getElementById("rec-grid").innerHTML=RUBRICI.map(r=>`<article class="re
 </article>`).join("");
 
 /* formulare colaborari */
-bindChips("f-type",v=>{document.getElementById("form-ev").hidden=v!=="ev";document.getElementById("form-pr").hidden=v!=="pr"});
+document.getElementById("f-type").addEventListener("click",ev=>{const b=ev.target.closest(".rule");if(!b)return;const v=b.dataset.v;
+  document.querySelectorAll("#f-type .rule").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
+  document.getElementById("form-ev").hidden=v!=="ev";document.getElementById("form-pr").hidden=v!=="pr";
+  document.getElementById(v==="ev"?"form-ev":"form-pr").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})});
 async function sendForm(tip,campuri){
   await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({tip,campuri})});
 }
@@ -743,7 +751,7 @@ document.getElementById("nl-form").addEventListener("submit",async ev=>{ev.preve
 const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate"];
 function go(v,scroll){
   VIEWS.forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
-  document.querySelectorAll(".nav ul a").forEach(a=>{if(a.dataset.view===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  document.querySelectorAll(".nav ul a,.tabbar a").forEach(a=>{if(a.dataset.view===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
   if(scroll)window.scrollTo(0,0);
 }
 function route(){
