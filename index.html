@@ -240,6 +240,40 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .install-steps{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:8px;line-height:1.45}
 .install-steps .ii{width:18px;height:18px;vertical-align:-3px;margin:0 1px;color:var(--accent)}
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
+
+/* pagini organizatori */
+.orgs-link{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:22px;padding:14px 16px;border-radius:16px;background:var(--surface);border:2px dashed var(--line);text-decoration:none;font-weight:600;font-size:.92rem}
+.orgs-link b{color:var(--accent);white-space:nowrap}
+.org-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:620px){.org-grid{grid-template-columns:1fr}}
+.org-card{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:14px;text-decoration:none;color:var(--fg)}
+.org-card:hover{border-color:var(--galben)}
+.org-card h3{font-family:var(--body);font-size:1rem;font-weight:700;line-height:1.25}
+.org-card div>span{font-size:.82rem;color:var(--muted)}
+.mono{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font:800 1.35rem var(--display);color:#fff;flex:none;overflow:hidden}
+.mono img{width:100%;height:100%;object-fit:cover}
+.mono.lg{width:72px;height:72px;font-size:1.9rem;border-radius:20px}
+.back{display:inline-block;margin-bottom:14px;font-weight:600;font-size:.9rem;color:var(--muted);text-decoration:none}
+.org-head{display:grid;grid-template-columns:72px 1fr;gap:16px;align-items:center;margin-bottom:16px}
+.org-head h2{font-size:clamp(1.6rem,5vw,2.2rem);font-weight:800}
+.org-head .tags{margin-top:8px}
+.org-photo{width:100%;aspect-ratio:16/7;object-fit:cover;border-radius:18px;margin-bottom:16px;display:block}
+.org-desc{margin:0 0 16px;max-width:62ch;font-size:1rem}
+.org-acts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.org-acts .btn{padding:10px 14px}
+.org-sec{margin-top:26px}
+.org-sec>h3{font-size:1.35rem;font-weight:800;margin-bottom:10px}
+.svc{display:grid;gap:10px}
+.svc-i{background:var(--surface);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:5px solid var(--galben)}
+.svc-i b{font-size:1rem}
+.svc-i span{font-size:.9rem;color:var(--muted)}
+.svc-i a{font-weight:700;font-size:.86rem;color:var(--accent);margin-top:2px}
+.org-info{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:.92rem;background:var(--surface);border-radius:14px;padding:14px 16px}
+.org-info dt{color:var(--muted)}
+.org-info dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
+.org-cta{margin-top:28px;background:var(--surface);border:2px solid var(--galben);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.org-cta p{margin:0;font-size:.92rem}
+.det dd a{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -298,6 +332,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       </div>
       <div class="days" id="days" role="tablist" aria-label="Alege ziua"></div>
       <div id="list"></div>
+      <a class="orgs-link" href="#organizatori"><span>Teatre, muzee și alte locuri pentru copii din oraș, fiecare cu pagina lui</span><b>Vezi toate</b></a>
     </div>
   </section>
 </div>
@@ -335,6 +370,23 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     
     <div class="rec-grid" id="rec-grid"></div>
   </div>
+</section>
+
+<!-- ORGANIZATORI -->
+<section id="v-organizatori" class="view vwrap" hidden>
+  <div class="wrap">
+    <div class="sec-h">
+      <span class="eyebrow">Locuri și organizatori</span>
+      <h2>Unde mergem cu copiii în oraș</h2>
+      <p>Fiecare loc are pagina lui, cu ce oferă, cum ajungi și ce evenimente are în calendar acum.</p>
+    </div>
+    <div class="org-grid" id="org-grid"></div>
+  </div>
+</section>
+
+<!-- PAGINA ORGANIZATOR -->
+<section id="v-org" class="view vwrap" hidden>
+  <div class="wrap" id="org-page"></div>
 </section>
 
 <!-- COLABORARI -->
@@ -679,11 +731,11 @@ function evCard(e){
     ${open?`<div class="det">
       <dl>
         <dt>Când</dt><dd>${esc(dateLong(e))}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}</dd>
-        <dt>Unde</dt><dd>${esc(e.l)}</dd>
+        <dt>Unde</dt><dd>${orgLink(e.l)}</dd>
         ${e.ad?`<dt>Adresa</dt><dd>${esc(e.ad)}</dd>`:""}
         ${al?`<dt>Vârsta</dt><dd>${esc(al)}</dd>`:""}
         <dt>Tip</dt><dd>${esc(e.c)}</dd>
-        ${e.o?`<dt>Organizator</dt><dd>${esc(e.o)}</dd>`:""}
+        ${e.o?`<dt>Organizator</dt><dd>${orgLink(e.o)}</dd>`:""}
       </dl>
       ${e.desc?`<p class="desc">${esc(e.desc)}</p>`:""}
       <div class="actions">
@@ -739,7 +791,7 @@ document.getElementById("days").addEventListener("click",ev=>{const b=ev.target.
 
 /* statistici (Umami, fără cookie-uri): numără click-urile pe acțiunile fiecărui eveniment */
 function track(name,id,extra){try{if(!window.umami)return;const e=id&&BYID[id];const data=Object.assign(e?{eveniment:e.n,organizator:e.o||"",data:e.d,categorie:e.c}:{},extra||{});window.umami.track(name,data)}catch(_){}}
-document.addEventListener("click",ev=>{const a=ev.target.closest("[data-trk]");if(a)track(a.dataset.trk,a.dataset.trkId)},true);
+document.addEventListener("click",ev=>{const a=ev.target.closest("[data-trk]");if(a)track(a.dataset.trk,a.dataset.trkId,a.dataset.trkOrg?{organizator:a.dataset.trkOrg}:null)},true);
 function toggleSave(id){
   saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];if(saved.includes(id))track("Salvează",id);
   if(!saved.includes(id))went=went.filter(x=>x!==id);
@@ -850,15 +902,98 @@ document.getElementById("nl-form").addEventListener("submit",async ev=>{ev.preve
   try{await sendForm("abonare",{"E-mail":m,"Vrea oferte de la parteneri":document.getElementById("nl-offers").checked?"Da":"Nu"});const offers=document.getElementById("nl-offers").checked;sub={email:m,offers};store.set("sub",sub);track("Abonare newsletter",null,{oferte:offers?"da":"nu"});pixel("Lead",{content_name:"Abonare newsletter"});ok.textContent="Gata, te-am notat!";ok.hidden=false;ev.target.reset();renderSub()}
   catch(_){toast("Nu s-a putut trimite. Încearcă din nou.")}finally{btn.disabled=false}});
 
+/* pagini organizatori: fila „Profiluri” din centralizator (publicată ca CSV); dacă nu e publicată încă, se folosește profiluri.csv din site */
+const PROF_CSV_URL=CSV_URL.replace("gid=900001","gid=900002");
+let ORGS=[],ORG_BY={},orgState="loading";
+const norm=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+function toOrgs(rows){
+  return rows.slice(1).map(r=>{const g=i=>(r[i]||"").trim();
+    const lines=i=>g(i).split(/\n+/).map(x=>x.trim()).filter(Boolean);
+    return {slug:slug(g(0)||g(1)),n:g(1),tip:g(2),desc:g(3),age:g(4),ad:g(5),web:cleanUrl(g(6)),bil:cleanUrl(g(7)),ig:cleanUrl(g(8)),fb:cleanUrl(g(9)),tel:g(10),mail:g(11),
+      svc:lines(12).map(x=>{const[t,d,l]=x.split("|").map(y=>(y||"").trim());return{t,d,l:cleanUrl(l)}}).filter(x=>x.t),
+      keys:[g(1),...lines(13)].map(norm).filter(Boolean),pro:/pro/i.test(g(14)),logo:cleanUrl(g(15)),foto:cleanUrl(g(16)),on:!/^nu/i.test(g(17))}})
+    .filter(o=>o.n&&o.on);
+}
+async function loadOrgs(){
+  for(const u of [PROF_CSV_URL+"&t="+Math.floor(Date.now()/60000),"profiluri.csv?t="+Math.floor(Date.now()/3600000)]){
+    try{const r=await fetch(u,{cache:"no-store"});if(!r.ok)continue;const t=await r.text();if(/^\s*</.test(t))continue;
+      ORGS=toOrgs(parseCSV(t));ORG_BY=Object.fromEntries(ORGS.map(o=>[o.slug,o]));orgState="ok";ORG_CACHE={};return}catch(_){}
+  }
+  orgState="error";
+}
+/* un eveniment aparține unui loc dacă organizatorul sau locația lui se potrivesc cu unul din numele din coloana „Nume în calendar” */
+let ORG_CACHE={};
+function keyMatch(v,k){return v===k||(k.length>=8&&(" "+v+" ").includes(" "+k+" "))}
+function orgByName(v){v=norm(v);if(!v)return null;if(v in ORG_CACHE)return ORG_CACHE[v];return ORG_CACHE[v]=ORGS.find(x=>x.keys.some(k=>keyMatch(v,k)))||null}
+const orgFor=e=>orgByName(e.o)||orgByName(e.l);
+const orgLink=(v)=>{const g=orgByName(v);return g?`<a href="#org/${g.slug}">${esc(v)}</a>`:esc(v)};
+const orgEvents=o=>EV.filter(e=>e.d>=iso(TODAY)&&orgFor(e)===o).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
+const MONO_C=["#1F4E5F","#EE6C4D","#2f7d5b","#7a5c9e","#c2851b","#3b6ea5"];
+function mono(o,lg){
+  if(o.logo)return `<span class="mono${lg?" lg":""}" style="background:#fff"><img src="${esc(o.logo)}" alt="" loading="lazy"></span>`;
+  const h=[...o.slug].reduce((a,c)=>a+c.charCodeAt(0),0);
+  const w=o.n.replace(/^((teatrul|muzeul|casa|pentru|copii|și|si|tineret|de|stat|a|al)\s+)+/i,"");
+  return `<span class="mono${lg?" lg":""}" style="background:${MONO_C[h%MONO_C.length]}" aria-hidden="true">${esc(w.charAt(0).toUpperCase())}</span>`;
+}
+function renderOrgs(){
+  const el=document.getElementById("org-grid");
+  if(orgState!=="ok"){el.innerHTML=`<div class="empty" style="grid-column:1/-1">${orgState==="loading"?"Se încarcă...":"Lista nu s-a putut încărca. Reîncarcă pagina."}</div>`;return}
+  const sorted=[...ORGS].sort((a,b)=>(b.pro-a.pro)||a.n.localeCompare(b.n,"ro"));
+  el.innerHTML=sorted.map(o=>{const n=loadState==="ok"?orgEvents(o).length:0;
+    return `<a class="org-card" href="#org/${o.slug}">${mono(o)}<div><h3>${esc(o.n)}</h3><span>${esc(o.tip)}${n?` · ${n} ${n===1?"eveniment":"evenimente"} în calendar`:""}</span></div></a>`}).join("");
+}
+function mapUrl(o){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(o.ad.replace(/^Intrarea publică:\s*/i,"")+", Timișoara")}
+function renderOrg(sl){
+  const el=document.getElementById("org-page");
+  const back='<a class="back" href="#organizatori">← Toate locurile</a>';
+  if(orgState==="loading"){el.innerHTML=back+'<div class="empty">Se încarcă...</div>';return}
+  const o=ORG_BY[sl];
+  if(!o){el.innerHTML=back+'<div class="empty">Nu am găsit pagina asta.</div>';return}
+  document.title=o.n+" | Ce facem cu copiii?";
+  const ev=loadState==="ok"?orgEvents(o):[];
+  const btn=(href,lbl,main,trk)=>href?`<a class="btn ${main?"btn-main":"btn-soft"}" href="${esc(href)}"${/^https?:/.test(href)?' target="_blank" rel="noopener"':""} data-trk="${trk}" data-trk-org="${esc(o.n)}">${lbl}</a>`:"";
+  el.innerHTML=`${back}
+    <div class="org-head">${mono(o,true)}<div><span class="eyebrow">${esc(o.tip)}</span><h2>${esc(o.n)}</h2>
+      <div class="tags">${o.age?`<span class="tag age">${esc(o.age)}</span>`:""}${o.pro?'<span class="tag saved">Partener</span>':""}</div></div></div>
+    ${o.foto?`<img class="org-photo" src="${esc(o.foto)}" alt="" loading="lazy">`:""}
+    ${o.desc?`<p class="org-desc">${esc(o.desc)}</p>`:""}
+    <div class="org-acts">
+      ${btn(o.bil,"Bilete și program",true,"Organizator: bilete")}
+      ${btn(o.web,"Site",false,"Organizator: site")}
+      ${btn(o.ad?mapUrl(o):"","Hartă",false,"Organizator: hartă")}
+      ${btn(o.tel?"tel:"+o.tel.replace(/[^\d+]/g,""):"","Sună",false,"Organizator: telefon")}
+      ${btn(o.ig,"Instagram",false,"Organizator: Instagram")}
+      ${btn(o.fb,"Facebook",false,"Organizator: Facebook")}
+    </div>
+    <div class="org-sec"><h3>În calendar</h3>
+      ${loadState==="loading"?'<div class="empty">Se încarcă evenimentele...</div>':ev.length?`<div class="mini">${ev.map(e=>{const d=dt(e.d);
+        return `<a class="mini-ev" href="#${e.id}" style="text-decoration:none;color:inherit"><div><b>${esc(e.n)}</b><span>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></div><span class="x">Detalii</span></a>`}).join("")}</div>`
+      :'<div class="empty">Momentan nu avem evenimente de aici în calendar. Revino curând.</div>'}
+    </div>
+    ${o.svc.length?`<div class="org-sec"><h3>Ce găsești aici</h3><div class="svc">${o.svc.map(x=>`<div class="svc-i"><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:""}${x.l?`<a href="${esc(x.l)}" target="_blank" rel="noopener" data-trk="Organizator: serviciu" data-trk-org="${esc(o.n)}">Mai multe</a>`:""}</div>`).join("")}</div></div>`:""}
+    <div class="org-sec"><h3>Informații</h3><dl class="org-info">
+      ${o.ad?`<dt>Adresa</dt><dd>${esc(o.ad)}</dd>`:""}
+      ${o.tel?`<dt>Telefon</dt><dd><a href="tel:${esc(o.tel.replace(/[^\d+]/g,""))}">${esc(o.tel)}</a></dd>`:""}
+      ${o.mail?`<dt>E-mail</dt><dd><a href="mailto:${esc(o.mail)}">${esc(o.mail)}</a></dd>`:""}
+      ${o.web?`<dt>Site</dt><dd><a href="${esc(o.web)}" target="_blank" rel="noopener">${esc(o.web.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,""))}</a></dd>`:""}
+    </dl><p class="note">Informațiile sunt adunate din surse publice. Verifică programul și prețurile pe site-ul organizatorului.</p></div>
+    <div class="org-cta"><p><b>Lucrezi aici?</b> Trimite-ne programul și ce vrei să apară pe pagină, iar noi o actualizăm.</p><a class="btn btn-soft" href="#colaborari">Scrie-ne</a></div>`;
+  track("Pagina organizator",null,{organizator:o.n});
+}
+
 /* navigare */
-const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate"];
+const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate","organizatori","org"];
 function go(v,scroll){
   VIEWS.forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
   document.querySelectorAll(".nav ul a,.tabbar a").forEach(a=>{if(a.dataset.view===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
   if(scroll)window.scrollTo(0,0);
 }
+const BASE_TITLE=document.title;
 function route(){
   const h=location.hash.slice(1);
+  document.title=BASE_TITLE;
+  if(h.startsWith("org/")){renderOrg(decodeURIComponent(h.slice(4)));go("org",true);return}
+  if(h==="organizatori"){renderOrgs();go("organizatori",true);return}
   if(BYID[h]){state.per="all";document.querySelectorAll("#f-per .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v==="all"?"true":"false"));state.open=h;state.day=BYID[h].d;go("calendar");render();setTimeout(()=>document.getElementById(h)?.scrollIntoView({block:"center"}),50);return}
   go(VIEWS.includes(h)?h:"calendar",true);
 }
@@ -964,7 +1099,8 @@ function pixel(ev,params){try{if(pixelOn&&window.fbq)fbq("track",ev,params||{})}
   if(ce)window.__cePending=ce;
 })();
 render();renderProfile();route();
-loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();if(BYID[location.hash.slice(1)])route()});
+loadOrgs().then(()=>{const h=location.hash.slice(1);if(h==="organizatori"||h.startsWith("org/"))route();if(loadState==="ok")render()});
+loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();const h=location.hash.slice(1);if(BYID[h]||h==="organizatori"||h.startsWith("org/"))route()});
 </script>
 </body>
 </html>
