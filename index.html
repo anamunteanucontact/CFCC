@@ -612,7 +612,7 @@ const state={per:"all",age:"",cat:"",open:null};
 const fcat=document.getElementById("f-cat");
 function buildCats(){
   fcat.querySelectorAll(".chip").forEach(c=>c.remove());
-  const cats=[...new Set(EV.map(e=>e.c))].sort((a,b)=>a.localeCompare(b,"ro"));
+  const cats=[...new Set(EV.map(e=>e.c))].filter(c=>c!=="Altele").sort((a,b)=>a.localeCompare(b,"ro"));
   [["","Toate"],...cats.map(c=>[c,c])].forEach(([v,t],i)=>{const b=document.createElement("button");b.type="button";b.className="chip";b.dataset.v=v;b.textContent=t;b.setAttribute("aria-pressed",i===0?"true":"false");fcat.appendChild(b)});
 }
 function bindChips(id,fn){document.getElementById(id).addEventListener("click",ev=>{const b=ev.target.closest(".chip");if(!b)return;[...ev.currentTarget.querySelectorAll(".chip")].forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));fn(b.dataset.v)})}
