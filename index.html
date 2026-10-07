@@ -190,7 +190,13 @@ textarea{min-height:90px;resize:vertical}
 
 /* profil */
 .login{background:var(--surface);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
-.gbtn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#1f1f1f;border:1.5px solid #dadce0;border-radius:999px;padding:9px 16px;font:600 .92rem var(--body);align-self:flex-start;cursor:not-allowed;opacity:.75}
+.gbtn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#1f1f1f;border:1.5px solid #dadce0;border-radius:999px;padding:10px 18px;font:600 .95rem var(--body);align-self:flex-start;cursor:pointer}
+#auth-out,#auth-in{display:flex;flex-direction:column;gap:12px}
+#auth-out h3{font-size:1.3rem;font-weight:800}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.82rem}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.linkbtn{all:unset;cursor:pointer;color:var(--accent);font-weight:600;font-size:.88rem;text-decoration:underline;align-self:flex-start}
+.linkbtn:focus-visible{outline:3px solid var(--hl)}
 .panel{background:var(--surface);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
 .panel h3{font-size:1.3rem;font-weight:800}
 .mini{display:flex;flex-direction:column;gap:8px}
@@ -379,7 +385,39 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <h2>Agenda familiei tale</h2>
       <p>Salvează evenimentele care îți plac și la care vrei să mergi. Adaugă-ți copiii, ca să-ți putem arăta ce li se potrivește. Și nu uita să te abonezi la newsletter, ca să primești programul săptămânal pe e-mail, plus reduceri și oferte de la partenerii noștri.</p>
     </div>
-    <p class="note" style="margin:0 0 16px">Ce salvezi aici rămâne pe acest telefon.</p>
+    <div class="login" id="auth-box">
+      <div id="auth-out">
+        <h3>Intră în cont</h3>
+        <p class="note" style="margin:0">Cu un cont, agenda ta te urmează pe orice telefon sau calculator. Fără cont, ce salvezi rămâne doar pe acest telefon.</p>
+        <button class="gbtn" type="button" id="g-login">
+          <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.2l7.8 6C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.8A14.5 14.5 0 0 1 9.5 24c0-1.7.3-3.3.9-4.8l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.2-13.5-9.9l-7.9 6C6.6 42.6 14.6 48 24 48z"/></svg>
+          Intră cu Google
+        </button>
+        <div class="or"><span>sau cu e-mail</span></div>
+        <form id="mail-form" novalidate style="padding:0;background:transparent">
+          <label for="au-mail">E-mail<input id="au-mail" type="email" autocomplete="email"></label>
+          <label for="au-pass">Parolă <small id="au-hint">(minim 6 caractere)</small><input id="au-pass" type="password" autocomplete="current-password"></label>
+          <div class="fr">
+            <button class="btn btn-main" type="submit" data-mode="in">Intră</button>
+            <button class="btn btn-soft" type="button" id="au-new">Creează cont</button>
+          </div>
+          <button class="linkbtn" type="button" id="au-reset">Am uitat parola</button>
+        </form>
+      </div>
+      <div id="auth-in" hidden>
+        <p style="margin:0">Ești conectat ca <strong id="au-who"></strong>. Agenda ta se salvează în cont.</p>
+        <div class="fr">
+          <button class="btn btn-soft" type="button" id="au-out">Ieși din cont</button>
+          <button class="linkbtn" type="button" id="au-del">Șterge contul</button>
+        </div>
+        <div id="au-del-confirm" class="msg" hidden>
+          Sigur? Se șterg contul și tot ce ai salvat în el, iar pasul nu se poate anula.
+          <div class="fr" style="margin-top:8px"><button class="btn btn-main" type="button" id="au-del-yes">Da, șterge</button><button class="btn btn-soft" type="button" id="au-del-no">Renunț</button></div>
+        </div>
+      </div>
+      <div class="err" id="au-err" hidden></div>
+      <div class="msg" id="au-ok" hidden></div>
+    </div>
 
     <div class="panel">
       <h3>Evenimente salvate</h3>
@@ -429,9 +467,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     <p><strong>Formularul de eveniment:</strong> numele evenimentului, organizatorul, detaliile evenimentului, e-mailul și, opțional, telefonul. Le folosim ca să verificăm evenimentul, să-l publicăm în calendar și să te contactăm dacă avem întrebări.</p>
     <p><strong>Formularul de colaborare:</strong> numele afacerii, persoana de contact, e-mailul, telefonul, conturile de social media și ce ne scrii despre voi. Le folosim ca să te contactăm și să-ți trimitem o ofertă.</p>
     <p><strong>Abonarea pe e-mail:</strong> adresa de e-mail, ca să-ți trimitem programul săptămânal. Reduceri și oferte de la parteneri îți trimitem doar dacă ai bifat separat că vrei asta.</p>
-    <p><strong>Agenda mea:</strong> evenimentele salvate, istoricul și copiii adăugați rămân doar în browserul de pe telefonul tău. Nu ajung la noi și le poți șterge oricând.</p>
+    <p><strong>Agenda mea fără cont:</strong> evenimentele salvate, istoricul și copiii adăugați rămân doar în browserul de pe telefonul tău. Nu ajung la noi.</p>
+    <p><strong>Agenda mea cu cont:</strong> dacă intri în cont (cu Google sau cu e-mail și parolă), păstrăm adresa ta de e-mail, evenimentele salvate, istoricul și, dacă le adaugi, prenumele și data nașterii copiilor, ca să-ți arătăm evenimentele potrivite vârstei lor. Le adaugi tu, ca părinte, și le poți șterge oricând. Datele stau în Google Firebase, pe servere din Uniunea Europeană, și le vezi doar tu. Din Agenda mea poți șterge oricând contul, împreună cu toate datele lui.</p>
     <h3>Temeiul legal</h3>
-    <p>Pentru formulare, temeiul este cererea ta de a fi contactat. Pentru e-mailuri, temeiul este consimțământul tău, pe care îl poți retrage oricând.</p>
+    <p>Pentru formulare, temeiul este cererea ta de a fi contactat. Pentru contul din Agenda mea, temeiul este contractul de utilizare a serviciului, pe care îl închei când îți faci cont. Pentru e-mailuri, temeiul este consimțământul tău, pe care îl poți retrage oricând.</p>
     <h3>Unde stau datele și cât timp</h3>
     <p>Datele trimise prin formulare sunt păstrate în Google Workspace (Google Sheets), un serviciu al Google, pe care îl folosim ca furnizor. Nu vindem și nu dăm datele tale altor firme. Păstrăm datele de contact cât timp colaborăm sau ești abonat, iar după aceea cel mult un an.</p>
     <h3>Cookie-uri</h3>
@@ -452,6 +491,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 
 
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 // Sursa datelor: fila „Site" din centralizator, publicată ca CSV
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSbnUHTjwgSj9bQj79waxY-7mZqMM9n0mU9-dUEnyN2bgrpqm9OTJ4aKtRZujKrBX9ayFyU0ORrU4-D/pub?gid=900001&single=true&output=csv";
@@ -516,9 +558,11 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 
 // Stocare pe telefonul vizitatorului (până la logarea cu Google)
 const mem={};
+let pushHook=null;
 const store={get(k,f){try{const v=localStorage.getItem("cfcc_"+k);return v?JSON.parse(v):(mem[k]??f)}catch(_){return mem[k]??f}},
              set(k,v){mem[k]=v;try{localStorage.setItem("cfcc_"+k,JSON.stringify(v))}catch(_){}}};
 let saved=store.get("saved",[]), went=store.get("went",[]), kids=store.get("kids",[]);
+const _set=store.set.bind(store);store.set=(k,v)=>{_set(k,v);if(pushHook&&["saved","went","kids"].includes(k))pushHook()};
 
 function toast(t){const el=document.getElementById("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>el.hidden=true,2200)}
 
@@ -761,6 +805,46 @@ function route(){
   go(VIEWS.includes(h)?h:"calendar",true);
 }
 window.addEventListener("hashchange",route);
+
+/* cont: Firebase (Google + e-mail/parolă), agenda salvată în users/{uid} */
+const FB_CONFIG={apiKey:"AIzaSyDJR2Ynv13EXtNWqOvUYTGYHcJadL_fkKc",authDomain:"cefacemcucopiii.firebaseapp.com",projectId:"cefacemcucopiii",storageBucket:"cefacemcucopiii.firebasestorage.app",messagingSenderId:"30162882104",appId:"1:30162882104:web:48e0a46593740a8f6e60cd"};
+const AU_ERR={"auth/invalid-email":"Adresa de e-mail nu e scrisă corect.","auth/missing-password":"Scrie parola.","auth/weak-password":"Parola trebuie să aibă minim 6 caractere.",
+ "auth/email-already-in-use":"Există deja un cont cu adresa asta. Apasă „Intră”.","auth/invalid-credential":"E-mailul sau parola nu se potrivesc.","auth/wrong-password":"E-mailul sau parola nu se potrivesc.",
+ "auth/user-not-found":"Nu există cont cu adresa asta. Apasă „Creează cont”.","auth/too-many-requests":"Prea multe încercări. Mai încearcă peste câteva minute.",
+ "auth/popup-closed-by-user":"Fereastra Google s-a închis înainte de logare.","auth/network-request-failed":"Nu am internet. Verifică conexiunea.",
+ "auth/requires-recent-login":"Din motive de siguranță, ieși din cont, intră din nou și apoi șterge contul."};
+let fbUser=null,db=null,auth=null,pushTimer=null;
+const $a=id=>document.getElementById(id);
+function auMsg(err,ok){const e=$a("au-err"),o=$a("au-ok");e.hidden=!err;e.textContent=err||"";o.hidden=!ok;o.textContent=ok||""}
+const auErr=x=>AU_ERR[x&&x.code]||"Ceva n-a mers. Încearcă din nou.";
+const uniq=a=>[...new Set(a)];
+function mergeKids(a,b){const m={};[...a,...b].forEach(k=>{if(k&&k.n&&k.b)m[k.n+"|"+k.b]=k});return Object.values(m)}
+async function pushNow(){if(!fbUser||!db)return;try{await db.collection("users").doc(fbUser.uid).set({email:fbUser.email||"",saved,went,kids,updated:firebase.firestore.FieldValue.serverTimestamp()})}catch(_){toast("Nu am putut salva în cont. Reîncearcă mai târziu.")}}
+pushHook=()=>{clearTimeout(pushTimer);pushTimer=setTimeout(pushNow,600)};
+async function pullAndMerge(){
+  try{const snap=await db.collection("users").doc(fbUser.uid).get();const d=snap.exists?snap.data():{};
+    saved=uniq([...(d.saved||[]),...saved]);went=uniq([...(d.went||[]),...went]);kids=mergeKids(d.kids||[],kids);
+    _set("saved",saved);_set("went",went);_set("kids",kids);render();renderProfile();await pushNow();
+  }catch(_){toast("Nu am putut încărca agenda din cont.")}
+}
+function initAuth(){
+  if(!window.firebase){$a("auth-box").hidden=true;return}
+  firebase.initializeApp(FB_CONFIG);auth=firebase.auth();db=firebase.firestore();auth.languageCode="ro";
+  auth.onAuthStateChanged(u=>{fbUser=u;$a("auth-out").hidden=!!u;$a("auth-in").hidden=!u;$a("au-del-confirm").hidden=true;
+    if(u){$a("au-who").textContent=u.email||u.displayName||"utilizator";pullAndMerge()}});
+  $a("g-login").addEventListener("click",async()=>{auMsg();const pr=new firebase.auth.GoogleAuthProvider();pr.setCustomParameters({prompt:"select_account"});
+    try{await auth.signInWithPopup(pr)}catch(e){if(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment"){try{await auth.signInWithRedirect(pr)}catch(e2){auMsg(auErr(e2))}}else if(e.code!=="auth/cancelled-popup-request")auMsg(auErr(e))}});
+  const creds=()=>[$a("au-mail").value.trim(),$a("au-pass").value];
+  $a("mail-form").addEventListener("submit",async ev=>{ev.preventDefault();auMsg();const[m,p]=creds();try{await auth.signInWithEmailAndPassword(m,p);$a("mail-form").reset()}catch(e){auMsg(auErr(e))}});
+  $a("au-new").addEventListener("click",async()=>{auMsg();const[m,p]=creds();try{await auth.createUserWithEmailAndPassword(m,p);$a("mail-form").reset();toast("Cont creat. Bine ai venit!")}catch(e){auMsg(auErr(e))}});
+  $a("au-reset").addEventListener("click",async()=>{const m=$a("au-mail").value.trim();if(!m){auMsg("Scrie mai întâi adresa de e-mail, apoi apasă din nou „Am uitat parola”.");return}
+    try{await auth.sendPasswordResetEmail(m);auMsg(null,"Ți-am trimis pe e-mail un link pentru parolă nouă. Uită-te și în Spam.")}catch(e){auMsg(auErr(e))}});
+  $a("au-out").addEventListener("click",async()=>{await auth.signOut();auMsg(null,"Ai ieșit din cont. Ce era salvat rămâne și pe acest telefon.")});
+  $a("au-del").addEventListener("click",()=>{$a("au-del-confirm").hidden=false});
+  $a("au-del-no").addEventListener("click",()=>{$a("au-del-confirm").hidden=true});
+  $a("au-del-yes").addEventListener("click",async()=>{auMsg();try{await db.collection("users").doc(fbUser.uid).delete();await fbUser.delete();auMsg(null,"Contul și datele lui au fost șterse.")}catch(e){auMsg(auErr(e))}});
+}
+initAuth();
 render();renderProfile();route();
 loadEvents().then(()=>{buildCats();render();renderProfile();if(BYID[location.hash.slice(1)])route()});
 </script>
