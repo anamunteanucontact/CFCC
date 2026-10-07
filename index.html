@@ -246,6 +246,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
         <div class="row" id="f-age" role="group" aria-label="Vârsta">
           <span class="lbl">Vârsta</span>
           <button class="chip" type="button" data-v="" aria-pressed="true">Oricare</button>
+          <button class="chip" type="button" data-v="kids" aria-pressed="false" id="age-kids" hidden>Copiii mei</button>
           <button class="chip" type="button" data-v="0-3" aria-pressed="false">0-3 ani</button>
           <button class="chip" type="button" data-v="3-6" aria-pressed="false">3-6 ani</button>
           <button class="chip" type="button" data-v="6-12" aria-pressed="false">6-12 ani</button>
@@ -366,7 +367,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     <div class="sec-h">
       <span class="eyebrow">Agenda mea</span>
       <h2>Agenda familiei tale</h2>
-      <p>Salvează evenimentele care vă plac, adaugă copiii și primește programul săptămânal pe e-mail, plus reduceri și oferte de la partenerii noștri.</p>
+      <p>Salvează evenimentele care îți plac și la care vrei să mergi. Adaugă-ți copiii, ca să-ți putem arăta ce li se potrivește. Și nu uita să te abonezi la newsletter, ca să primești programul săptămânal pe e-mail, plus reduceri și oferte de la partenerii noștri.</p>
     </div>
     <div class="login">
       <button class="gbtn" type="button" disabled>
@@ -615,7 +616,8 @@ function render(){
   if(loadState!=="ok"){document.getElementById("days").innerHTML="";document.getElementById("count").textContent="";
     list.innerHTML=loadState==="loading"?'<div class="empty">Se încarcă calendarul...</div>':'<div class="empty">Calendarul nu s-a putut încărca. Verifică internetul și reîncarcă pagina.</div>';return}
   let rows=EV.filter(inPeriod);
-  if(state.age){const[lo,hi]=state.age.split("-").map(Number);rows=rows.filter(e=>{const[a,b]=ageRange(e);return a<hi&&b>=lo})}
+  if(state.age==="kids"){const ages=kids.map(k=>kidYears(k.b));rows=rows.filter(e=>{const[a,b]=ageRange(e);return ages.some(x=>x>=a&&x<=b+0.99)})}
+  else if(state.age){const[lo,hi]=state.age.split("-").map(Number);rows=rows.filter(e=>{const[a,b]=ageRange(e);return a<hi&&b>=lo})}
   if(state.cat)rows=rows.filter(e=>e.c===state.cat);
   rows.sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
   const by={};rows.forEach(e=>(by[e.d]=by[e.d]||[]).push(e));
@@ -720,8 +722,11 @@ function miniEv(e,mode){
   ${mode==="saved"?`<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="x" type="button" data-went="${e.id}">Am fost</button><button class="x" type="button" data-unsave="${e.id}" aria-label="Scoate ${esc(e.n)} din salvate">Scoate</button></div>`
    :`<button class="x on" type="button" data-went="${e.id}">Am fost ✓</button>`}</div>`;
 }
+function kidYears(b){const d=dt(b);return (TODAY-d)/(365.25*864e5)}
 function age(b){const d=dt(b);let y=TODAY.getFullYear()-d.getFullYear(),m=TODAY.getMonth()-d.getMonth();if(TODAY.getDate()<d.getDate())m--;if(m<0){y--;m+=12}return y>=2?y+" ani":(y*12+m)+" luni"}
+function syncKidsChip(){const c=document.getElementById("age-kids");c.hidden=!kids.length;if(!kids.length&&state.age==="kids"){state.age="";document.querySelectorAll("#f-age .chip").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===""?"true":"false"));render()}}
 function renderProfile(){
+  syncKidsChip();
   const sv=saved.filter(id=>BYID[id]&&!went.includes(id)).map(id=>BYID[id]).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
   document.getElementById("saved-list").innerHTML=sv.length?sv.map(e=>miniEv(e,"saved")).join(""):'<p class="note" style="margin:0">Nu ai salvat încă nimic. Deschide un eveniment din <a href="#calendar" data-goto="calendar">Calendar</a> și apasă Salvează.</p>';
   const h=went.filter(id=>BYID[id]).map(id=>BYID[id]);
