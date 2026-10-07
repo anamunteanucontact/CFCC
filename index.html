@@ -271,8 +271,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .org-info{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:.92rem;background:var(--surface);border-radius:14px;padding:14px 16px}
 .org-info dt{color:var(--muted)}
 .org-info dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
-.org-cta{margin-top:28px;background:var(--surface);border:2px solid var(--galben);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
-.org-cta p{margin:0;font-size:.92rem}
+.past{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.past li{display:flex;flex-direction:column;gap:2px;padding:10px 2px;border-top:1px solid var(--line)}
+.past li:first-child{border-top:0}
+.past b{font-weight:600;font-size:.95rem}
+.past span{font-size:.82rem;color:var(--muted)}
 .det dd a{color:var(--accent)}
 </style>
 </head>
@@ -951,6 +954,7 @@ function renderOrg(sl){
   if(!o){el.innerHTML=back+'<div class="empty">Nu am găsit pagina asta.</div>';return}
   document.title=o.n+" | Ce facem cu copiii?";
   const ev=loadState==="ok"?orgEvents(o):[];
+  const past=loadState==="ok"?EV.filter(e=>e.d<iso(TODAY)&&orgFor(e)===o).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,6):[];
   const btn=(href,lbl,main,trk)=>href?`<a class="btn ${main?"btn-main":"btn-soft"}" href="${esc(href)}"${/^https?:/.test(href)?' target="_blank" rel="noopener"':""} data-trk="${trk}" data-trk-org="${esc(o.n)}">${lbl}</a>`:"";
   el.innerHTML=`${back}
     <div class="org-head">${mono(o,true)}<div><span class="eyebrow">${esc(o.tip)}</span><h2>${esc(o.n)}</h2>
@@ -958,10 +962,8 @@ function renderOrg(sl){
     ${o.foto?`<img class="org-photo" src="${esc(o.foto)}" alt="" loading="lazy">`:""}
     ${o.desc?`<p class="org-desc">${esc(o.desc)}</p>`:""}
     <div class="org-acts">
-      ${btn(o.bil,"Bilete și program",true,"Organizator: bilete")}
-      ${btn(o.web,"Site",false,"Organizator: site")}
+      ${btn(o.web,"Site",true,"Organizator: site")}
       ${btn(o.ad?mapUrl(o):"","Hartă",false,"Organizator: hartă")}
-      ${btn(o.tel?"tel:"+o.tel.replace(/[^\d+]/g,""):"","Sună",false,"Organizator: telefon")}
       ${btn(o.ig,"Instagram",false,"Organizator: Instagram")}
       ${btn(o.fb,"Facebook",false,"Organizator: Facebook")}
     </div>
@@ -970,14 +972,13 @@ function renderOrg(sl){
         return `<a class="mini-ev" href="#${e.id}" style="text-decoration:none;color:inherit"><div><b>${esc(e.n)}</b><span>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></div><span class="x">Detalii</span></a>`}).join("")}</div>`
       :'<div class="empty">Momentan nu avem evenimente de aici în calendar. Revino curând.</div>'}
     </div>
-    ${o.svc.length?`<div class="org-sec"><h3>Ce găsești aici</h3><div class="svc">${o.svc.map(x=>`<div class="svc-i"><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:""}${x.l?`<a href="${esc(x.l)}" target="_blank" rel="noopener" data-trk="Organizator: serviciu" data-trk-org="${esc(o.n)}">Mai multe</a>`:""}</div>`).join("")}</div></div>`:""}
+    ${past.length?`<div class="org-sec"><h3>Au fost recent în calendar</h3><ul class="past">${past.map(e=>{const d=dt(e.d);return `<li><b>${esc(e.n)}</b><span>${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></li>`}).join("")}</ul></div>`:""}
     <div class="org-sec"><h3>Informații</h3><dl class="org-info">
       ${o.ad?`<dt>Adresa</dt><dd>${esc(o.ad)}</dd>`:""}
       ${o.tel?`<dt>Telefon</dt><dd><a href="tel:${esc(o.tel.replace(/[^\d+]/g,""))}">${esc(o.tel)}</a></dd>`:""}
       ${o.mail?`<dt>E-mail</dt><dd><a href="mailto:${esc(o.mail)}">${esc(o.mail)}</a></dd>`:""}
       ${o.web?`<dt>Site</dt><dd><a href="${esc(o.web)}" target="_blank" rel="noopener">${esc(o.web.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,""))}</a></dd>`:""}
-    </dl><p class="note">Informațiile sunt adunate din surse publice. Verifică programul și prețurile pe site-ul organizatorului.</p></div>
-    <div class="org-cta"><p><b>Lucrezi aici?</b> Trimite-ne programul și ce vrei să apară pe pagină, iar noi o actualizăm.</p><a class="btn btn-soft" href="#colaborari">Scrie-ne</a></div>`;
+    </dl><p class="note">Informațiile sunt adunate din surse publice.</p></div>`;
   track("Pagina organizator",null,{organizator:o.n});
 }
 
