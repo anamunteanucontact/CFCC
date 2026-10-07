@@ -105,7 +105,8 @@ button{font-family:inherit}
 .dpill.sel{background:var(--fg);border-color:var(--fg);color:var(--bg)}
 .dpill.sel .dz{color:var(--bg)}
 .dpill.sel .dn{background:var(--galben);color:#1F4E5F}
-.dpill[disabled]{opacity:.4;cursor:default}
+.dpill[data-empty]{opacity:.45}
+.dpill[data-empty].sel{opacity:1}
 .dayhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:6px 0 12px}
 .dayhead h3{font-size:1.4rem;font-weight:800}
 .dayhead span{font-size:.88rem;color:var(--muted);font-weight:600;white-space:nowrap}
@@ -677,18 +678,23 @@ function render(){
   rows.sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
   const by={};rows.forEach(e=>(by[e.d]=by[e.d]||[]).push(e));
   const days=dayRange();
-  if(!state.day||!by[state.day])state.day=days.find(k=>by[k])||null;
+  if(!state.day||!days.includes(state.day)||(!by[state.day]&&!state.dayPicked))state.day=days.find(k=>by[k])||null;
   document.getElementById("count").textContent=rows.length?`${rows.length} ${rows.length===1?"activitate":"activități"} în perioada aleasă. Alege ziua:`:"";
   const strip=document.getElementById("days");
   strip.innerHTML=days.map(k=>{const d=dt(k),n=(by[k]||[]).length,we=d.getDay()===0||d.getDay()===6,sel=k===state.day;
-    return `<button type="button" class="dpill${we?" we":""}${sel?" sel":""}" data-day="${k}" role="tab" aria-selected="${sel}" ${n?"":"disabled"} aria-label="${ZILE[d.getDay()]} ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}, ${n} activități">
+    return `<button type="button" class="dpill${we?" we":""}${sel?" sel":""}" data-day="${k}" role="tab" aria-selected="${sel}" ${n?"":'data-empty="1"'} aria-label="${ZILE[d.getDay()]} ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}, ${n} activități">
       <span class="dz">${ZS[d.getDay()]}</span><span class="dd">${d.getDate()}</span><span class="dn">${n||"-"}</span></button>`}).join("");
   const selEl=strip.querySelector(".sel");if(selEl)strip.scrollLeft=Math.max(0,selEl.offsetLeft-strip.offsetLeft-16);
   if(!state.day){list.innerHTML='<div class="empty">Nu am găsit nimic pentru filtrele alese. Încearcă altă vârstă sau toată luna.</div>';return}
   const d=dt(state.day),ev=by[state.day];
+  if(!ev){const filt=state.age||state.cat;
+    list.innerHTML=`<div class="dayhead"><h3>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}</h3></div>
+    <div class="empty" style="display:flex;flex-direction:column;gap:12px;align-items:center">
+      <span>${filt?"Nu am găsit evenimente pentru filtrele alese în ziua asta.":"Încă nu am găsit evenimente pentru copii în ziua asta."} Organizezi tu ceva? Scrie-ne și îl adăugăm în calendar.</span>
+      <a class="btn btn-main" href="#colaborari">Adaugă evenimentul tău</a></div>`;return}
   list.innerHTML=`<div class="dayhead"><h3>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}</h3><span>${ev.length} ${ev.length===1?"activitate":"activități"}</span></div><div class="evs">${ev.map(evCard).join("")}</div>`;
 }
-document.getElementById("days").addEventListener("click",ev=>{const b=ev.target.closest("[data-day]");if(!b||b.disabled)return;state.day=b.dataset.day;state.open=null;render()});
+document.getElementById("days").addEventListener("click",ev=>{const b=ev.target.closest("[data-day]");if(!b)return;state.day=b.dataset.day;state.dayPicked=!!b.dataset.empty;state.open=null;render()});
 
 /* statistici (Umami, fără cookie-uri): numără click-urile pe acțiunile fiecărui eveniment */
 function track(name,id,extra){try{if(!window.umami)return;const e=id&&BYID[id];const data=Object.assign(e?{eveniment:e.n,organizator:e.o||"",data:e.d,categorie:e.c}:{},extra||{});window.umami.track(name,data)}catch(_){}}
