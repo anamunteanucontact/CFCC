@@ -404,7 +404,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     <div class="sec-h">
       <span class="eyebrow">Agenda mea</span>
       <h2>Agenda familiei tale</h2>
-      <p>Salvează evenimentele care îți plac și la care vrei să mergi. Adaugă-ți copiii, ca să-ți putem arăta ce li se potrivește. Și nu uita să te abonezi la newsletter, ca să primești programul săptămânal pe e-mail, plus reduceri și oferte de la partenerii noștri.</p>
+      <p>Salvează evenimentele care îți plac și la care vrei să mergi. Adaugă-ți copiii, ca să-ți putem arăta ce li se potrivește. Și nu uita să te abonezi la newsletter, ca să primești programul săptămânal pe e-mail, plus reduceri și oferte speciale pentru familii.</p>
     </div>
     <div class="login" id="auth-box">
       <div id="auth-out">
@@ -470,7 +470,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <form id="nl-form" class="inline" novalidate style="padding:0;background:transparent;grid-template-columns:1fr auto">
         <label for="nl-mail">E-mail<input id="nl-mail" type="email"></label>
         <button class="btn btn-main" type="submit">Mă abonez</button>
-        <label for="nl-offers" class="check" style="grid-column:1/-1"><input id="nl-offers" type="checkbox"> Vreau să primesc și reduceri și oferte de la partenerii noștri</label>
+        <label for="nl-offers" class="check" style="grid-column:1/-1"><input id="nl-offers" type="checkbox"> Vreau să primesc și reduceri și oferte speciale pentru familii, de la organizatorii și brandurile cu care colaborăm</label>
       </form>
       <p class="note" style="margin:0">Te poți dezabona oricând. Detalii în <a href="#confidentialitate">Politica de confidențialitate</a>.</p>
       </div>
@@ -490,7 +490,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     <h3>Ce date strângem și de ce</h3>
     <p><strong>Formularul de eveniment:</strong> numele evenimentului, organizatorul, detaliile evenimentului, e-mailul și, opțional, telefonul. Le folosim ca să verificăm evenimentul, să-l publicăm în calendar și să te contactăm dacă avem întrebări.</p>
     <p><strong>Formularul de colaborare:</strong> numele afacerii, persoana de contact, e-mailul, telefonul, conturile de social media și ce ne scrii despre voi. Le folosim ca să te contactăm și să-ți trimitem o ofertă.</p>
-    <p><strong>Abonarea pe e-mail:</strong> adresa de e-mail, ca să-ți trimitem programul săptămânal. Reduceri și oferte de la parteneri îți trimitem doar dacă ai bifat separat că vrei asta.</p>
+    <p><strong>Abonarea pe e-mail:</strong> adresa de e-mail, ca să-ți trimitem programul săptămânal. Reduceri și oferte speciale de la organizatorii și brandurile cu care colaborăm îți trimitem doar dacă ai bifat separat că vrei asta. Nu le dăm adresa ta, ofertele vin de la noi.</p>
     <p><strong>Agenda mea fără cont:</strong> evenimentele salvate, istoricul și copiii adăugați rămân doar în browserul de pe telefonul tău. Nu ajung la noi.</p>
     <p><strong>Agenda mea cu cont:</strong> dacă intri în cont (cu Google sau cu e-mail și parolă), păstrăm adresa ta de e-mail, evenimentele salvate, istoricul și, dacă le adaugi, prenumele și data nașterii copiilor, ca să-ți arătăm evenimentele potrivite vârstei lor. Le adaugi tu, ca părinte, și le poți șterge oricând. Datele stau în Google Firebase, pe servere din Uniunea Europeană, și le vezi doar tu. Din Agenda mea poți șterge oricând contul, împreună cu toate datele lui.</p>
     <h3>Temeiul legal</h3>
@@ -835,7 +835,7 @@ function age(b){const d=dt(b);let y=TODAY.getFullYear()-d.getFullYear(),m=TODAY.
 function syncKidsChip(){const c=document.getElementById("age-kids");c.hidden=!kids.length;if(!kids.length&&state.age==="kids"){state.age="";document.querySelectorAll("#f-age .chip").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===""?"true":"false"));render()}}
 function renderSub(){const on=!!(sub&&sub.email);document.getElementById("nl-box").hidden=on;const d=document.getElementById("nl-done");d.hidden=!on;
   document.getElementById("nl-title").textContent=on?"Ești abonat":"Abonează-te";
-  if(on)d.textContent=`Primești programul în fiecare miercuri pe ${sub.email}${sub.offers?", plus reduceri și oferte de la parteneri":""}.`}
+  if(on)d.textContent=`Primești programul în fiecare miercuri pe ${sub.email}${sub.offers?", plus reduceri și oferte speciale":""}.`}
 function renderProfile(){
   syncKidsChip();renderSub();
   const sv=saved.filter(id=>BYID[id]&&!went.includes(id)).map(id=>BYID[id]).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));

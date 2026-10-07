@@ -58,7 +58,7 @@ function trimite_confirmare(tip, c) {
     continut =
       '<p>Ceau!</p>' +
       '<p>Mulțumim că te-ai abonat. De acum, în fiecare miercuri îți trimitem programul săptămânii: spectacole, ateliere, concerte și ieșiri pentru copii din Timișoara.</p>' +
-      (c['Vrea oferte de la parteneri'] === 'Da' ? '<p>Ai ales să primești și reduceri și oferte de la partenerii noștri. Le trimitem doar când merită.</p>' : '') +
+      (c['Vrea oferte de la parteneri'] === 'Da' ? '<p>Ai ales să primești și reduceri și oferte speciale pentru familii, de la organizatorii și brandurile cu care colaborăm. Le trimitem doar când merită.</p>' : '') +
       '<p>Până la primul e-mail, tot calendarul e pe <a href="' + SITE + '">cefacemcucopiii.ro</a>, iar noutățile zilnice pe <a href="' + INSTAGRAM + '">Instagram</a>.</p>' +
       '<p>Cu drag,<br>Ana, de la Ce facem cu copiii?</p>' +
       '<p style="color:#888;font-size:12px">Te poți dezabona oricând, răspunzând la acest e-mail cu „dezabonare”.</p>';
