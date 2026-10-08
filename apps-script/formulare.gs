@@ -10,6 +10,8 @@
  * 2. Când schimbi statusul unei propuneri în „Pregătit pentru calendar”,
  *    o mută singur în fila „Evenimente”, la ziua și ora ei, cu status „De verificat”.
  *    După ce o treci pe „Confirmat”, apare pe site.
+ * 3. În „CFCC - Onboarding parteneri”, când un rând primește statusul „Verificat - creează pagina”,
+ *    îl copiază în „Comunitatea CFCC” ca ciornă (Pe site = Nu). Pornește o dată cu porneste_onboarding().
  */
 
 const NUME_EXPEDITOR = 'Ce facem cu copiii?';
@@ -260,3 +262,93 @@ function ca_ora(x, tz) {
   const m = String(x || '').match(/(\d{1,2}):(\d{2})/);
   return m ? ('0' + m[1]).slice(-2) + ':' + m[2] : '';
 }
+
+/* ---------- 3. din „Onboarding parteneri” în „Comunitatea CFCC” ---------- */
+
+const COMUNITATE_ID = '19VxFnrcRzF8sMIG0tUiQSexOE1I21g5tXm9CQw2n7hQ'; // „Comunitatea CFCC - pagini parteneri” (public)
+const STATUS_CREEAZA = 'Verificat - creează pagina';
+const STATUS_CREATA = 'Pagină creată (Pe site = Nu)';
+
+/** Rulează o singură dată din editor: pornește copierea automată din sheet-ul de onboarding. */
+function porneste_onboarding() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'la_editare_onboarding') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('la_editare_onboarding').forSpreadsheet(ONBOARDING_ID).onEdit().create();
+}
+
+function la_editare_onboarding(e) {
+  const fila = e.range.getSheet();
+  if (fila.getName() !== FILE.pagina.nume) return;
+  if (e.range.getColumn() !== 2 || e.range.getRow() < 2) return; // coloana Status
+  if (String(e.value || '') !== STATUS_CREEAZA) return;
+  try {
+    const id = creeaza_pagina(fila, e.range.getRow());
+    e.range.setValue(STATUS_CREATA);
+    fila.getRange(e.range.getRow(), 1, 1, FILE.pagina.coloane.length).setBackground('#d9ead3').setFontColor('#274e13');
+    e.source.toast('Am creat pagina „' + id + '” în Comunitatea CFCC, ca ciornă (Pe site = Nu).', 'Ce facem cu copiii?', 10);
+  } catch (err) {
+    e.range.setValue('De verificat');
+    e.source.toast('Nu am putut crea pagina: ' + err.message, 'Ce facem cu copiii?', 15);
+  }
+}
+
+function creeaza_pagina(fila, rand) {
+  const v = fila.getRange(rand, 1, 1, FILE.pagina.coloane.length).getDisplayValues()[0];
+  const p = {};
+  FILE.pagina.coloane.forEach(function (c, i) { p[c[0]] = String(v[i] || '').trim(); });
+  if (!p['Nume']) throw new Error('lipsește numele');
+
+  const com = SpreadsheetApp.openById(COMUNITATE_ID);
+  const parteneri = com.getSheetByName('Parteneri');
+  const id = slug_id(p['Nume']);
+  const existente = parteneri.getRange(1, 1, Math.max(parteneri.getLastRow(), 1), 1).getDisplayValues().map(function (r) { return r[0]; });
+  if (existente.indexOf(id) >= 0) throw new Error('există deja o pagină cu ID-ul „' + id + '”');
+
+  const logo = poze_publice(p['Logo'])[0] || '';
+  const cover = poze_publice(p['Poza principală'])[0] || '';
+  const alte = poze_publice(p['Alte poze']);
+  const nume_calendar = [p['Nume']].concat(p['Nume în calendar'].split(/\n+/)).map(function (x) { return x.trim(); }).filter(String).join('\n');
+
+  parteneri.appendRow([id, p['Nume'], p['Cum se descriu'], 'Partener', 'Nu', p['Descriere'], p['Vârste'], p['Adresă'],
+    text(p['Telefon public']), p['E-mail public'], link_social(p['Instagram'], 'instagram'), link_social(p['Facebook'], 'facebook'),
+    p['Website'], logo, cover, nume_calendar]);
+
+  const act = p['Activități'].split(/\n+/).filter(String).map(function (l) {
+    const parti = l.split('|');
+    return [id, parti[0].trim(), (parti.slice(1).join('|') || '').trim()];
+  });
+  if (act.length) {
+    const fa = com.getSheetByName('Activități');
+    fa.getRange(fa.getLastRow() + 1, 1, act.length, 3).setValues(act);
+  }
+  if (alte.length) {
+    const fg = com.getSheetByName('Galerie');
+    fg.getRange(fg.getLastRow() + 1, 1, alte.length, 3).setValues(alte.map(function (u) { return [id, u, '']; }));
+  }
+  return id;
+}
+
+/** Face pozele din Drive vizibile pentru oricine are linkul și întoarce linkuri care se pot afișa pe site. */
+function poze_publice(celula) {
+  return String(celula || '').split(/\s+/).filter(String).map(function (u) {
+    const m = u.match(/\/d\/([\w-]{20,})/) || u.match(/[?&]id=([\w-]{20,})/);
+    if (!m) return u;
+    DriveApp.getFileById(m[1]).setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return 'https://lh3.googleusercontent.com/d/' + m[1];
+  });
+}
+
+function slug_id(s) {
+  return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'partener';
+}
+
+function link_social(x, retea) {
+  x = String(x || '').trim();
+  if (!x || /^https?:\/\//i.test(x)) return x;
+  const nume = x.replace(/^@/, '').replace(/^(www\.)?(instagram|facebook)\.com\//i, '').replace(/\/$/, '');
+  return 'https://www.' + retea + '.com/' + nume + '/';
+}
+
+function text(x) { return x ? "'" + x : ''; }
