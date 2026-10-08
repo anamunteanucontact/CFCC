@@ -1106,7 +1106,7 @@ initAuth();
 })();
 
 /* Meta Pixel, doar cu acordul vizitatorului */
-const META_PIXEL_ID=""; // se completează cu ID-ul din Meta Events Manager
+const META_PIXEL_ID="1139777595374045"; // Meta Events Manager, pornește doar după acordul la cookie-uri
 let pixelOn=false;
 function loadPixel(){if(pixelOn||!META_PIXEL_ID)return;pixelOn=true;
   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");
