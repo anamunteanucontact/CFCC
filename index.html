@@ -784,7 +784,7 @@ function evCard(e){
   return `<article class="ev${open?" open":""}" id="${e.id}">
     <button class="ev-head" type="button" data-open="${e.id}" aria-expanded="${open}">
       <div class="tm">${esc(timeLabel(e))}</div>
-      <div><h3>${esc(e.n)}</h3>${e.o?`<div class="meta org">${esc(e.o)}</div>`:""}${e.l&&(!e.o||e.l.trim().toLowerCase()!==e.o.trim().toLowerCase())?`<div class="meta loc">${I.pin}${esc(e.l)}</div>`:""}
+      <div><h3>${esc(e.n)}</h3>${(()=>{const same=e.o&&e.l&&e.l.trim().toLowerCase()===e.o.trim().toLowerCase();return same?`<div class="meta org loc">${I.pin}${esc(e.o)}</div>`:(e.o?`<div class="meta org">${esc(e.o)}</div>`:"")+(e.l?`<div class="meta loc">${I.pin}${esc(e.l)}</div>`:"")})()}
         <div class="tags"><span class="tag">${esc(e.c)}</span>${al?`<span class="tag age">${esc(al)}</span>`:""}${isSaved?'<span class="tag saved">Salvat</span>':""}</div></div>
       <span class="caret">${I.caret}</span>
     </button>
