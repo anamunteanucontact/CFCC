@@ -5,7 +5,7 @@
  *    - propunerile de evenimente -> fila „Propuneri evenimente” din acest sheet
  *    - abonările și colaborările -> sheet-ul separat „Contacte”
  *    - formularul pentru parteneri (cefacemcucopiii.ro/#formular-partener) -> fila „Pagini parteneri - de verificat”
- *      din „Contacte”, cu roșu, ca să le verifice un om; pozele lor se salvează în Drive, în folderul „CFCC - poze parteneri”
+ *      din sheet-ul separat „CFCC - Onboarding parteneri”, cu roșu, ca să le verifice un om; pozele lor se salvează în Drive, în folderul „CFCC - poze parteneri”
  *    și trimite un e-mail de confirmare celui care a completat.
  * 2. Când schimbi statusul unei propuneri în „Pregătit pentru calendar”,
  *    o mută singur în fila „Evenimente”, la ziua și ora ei, cu status „De verificat”.
@@ -16,6 +16,7 @@ const NUME_EXPEDITOR = 'Ce facem cu copiii?';
 const SITE = 'https://cefacemcucopiii.ro';
 const INSTAGRAM = 'https://www.instagram.com/cefacemcucopiii/';
 const CONTACTE_ID = '1ydRGLLcpV0bGP07bckIoAZ4k2Z6llGmozHPJTVbSF38';
+const ONBOARDING_ID = '1wyNnAA3GNJis2cofoQixTLizss0zU-90uBpFaaQIir0'; // „CFCC - Onboarding parteneri”
 
 // Fiecare coloană: [titlul din sheet, numele câmpului trimis de site]
 const FILE = {
@@ -34,7 +35,7 @@ const FILE = {
     coloane: [['Primit la'], ['E-mail'], ['Vrea oferte speciale', 'Vrea oferte de la parteneri'], ['Note']]
   },
   pagina: {
-    nume: 'Pagini parteneri - de verificat', fisier: 'contacte', status: 'De verificat', rosu: true, lungime: 5000,
+    nume: 'Pagini parteneri - de verificat', fisier: 'onboarding', status: 'De verificat', rosu: true, lungime: 5000,
     coloane: [['Primit la'], ['Status'], ['Nume'], ['Cum se descriu', 'Ce sunt'], ['Descriere'], ['Vârste'], ['Adresă'],
       ['Telefon public'], ['E-mail public'], ['Instagram'], ['Facebook'], ['Website'], ['Activități'], ['Nume în calendar'],
       ['Logo'], ['Poza principală'], ['Alte poze'], ['Folder poze'], ['Persoană de contact'], ['Telefon contact'], ['E-mail'],
@@ -78,7 +79,9 @@ function doPost(e) {
 }
 
 function ia_fila(tip) {
-  const ss = tip.fisier === 'contacte' ? SpreadsheetApp.openById(CONTACTE_ID) : SpreadsheetApp.getActiveSpreadsheet();
+  const ss = tip.fisier === 'contacte' ? SpreadsheetApp.openById(CONTACTE_ID)
+    : tip.fisier === 'onboarding' ? SpreadsheetApp.openById(ONBOARDING_ID)
+    : SpreadsheetApp.getActiveSpreadsheet();
   let fila = ss.getSheetByName(tip.nume);
   if (!fila) {
     fila = ss.insertSheet(tip.nume);
