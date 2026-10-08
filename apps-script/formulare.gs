@@ -30,7 +30,8 @@ const FILE = {
     nume: 'Pagini parteneri - de verificat',
     coloane: ['Primit la', 'Status', 'Nume', 'Ce sunt', 'Descriere', 'Vârste', 'Adresă', 'Telefon public', 'E-mail public',
       'Instagram', 'Facebook', 'Website', 'Activități', 'Nume în calendar', 'Logo', 'Poza principală', 'Alte poze',
-      'Folder poze', 'Persoană de contact', 'Telefon contact', 'E-mail', 'Observații', 'Acord publicare'],
+      'Folder poze', 'Persoană de contact', 'Telefon contact', 'E-mail', 'Denumire legală', 'CUI', 'Nr. înregistrare',
+      'Sediu social', 'Observații', 'Acord publicare'],
     status: 'De verificat',
     rosu: true,
     lungime: 5000
@@ -99,7 +100,7 @@ function trimite_confirmare(tip, c) {
     subiect = 'Am primit informațiile pentru pagina voastră - Ce facem cu copiii?';
     continut =
       '<p>Bună, ' + esc(c['Persoană de contact'] || '') + '!</p>' +
-      '<p>Mulțumim! Am primit informațiile pentru pagina <strong>' + esc(c['Nume']) + '</strong> din Comunitatea CFCC. Le citim, aranjăm textele dacă e nevoie și vă trimitem pagina spre aprobare înainte s-o publicăm.</p>' +
+      '<p>Mulțumim! Am primit informațiile pentru pagina <strong>' + esc(c['Nume']) + '</strong> din Comunitatea CFCC. Un om din echipa noastră le verifică și vă contactează dacă mai avem nevoie de ceva. Când pagina e gata, v-o trimitem spre aprobare și o publicăm doar după ce ne dați ok.</p>' +
       '<p>Dacă vreți să schimbați ceva între timp, răspundeți la acest e-mail.</p>' +
       '<p>Cu drag,<br>Ana, de la Ce facem cu copiii?</p>';
   } else {
