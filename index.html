@@ -398,7 +398,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     <div class="sec-h">
       <span class="eyebrow">Comunitatea CFCC</span>
       <h2>Locurile și oamenii din spatele calendarului</h2>
-      <p>Fiecare are pagina lui, cu ce face, cum ajungi și ce evenimente are în calendar acum.</p>
+      <p>Fă cunoștință cu fiecare-n parte.</p>
     </div>
     <div id="org-grid"></div>
   </div>
@@ -999,14 +999,14 @@ function renderOrg(sl){
       ${btn(o.ig,"Instagram",false,"Organizator: Instagram")}
       ${btn(o.fb,"Facebook",false,"Organizator: Facebook")}
     </div>
-    <div class="org-sec"><h3>În calendar</h3>
+    <div class="org-sec"><h3>În calendar acum</h3>
       ${loadState==="loading"?'<div class="empty">Se încarcă evenimentele...</div>':ev.length?`<div class="mini">${ev.map(e=>{const d=dt(e.d);
         return `<a class="mini-ev" href="#${e.id}" style="text-decoration:none;color:inherit"><div><b>${esc(e.n)}</b><span>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></div><span class="x">Detalii</span></a>`}).join("")}</div>`
       :'<div class="empty">Momentan nu avem evenimente de aici în calendar. Revino curând.</div>'}
     </div>
     ${past.length?`<div class="org-sec"><h3>Au fost recent în calendar</h3><ul class="past">${past.map(e=>{const d=dt(e.d);return `<li><b>${esc(e.n)}</b><span>${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></li>`}).join("")}</ul></div>`:""}
     ${o.pro&&o.svc.length?`<div class="org-sec"><h3>Activități</h3><div class="acts">${o.svc.map(x=>`<div class="acts-i"><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:""}</div>`).join("")}</div></div>`:""}
-    ${o.pro&&o.foto.length?`<div class="org-sec"><h3>Galerie</h3><div class="gal">${o.foto.map(f=>`<img src="${esc(f.u)}" alt="${esc(f.alt)}" loading="lazy">`).join("")}</div></div>`:""}
+    ${o.pro&&o.foto.length?`<div class="org-sec"><div class="gal">${o.foto.map(f=>`<img src="${esc(f.u)}" alt="${esc(f.alt)}" loading="lazy">`).join("")}</div></div>`:""}
     ${o.pro&&o.art.length?`<div class="org-sec"><h3>Am scris despre ei</h3><div class="arts">${o.art.map(artCard).join("")}</div></div>`:""}
     <div class="org-sec"><h3>Informații</h3><dl class="org-info">
       ${o.ad?`<dt>Adresa</dt><dd>${esc(o.ad)}</dd>`:""}
