@@ -293,6 +293,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .fs+.fs{margin-top:14px}
 .fs legend{font:800 1.2rem var(--display);padding:0;margin-bottom:4px}
 .fs .note{margin:0}
+.tips{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.88rem;color:var(--muted)}
 .act-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
 @media (max-width:520px){.act-row{grid-template-columns:1fr auto}.act-row label:first-child{grid-column:1/-1}}
 .act-row .x{margin-bottom:8px}
@@ -433,14 +434,15 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
   <div class="wrap">
     <div class="sec-h">
       <span class="eyebrow">Comunitatea CFCC</span>
-      <h2>Pagina voastră pe Ce facem cu copiii?</h2>
-      <p>Completați aici tot ce vreți să apară pe pagina voastră. Noi citim totul, aranjăm textele dacă e nevoie și vă trimitem pagina spre aprobare înainte s-o publicăm.</p>
+      <h2>Hai să construim împreună pagina voastră pe platforma Ce facem cu copiii?</h2>
+      <p>Completați aici tot ce vreți să apară pe pagina voastră de prezentare.</p>
+      <p><strong>Ce se întâmplă după ce trimiteți formularul:</strong> un om (adevărat) verifică tot ce ați completat. Dacă mai avem nevoie de ceva, vă contactăm. Când pagina e gata, v-o trimitem spre aprobare și o publicăm doar după ce ne dați ok.</p>
     </div>
     <form id="form-pg" novalidate>
       <fieldset class="fs">
         <legend>Despre voi</legend>
-        <label for="pg-name">Numele afacerii sau al locului<input id="pg-name" required></label>
-        <label for="pg-tip">Ce sunteți, pe scurt<input id="pg-tip" required placeholder="ex. Creșă și grădiniță, Club de înot, Atelier de ceramică"></label>
+        <label for="pg-name">Numele brandului <small>(cum vă știe lumea, nu cum apare în Registrul Comerțului)</small><input id="pg-name" required></label>
+        <label for="pg-tip">Cum vă descrieți pe scurt<input id="pg-tip" required placeholder="ex. centru educațional, bibliotecă, comunitate, atelier"></label>
         <label for="pg-desc">Descriere<textarea id="pg-desc" required maxlength="900" placeholder="Ce faceți, pentru cine, ce vă face diferiți. 3-5 propoziții."></textarea><small class="cnt" data-for="pg-desc"></small></label>
         <label for="pg-age">Vârste<input id="pg-age" placeholder="ex. 18 luni - 6 ani"></label>
       </fieldset>
@@ -469,18 +471,24 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 
       <fieldset class="fs">
         <legend>Poze</legend>
-        <p class="note">JPG sau PNG. Le micșorăm automat, nu e nevoie să le pregătiți voi.</p>
-        <label for="pg-logo">Logo<input id="pg-logo" type="file" accept="image/*"></label>
+        <p class="note">Cu cât pozele sunt mai bune, cu atât pagina voastră de prezentare arată mai profesionist. Câteva sfaturi:</p>
+        <ul class="tips">
+          <li>Format JPG sau PNG, în calitatea cea mai bună pe care o aveți. Nu trimiteți capturi de ecran sau poze luate de pe Instagram, sunt prea mici.</li>
+          <li>Poze clare, luminoase, făcute la lumină naturală, fără text, logo sau filtre puse peste.</li>
+          <li>Arătați locul și activitățile reale: sala, curtea, copiii la lucru, oamenii din echipă.</li>
+          <li>Dacă în poze apar copii, trebuie să aveți acordul părinților pentru publicare.</li>
+        </ul>
+        <label for="pg-logo">Logo <small>(pătrat, cel puțin 500 × 500 px, ideal PNG cu fundal transparent)</small><input id="pg-logo" type="file" accept="image/*"></label>
         <div class="thumbs" id="th-logo"></div>
-        <label for="pg-cover">Poza principală (orizontală, apare sus pe pagină)<input id="pg-cover" type="file" accept="image/*"></label>
+        <label for="pg-cover">Poza principală <small>(apare sus pe pagină: orizontală, cel puțin 1600 px lățime, cea mai reprezentativă poză a voastră)</small><input id="pg-cover" type="file" accept="image/*"></label>
         <div class="thumbs" id="th-cover"></div>
-        <label for="pg-gal">Alte poze (cel mult 8)<input id="pg-gal" type="file" accept="image/*" multiple></label>
+        <label for="pg-gal">Alte poze <small>(cel mult 8, cel puțin 1200 px pe latura mare)</small><input id="pg-gal" type="file" accept="image/*" multiple></label>
         <div class="thumbs" id="th-gal"></div>
       </fieldset>
 
       <fieldset class="fs">
-        <legend>Cum apăreți în anunțuri</legend>
-        <label for="pg-names">Alte nume sub care apar evenimentele voastre<textarea id="pg-names" placeholder="ex. numele sălii, al festivalului sau prescurtări. Câte unul pe rând."></textarea></label>
+        <legend>Cum vă mai știe lumea</legend>
+        <label for="pg-names">Alte nume sub care apar evenimentele voastre <small>(dacă e cazul)</small><textarea id="pg-names" placeholder="ex. numele sălii, al festivalului sau prescurtări. Câte unul pe rând."></textarea></label>
       </fieldset>
 
       <fieldset class="fs">
@@ -491,6 +499,17 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
           <label for="pg-ctel">Telefon<input id="pg-ctel" type="tel" required></label>
           <label for="pg-cmail">E-mail<input id="pg-cmail" type="email" required></label>
         </div>
+      </fieldset>
+
+      <fieldset class="fs">
+        <legend>Datele firmei</legend>
+        <p class="note">Entitatea legală, ca în Registrul Comerțului sau în Registrul asociațiilor. Nu apar pe site, ne trebuie pentru contract și factură.</p>
+        <label for="pg-legal">Denumirea legală<input id="pg-legal" required placeholder="ex. Exemplu Kids S.R.L."></label>
+        <div class="fr">
+          <label for="pg-cui">CUI<input id="pg-cui" required placeholder="ex. RO12345678"></label>
+          <label for="pg-reg">Nr. de înregistrare<input id="pg-reg" required placeholder="ex. J35/1234/2020"></label>
+        </div>
+        <label for="pg-seat">Sediul social<input id="pg-seat" required placeholder="Strada, numărul, localitatea, județul"></label>
         <label for="pg-note">Altceva ce vreți să știm <small>(opțional)</small><textarea id="pg-note"></textarea></label>
       </fieldset>
 
@@ -1047,9 +1066,9 @@ document.getElementById("nl-form").addEventListener("submit",async ev=>{ev.preve
     ev.preventDefault();
     const err=$f("pg-err"),ok=$f("pg-ok-msg");
     if($f("pg-hp").value)return;
-    const req=["pg-name","pg-tip","pg-desc","pg-cname","pg-ctel","pg-cmail"];const miss=req.filter(id=>!val(id));
+    const req=["pg-name","pg-tip","pg-desc","pg-cname","pg-ctel","pg-cmail","pg-legal","pg-cui","pg-reg","pg-seat"];const miss=req.filter(id=>!val(id));
     const badMail=["pg-mail","pg-cmail"].find(id=>val(id)&&!/^\S+@\S+\.\S+$/.test(val(id)));
-    if(miss.length||badMail||!$f("pg-ok").checked){err.textContent=badMail?"Verificați adresa de e-mail.":miss.length?"Completați câmpurile obligatorii: nume, ce sunteți, descriere și persoana de contact.":"Bifați acordul de la final.";
+    if(miss.length||badMail||!$f("pg-ok").checked){err.textContent=badMail?"Verificați adresa de e-mail.":miss.length?"Completați câmpurile obligatorii: numele brandului, descrierea, persoana de contact și datele firmei.":"Bifați acordul de la final.";
       err.hidden=false;ok.hidden=true;(miss[0]?$f(miss[0]):badMail?$f(badMail):$f("pg-ok")).focus();return}
     const activ=[...acts.children].map(r=>[r.querySelector(".pa-t").value.trim(),r.querySelector(".pa-d").value.trim()]).filter(a=>a[0]).map(a=>a[1]?a[0]+" | "+a[1]:a[0]).join("\n");
     const strip=p=>({nume:p.nume,tip:p.tip,data:p.data});
@@ -1058,9 +1077,9 @@ document.getElementById("nl-form").addEventListener("submit",async ev=>{ev.preve
       await sendForm("pagina",{"Nume":val("pg-name"),"Ce sunt":val("pg-tip"),"Descriere":val("pg-desc"),"Vârste":val("pg-age"),"Adresă":val("pg-addr"),
         "Telefon public":val("pg-tel"),"E-mail public":val("pg-mail"),"Instagram":val("pg-ig"),"Facebook":val("pg-fb"),"Website":val("pg-web"),
         "Activități":activ,"Nume în calendar":val("pg-names"),"Persoană de contact":val("pg-cname"),"Telefon contact":val("pg-ctel"),"E-mail":val("pg-cmail"),
-        "Observații":val("pg-note"),"Acord publicare":"Da",
+        "Denumire legală":val("pg-legal"),"CUI":val("pg-cui"),"Nr. înregistrare":val("pg-reg"),"Sediu social":val("pg-seat"),"Observații":val("pg-note"),"Acord publicare":"Da",
         "_poze":{logo:POZE.logo.map(strip),cover:POZE.cover.map(strip),gal:POZE.gal.map(strip)}});
-      track("Formular pagină partener trimis");err.hidden=true;ok.textContent="Mulțumim! Am primit informațiile. Le verificăm și vă trimitem pagina spre aprobare înainte s-o publicăm.";ok.hidden=false;
+      track("Formular pagină partener trimis");err.hidden=true;ok.textContent="Mulțumim! Am primit informațiile. Un om din echipa noastră le verifică, vă contactează dacă mai e nevoie de ceva și vă trimite pagina spre aprobare înainte s-o publicăm.";ok.hidden=false;
       form.reset();POZE.logo=[];POZE.cover=[];POZE.gal=[];["logo","cover","gal"].forEach(showThumbs);acts.innerHTML="";addAct();addAct();upd();ok.scrollIntoView({block:"center"});
     }catch(_){err.textContent="Nu s-a putut trimite. Verificați internetul și încercați din nou.";err.hidden=false;ok.hidden=true}
     finally{btn.disabled=false;btn.textContent=lbl}
