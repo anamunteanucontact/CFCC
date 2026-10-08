@@ -379,17 +379,17 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
           <label for="pg-mail">E-mail pentru părinți<input id="pg-mail" type="email"></label>
         </div>
         <div class="fr">
-          <label for="pg-ig">Instagram<input id="pg-ig" placeholder="link sau @nume"></label>
-          <label for="pg-fb">Facebook<input id="pg-fb" placeholder="link"></label>
+          <label for="pg-ig">Instagram <small>(opțional)</small><input id="pg-ig" placeholder="link sau @nume"></label>
+          <label for="pg-fb">Facebook <small>(opțional)</small><input id="pg-fb" placeholder="link"></label>
         </div>
-        <label for="pg-web">Website<input id="pg-web" type="url" placeholder="https://"></label>
+        <label for="pg-web">Website <small>(opțional)</small><input id="pg-web" type="url" placeholder="https://"></label>
       </fieldset>
 
       <fieldset class="fs">
         <legend>Ce oferiți</legend>
         <p class="note">Câte un rând pentru fiecare program, curs sau activitate. Le afișăm în ordinea de aici.</p>
         <div id="pg-acts"></div>
-        <button class="btn btn-soft" type="button" id="pg-add">+ Încă o activitate</button>
+        <button class="btn btn-soft" type="button" id="pg-add">+ Adaugă încă o activitate sau tip de eveniment</button>
       </fieldset>
 
       <fieldset class="fs">
@@ -399,9 +399,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
           <li>Format JPG sau PNG, în calitatea cea mai bună pe care o aveți. Nu trimiteți capturi de ecran sau poze luate de pe Instagram, sunt prea mici.</li>
           <li>Poze clare, luminoase, făcute la lumină naturală, fără text, logo sau filtre puse peste.</li>
           <li>Arătați locul și activitățile reale: sala, curtea, copiii la lucru, oamenii din echipă.</li>
+          <li>Nu folosiți poze generate cu AI. Slăbesc credibilitatea brandului: părinții sunt oameni reali și vor să vadă fotografii reale.</li>
           <li>Dacă în poze apar copii, trebuie să aveți acordul părinților pentru publicare.</li>
         </ul>
-        <label for="pg-logo">Logo <small>(pătrat, cel puțin 500 × 500 px, ideal PNG cu fundal transparent)</small><input id="pg-logo" type="file" accept="image/*"></label>
+        <label for="pg-logo">Logo <small>(pătrat, cel puțin 500 × 500 px, ideal PNG cu fundal transparent. Dacă nu aveți un logo, lăsați liber și vă contactăm noi.)</small><input id="pg-logo" type="file" accept="image/*"></label>
         <div class="thumbs" id="th-logo"></div>
         <label for="pg-cover">Poza principală <small>(apare sus pe pagină: orizontală, cel puțin 1600 px lățime, cea mai reprezentativă poză a voastră)</small><input id="pg-cover" type="file" accept="image/*"></label>
         <div class="thumbs" id="th-cover"></div>
@@ -426,7 +427,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 
       <fieldset class="fs">
         <legend>Datele firmei</legend>
-        <p class="note">Entitatea legală, ca în Registrul Comerțului sau în Registrul asociațiilor. Nu apar pe site, ne trebuie pentru contract și factură.</p>
+        <p class="note">Entitatea legală, ca în Registrul Comerțului sau în Registrul asociațiilor. Nu apar pe site!</p>
         <label for="pg-legal">Denumirea legală<input id="pg-legal" required placeholder="ex. Exemplu Kids S.R.L."></label>
         <div class="fr">
           <label for="pg-cui">CUI<input id="pg-cui" required placeholder="ex. RO12345678"></label>
@@ -962,9 +963,10 @@ document.getElementById("nl-form").addEventListener("submit",async ev=>{ev.preve
 (()=>{
   const $f=id=>document.getElementById(id);
   const acts=$f("pg-acts");
-  const addAct=()=>{if(acts.children.length>=12)return;const n=acts.children.length+1;
+  const EX=[["Curs de înot pentru începători","4-7 ani, de 2 ori pe săptămână"],["Atelier de ceramică părinte-copil","3-10 ani, în fiecare sâmbătă"],["Petreceri aniversare","grupuri de până la 15 copii"],["Ora de povești","1-4 ani, joi dimineața"]];
+  const addAct=()=>{if(acts.children.length>=12)return;const ex=EX[acts.children.length%EX.length];
     const d=document.createElement("div");d.className="act-row";
-    d.innerHTML=`<label>Activitate<input class="pa-t" placeholder="ex. Curs de înot pentru începători"></label><label>Detalii<input class="pa-d" placeholder="ex. 4-7 ani, de 2 ori pe săptămână"></label><button type="button" class="x" aria-label="Șterge activitatea">Șterge</button>`;
+    d.innerHTML=`<label>Activitate<input class="pa-t" placeholder="ex. ${ex[0]}"></label><label>Detalii<input class="pa-d" placeholder="ex. ${ex[1]}"></label><button type="button" class="x" aria-label="Șterge activitatea">Șterge</button>`;
     d.querySelector(".x").addEventListener("click",()=>{d.remove();if(!acts.children.length)addAct()});acts.appendChild(d)};
   addAct();addAct();$f("pg-add").addEventListener("click",addAct);
   const cnt=document.querySelector('.cnt[data-for="pg-desc"]');const upd=()=>{cnt.textContent=$f("pg-desc").value.length+" / 900"};$f("pg-desc").addEventListener("input",upd);upd();
