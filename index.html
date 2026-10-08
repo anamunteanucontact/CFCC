@@ -850,7 +850,7 @@ function render(){
 document.getElementById("days").addEventListener("click",ev=>{const b=ev.target.closest("[data-day]");if(!b)return;state.day=b.dataset.day;state.dayPicked=!!b.dataset.empty;state.open=null;render()});
 
 /* statistici (Umami, fără cookie-uri): numără click-urile pe acțiunile fiecărui eveniment */
-function track(name,id,extra){try{if(!window.umami)return;const e=id&&BYID[id];const data=Object.assign(e?{eveniment:e.n,organizator:e.o||"",data:e.d,categorie:e.c}:{},extra||{});window.umami.track(name,data)}catch(_){}}
+function track(name,id,extra){try{if(!window.umami)return;const e=id&&BYID[id];const data=Object.assign(e?{eveniment:e.n,organizator:e.o||"",locatie:e.l||"",data:e.d,categorie:e.c}:{},extra||{});window.umami.track(name,data)}catch(_){}}
 document.addEventListener("click",ev=>{const a=ev.target.closest("[data-trk]");if(a)track(a.dataset.trk,a.dataset.trkId)},true);
 function toggleSave(id){
   saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];if(saved.includes(id))track("Salvează",id);
@@ -869,11 +869,11 @@ async function copyLink(id){
   try{await navigator.clipboard.writeText(t);toast("Link copiat")}catch(_){toast(t)}
 }
 document.addEventListener("click",ev=>{
-  const o=ev.target.closest("[data-open]");if(o){const id=o.dataset.open;state.open=state.open===id?null:id;render();return}
+  const o=ev.target.closest("[data-open]");if(o){const id=o.dataset.open;state.open=state.open===id?null:id;if(state.open)track("Detalii eveniment",id);render();return}
   const s=ev.target.closest("[data-save]");if(s){toggleSave(s.dataset.save);return}
   const sh=ev.target.closest("[data-share]");if(sh){share(sh.dataset.share);return}
   const c=ev.target.closest("[data-copy]");if(c){copyLink(c.dataset.copy);return}
-  const w=ev.target.closest("[data-went]");if(w){const id=w.dataset.went;went=went.includes(id)?went.filter(x=>x!==id):[...went,id];store.set("went",went);renderProfile();return}
+  const w=ev.target.closest("[data-went]");if(w){const id=w.dataset.went;went=went.includes(id)?went.filter(x=>x!==id):[...went,id];if(went.includes(id))track("Am fost",id);store.set("went",went);renderProfile();return}
   const u=ev.target.closest("[data-unsave]");if(u){toggleSave(u.dataset.unsave);return}
   const k=ev.target.closest("[data-kid]");if(k){kids.splice(+k.dataset.kid,1);store.set("kids",kids);renderProfile();return}
   const g=ev.target.closest("[data-goto]");if(g){go(g.dataset.goto,true);return}
