@@ -455,11 +455,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <p>Alege ce ai nevoie și completează formularul. Revenim noi cu răspuns.</p>
     </div>
     <div class="rules" id="f-type" role="group" aria-label="Ce vrei să ne trimiți">
-      <button class="rule" type="button" data-v="ev" aria-pressed="true"><span class="who">Evenimente cu dată</span><h3>Adaug un eveniment în calendar</h3><span class="note">Spectacole, ateliere, lansări, sesiuni demo. Listarea în calendar este și rămâne gratuită.</span><span class="pick">Completează formularul</span></button>
+      <button class="rule" type="button" data-v="ev" aria-pressed="false"><span class="who">Evenimente cu dată</span><h3>Adaug un eveniment în calendar</h3><span class="note">Spectacole, ateliere, lansări, sesiuni demo. Listarea în calendar este și rămâne gratuită.</span><span class="pick">Completează formularul</span></button>
       <button class="rule" type="button" data-v="pr" aria-pressed="false"><span class="who">Cursuri, cluburi, abonamente, branduri</span><h3>Vreau o colaborare de promovare</h3><span class="note">Postări dedicate, reels, articole pe site. După ce ne cunoaștem, revenim cu oferte și pachete personalizate.</span><span class="pick">Completează formularul</span></button>
     </div>
 
-    <form id="form-ev" novalidate>
+    <form id="form-ev" novalidate hidden>
       <label for="ev-name">Numele evenimentului<input id="ev-name" required></label>
       <label for="ev-org">Organizator<input id="ev-org" required></label>
       <div class="fr">
@@ -841,7 +841,7 @@ function render(){
     list.innerHTML=`<div class="dayhead"><h3>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}</h3></div>
     <div class="empty" style="display:flex;flex-direction:column;gap:12px;align-items:center">
       <span>${filt?"Nu am găsit evenimente pentru filtrele alese în ziua asta.":"Încă nu am găsit evenimente pentru copii în ziua asta."} Organizezi tu ceva? Scrie-ne și îl adăugăm în calendar.</span>
-      <a class="btn btn-main" href="#colaborari">Adaugă evenimentul tău</a></div>`;return}
+      <a class="btn btn-main" href="#adauga-eveniment">Adaugă evenimentul tău</a></div>`;return}
   list.innerHTML=`<div class="dayhead"><h3>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}</h3><span>${ev.length} ${ev.length===1?"activitate":"activități"}</span></div><div class="evs">${ev.map(evCard).join("")}</div>`;
 }
 document.getElementById("days").addEventListener("click",ev=>{const b=ev.target.closest("[data-day]");if(!b)return;state.day=b.dataset.day;state.dayPicked=!!b.dataset.empty;state.open=null;render()});
@@ -890,10 +890,12 @@ document.getElementById("rec-grid").innerHTML=RUBRICI.map(r=>`<article class="re
 </article>`).join("");
 
 /* formulare colaborari */
-document.getElementById("f-type").addEventListener("click",ev=>{const b=ev.target.closest(".rule");if(!b)return;const v=b.dataset.v;
-  document.querySelectorAll("#f-type .rule").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));
+function openForm(v,scroll){
+  document.querySelectorAll("#f-type .rule").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===v?"true":"false"));
   document.getElementById("form-ev").hidden=v!=="ev";document.getElementById("form-pr").hidden=v!=="pr";
-  document.getElementById(v==="ev"?"form-ev":"form-pr").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})});
+  if(v&&scroll)setTimeout(()=>document.getElementById(v==="ev"?"form-ev":"form-pr").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}),60);
+}
+document.getElementById("f-type").addEventListener("click",ev=>{const b=ev.target.closest(".rule");if(!b)return;openForm(b.dataset.v,true)});
 async function sendForm(tip,campuri){
   await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({tip,campuri})});
 }
@@ -1027,6 +1029,8 @@ function route(){
   const h=location.hash.slice(1);
   if(h==="formular-partener"){go("formular",true);return}
   if(BYID[h]){state.per="all";document.querySelectorAll("#f-per .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v==="all"?"true":"false"));state.open=h;state.day=BYID[h].d;go("calendar");render();setTimeout(()=>document.getElementById(h)?.scrollIntoView({block:"center"}),50);return}
+  if(h==="adauga-eveniment"||h==="colaborare-promovare"){go("colaborari",true);openForm(h==="adauga-eveniment"?"ev":"pr",true);return}
+  if(h==="colaborari")openForm(null);
   go(VIEWS.includes(h)?h:"calendar",true);
 }
 window.addEventListener("hashchange",route);
