@@ -15,6 +15,7 @@
  */
 
 const NUME_EXPEDITOR = 'Ce facem cu copiii?';
+const EMAIL_EXPEDITOR = 'hello@cefacemcucopiii.ro'; // expeditor verificat în Brevo
 const SITE = 'https://cefacemcucopiii.ro';
 const INSTAGRAM = 'https://www.instagram.com/cefacemcucopiii/';
 const CONTACTE_ID = '1ydRGLLcpV0bGP07bckIoAZ4k2Z6llGmozHPJTVbSF38';
@@ -165,7 +166,30 @@ function trimite_confirmare(tip, c) {
   } else {
     return;
   }
-  MailApp.sendEmail({ to: catre, subject: subiect, htmlBody: continut, name: NUME_EXPEDITOR });
+  trimite_email(catre, subiect, continut);
+}
+
+/* Trimite prin Brevo, de pe hello@cefacemcucopiii.ro.
+   Cheia stă în Project Settings → Script Properties → BREVO_API_KEY (nu în cod).
+   Dacă lipsește cheia sau Brevo dă eroare, trimite ca înainte, din Gmail. */
+function trimite_email(catre, subiect, html) {
+  const cheie = PropertiesService.getScriptProperties().getProperty('BREVO_API_KEY');
+  if (cheie) {
+    try {
+      const r = UrlFetchApp.fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+        headers: { 'api-key': cheie, accept: 'application/json' },
+        payload: JSON.stringify({
+          sender: { name: NUME_EXPEDITOR, email: EMAIL_EXPEDITOR },
+          replyTo: { name: NUME_EXPEDITOR, email: EMAIL_EXPEDITOR },
+          to: [{ email: catre }], subject: subiect, htmlContent: html
+        })
+      });
+      if (r.getResponseCode() < 300) return;
+      console.warn('Brevo ' + r.getResponseCode() + ': ' + r.getContentText());
+    } catch (err) { console.warn('Brevo: ' + err); }
+  }
+  MailApp.sendEmail({ to: catre, subject: subiect, htmlBody: html, name: NUME_EXPEDITOR, replyTo: EMAIL_EXPEDITOR });
 }
 
 function esc(s) {
