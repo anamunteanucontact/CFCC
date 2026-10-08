@@ -242,8 +242,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
 
 /* pagini organizatori */
-.orgs-link{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:22px;padding:14px 16px;border-radius:16px;background:var(--surface);border:2px dashed var(--line);text-decoration:none;font-weight:600;font-size:.92rem}
-.orgs-link b{color:var(--accent);white-space:nowrap}
+.grp{font-size:1.25rem;font-weight:800;margin:6px 0 12px}
+.org-grid+.grp{margin-top:28px}
 .org-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 @media (max-width:620px){.org-grid{grid-template-columns:1fr}}
 .org-card{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:14px;text-decoration:none;color:var(--fg)}
@@ -281,6 +281,14 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .arts{display:flex;flex-direction:column;gap:10px}
 .art{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-radius:14px;background:var(--surface);text-decoration:none;color:var(--fg);border:2px solid var(--line)}
 .art b{font-size:1rem;line-height:1.3}
+.art img{width:100%;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin-bottom:6px}
+.art-rez{font-size:.88rem;color:var(--muted)}
+.art-body{max-width:65ch;display:flex;flex-direction:column;gap:12px}
+.art-body h2{font-size:clamp(1.7rem,5vw,2.3rem);font-weight:800}
+.art-body p{margin:0}
+.art-lead{font-size:1.1rem;color:var(--muted)}
+.rec-arts{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.rec-arts a{font-weight:700;font-size:.92rem;color:var(--accent)}
 .past{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .past li{display:flex;flex-direction:column;gap:2px;padding:10px 2px;border-top:1px solid var(--line)}
 .past li:first-child{border-top:0}
@@ -345,7 +353,6 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       </div>
       <div class="days" id="days" role="tablist" aria-label="Alege ziua"></div>
       <div id="list"></div>
-      <a class="orgs-link" href="#organizatori"><span>Teatre, muzee și alte locuri pentru copii din oraș, fiecare cu pagina lui</span><b>Vezi toate</b></a>
     </div>
   </section>
 </div>
@@ -385,16 +392,21 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
   </div>
 </section>
 
-<!-- ORGANIZATORI -->
-<section id="v-organizatori" class="view vwrap" hidden>
+<!-- COMUNITATEA CFCC -->
+<section id="v-comunitate" class="view vwrap" hidden>
   <div class="wrap">
     <div class="sec-h">
-      <span class="eyebrow">Locuri și organizatori</span>
-      <h2>Unde mergem cu copiii în oraș</h2>
-      <p>Fiecare loc are pagina lui, cu ce oferă, cum ajungi și ce evenimente are în calendar acum.</p>
+      <span class="eyebrow">Comunitatea CFCC</span>
+      <h2>Locurile și oamenii din spatele calendarului</h2>
+      <p>Fiecare are pagina lui, cu ce face, cum ajungi și ce evenimente are în calendar acum.</p>
     </div>
-    <div class="org-grid" id="org-grid"></div>
+    <div id="org-grid"></div>
   </div>
+</section>
+
+<!-- ARTICOL -->
+<section id="v-articol" class="view vwrap" hidden>
+  <div class="wrap" id="art-page"></div>
 </section>
 
 <!-- PAGINA ORGANIZATOR -->
@@ -574,7 +586,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 
 <footer>
   <div class="wrap">
-    <span>Ce facem cu copiii? · Timișoara · <a href="#confidentialitate">Confidențialitate</a> · <a href="#" id="cookie-settings">Cookie-uri</a></span>
+    <span>Ce facem cu copiii? · Timișoara · <a href="#comunitate">Comunitatea CFCC</a> · <a href="#confidentialitate">Confidențialitate</a> · <a href="#" id="cookie-settings">Cookie-uri</a></span>
     <span>cefacemcucopiii.ro · <a href="https://www.instagram.com/cefacemcucopiii/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.facebook.com/share/1Dk1phx9mW/" target="_blank" rel="noopener">Facebook</a></span>
   </div>
 </footer>
@@ -651,14 +663,13 @@ const ACC_LBL={G:"Gratuit",I:"Cu înscriere",B:"Cu bilet",D:"Donație"};
 const PART_LBL={B:"Bilete",I:"Înscriere",G:"Participare"};
 const accKey=e=>e.acc==="D"?"G":e.acc;
 
-// Rubricile din Recomandări (articolele se adaugă în ARTICOLE când sunt gata)
+// Rubricile din Recomandări (articolele vin din fila Articole a sheet-ului Comunitatea CFCC)
 const RUBRICI=[
  {t:"Unde mergem",d:"Locuri din oraș testate cu copiii.",c:"#EE6C4D",ic:"pin",sub:["Locații baby friendly","Restaurante și cafenele","Locuri de joacă","Grădinițe și creșe"]},
  {t:"Am fost, ne-a plăcut",d:"Spectacole, ateliere și ieșiri la care am fost noi.",c:"#F4B942",ic:"heart",sub:["Recomandări personale"]},
  {t:"Ghiduri pentru părinți",d:"Ce e bine de știut înainte să ieșiți din casă.",c:"#7fb7a4",ic:"book",sub:["Cum ne purtăm la teatru, operă, filarmonică, expoziții","Etape de creștere","De ce nu stă copilul pe scaun la teatru"]},
  {t:"De vorbă cu...",d:"Oamenii din spatele locurilor și al poveștilor.",c:"#1F4E5F",ic:"chat",sub:["Psihologul","Oameni din oraș","Părinți care povestesc"]}
 ];
-const ARTICOLE=[]; // {titlu, rubrica, poza, video, text}
 
 const TODAY=(()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate());})();
 const ZILE=["Duminică","Luni","Marți","Miercuri","Joi","Vineri","Sâmbătă"];
@@ -839,11 +850,7 @@ const RIC={
  book:'<path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5V19c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5z"/><path d="M12 6v13.5"/>',
  chat:'<path d="M5 5h14v10H10l-4 3.5V15H5z"/><path d="M9 9.5h6M9 12h4"/>'
 };
-document.getElementById("rec-grid").innerHTML=RUBRICI.map(r=>`<article class="rec">
-  <div class="rec-top"><span class="ic" style="background:${r.c}"><svg viewBox="0 0 24 24" fill="none" stroke="${r.c==="#1F4E5F"?"#FFF8F0":"#1F4E5F"}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${RIC[r.ic]}</svg></span><span class="soon">În curând</span></div>
-  <h3>${esc(r.t)}</h3><p>${esc(r.d)}</p>
-  <ul>${r.sub.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
-</article>`).join("");
+
 
 /* formulare colaborari */
 document.getElementById("f-type").addEventListener("click",ev=>{const b=ev.target.closest(".rule");if(!b)return;const v=b.dataset.v;
@@ -915,35 +922,44 @@ document.getElementById("nl-form").addEventListener("submit",async ev=>{ev.preve
   try{await sendForm("abonare",{"E-mail":m,"Vrea oferte de la parteneri":document.getElementById("nl-offers").checked?"Da":"Nu"});const offers=document.getElementById("nl-offers").checked;sub={email:m,offers};store.set("sub",sub);track("Abonare newsletter",null,{oferte:offers?"da":"nu"});pixel("Lead",{content_name:"Abonare newsletter"});ok.textContent="Gata, te-am notat!";ok.hidden=false;ev.target.reset();renderSub()}
   catch(_){toast("Nu s-a putut trimite. Încearcă din nou.")}finally{btn.disabled=false}});
 
-/* pagini organizatori: fila „Profiluri” din centralizator (publicată ca CSV); dacă nu e publicată încă, se folosește profiluri.csv din site */
-const PROF_CSV_URL=CSV_URL.replace("gid=900001","gid=900002");
-let ORGS=[],ORG_BY={},orgState="loading";
+/* Comunitatea CFCC: paginile partenerilor și articolele vin din sheet-ul „Comunitatea CFCC - pagini parteneri”, publicat pe web.
+   COM_PUB = linkul de publicare (…/pub), fără parametri. Cât e gol, site-ul folosește comunitate.json din site. */
+const COM_PUB="";
+const COM_TABS={parteneri:0,activitati:1001,galerie:1002,articole:1003};
+let ORGS=[],ORG_BY={},ARTS=[],ART_BY={},orgState="loading";
 const norm=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
 /* imagini: link https sau fișier din site (ex. assets/logos/merlin.png) */
 const imgUrl=u=>{u=(u||"").trim();return /^[\w\-./]+\.(png|jpe?g|webp|svg)$/i.test(u)&&!u.includes("..")?u:cleanUrl(u)};
-function toOrgs(rows){
-  return rows.slice(1).map(r=>{const g=i=>(r[i]||"").trim();
-    const lines=i=>g(i).split(/\n+/).map(x=>x.trim()).filter(Boolean);
-    return {slug:slug(g(0)||g(1)),n:g(1),tip:g(2),desc:g(3),age:g(4),ad:g(5),web:cleanUrl(g(6)),bil:cleanUrl(g(7)),ig:cleanUrl(g(8)),fb:cleanUrl(g(9)),tel:g(10),mail:g(11),
-      svc:lines(12).map(x=>{const[t,d,l]=x.split("|").map(y=>(y||"").trim());return{t,d,l:cleanUrl(l)}}).filter(x=>x.t),
-      keys:[g(1),...lines(13)].map(norm).filter(Boolean),pro:/pro/i.test(g(14)),logo:imgUrl(g(15)),foto:lines(16).map(imgUrl).filter(Boolean),on:!/^nu/i.test(g(17)),
-      art:lines(18).map(x=>{const[t,l]=x.split("|").map(y=>(y||"").trim());return{t,l:/^#[\w\-/]+$/.test(l||"")?l:cleanUrl(l)}}).filter(x=>x.t)}})
-    .filter(o=>o.n&&o.on);
+const da=v=>/^da/i.test((v||"").trim());
+function buildCom(t){
+  const rows=k=>(t[k]||[]).slice(1).map(r=>{const g=i=>(r[i]||"").trim();return g});
+  ARTS=rows("articole").filter(g=>g(1)&&da(g(8))).map(g=>({id:slug(g(0)||g(1)),t:g(1),rub:g(2),data:g(3),rez:g(4),text:g(5),poza:imgUrl(g(6)),
+    parts:g(7).split(/[,\n]+/).map(x=>slug(x)).filter(Boolean)}));
+  ART_BY=Object.fromEntries(ARTS.map(a=>[a.id,a]));
+  const acts=rows("activitati"),gal=rows("galerie");
+  ORGS=rows("parteneri").filter(g=>g(1)&&da(g(4))).map(g=>{const id=slug(g(0)||g(1));
+    return {slug:id,n:g(1),tip:g(2),pro:/^partener/i.test(g(3)),desc:g(5),age:g(6),ad:g(7),tel:g(8),mail:g(9),ig:cleanUrl(g(10)),fb:cleanUrl(g(11)),web:cleanUrl(g(12)),
+      logo:imgUrl(g(13)),cover:imgUrl(g(14)),keys:[g(1),...g(15).split(/\n+/)].map(norm).filter(Boolean),
+      svc:acts.filter(a=>slug(a(0))===id&&a(1)).map(a=>({t:a(1),d:a(2)})),
+      foto:gal.filter(a=>slug(a(0))===id).map(a=>({u:imgUrl(a(1)),alt:a(2)})).filter(x=>x.u),
+      art:ARTS.filter(a=>a.parts.includes(id))}});
+  ORG_BY=Object.fromEntries(ORGS.map(o=>[o.slug,o]));ORG_CACHE={};orgState="ok";
 }
-async function loadOrgs(){
-  for(const u of [PROF_CSV_URL+"&t="+Math.floor(Date.now()/60000),"profiluri.csv?t="+Math.floor(Date.now()/3600000)]){
-    try{const r=await fetch(u,{cache:"no-store"});if(!r.ok)continue;const t=await r.text();if(/^\s*</.test(t))continue;
-      ORGS=toOrgs(parseCSV(t));ORG_BY=Object.fromEntries(ORGS.map(o=>[o.slug,o]));orgState="ok";ORG_CACHE={};return}catch(_){}
-  }
+async function loadCom(){
+  if(COM_PUB){try{const t={},v=Math.floor(Date.now()/60000);
+    await Promise.all(Object.entries(COM_TABS).map(async([k,gid])=>{const r=await fetch(`${COM_PUB}?gid=${gid}&single=true&output=csv&t=${v}`,{cache:"no-store"});
+      if(!r.ok)throw new Error(r.status);const x=await r.text();if(/^\s*</.test(x))throw new Error("html");t[k]=parseCSV(x)}));
+    buildCom(t);return}catch(_){}}
+  try{const r=await fetch("comunitate.json?t="+Math.floor(Date.now()/3600000),{cache:"no-store"});if(!r.ok)throw 0;buildCom(await r.json());return}catch(_){}
   orgState="error";
 }
-/* un eveniment aparține unui loc dacă organizatorul sau locația lui se potrivesc cu unul din numele din coloana „Nume în calendar” */
+/* un eveniment aparține unui partener dacă organizatorul sau locația („Unde”) se potrivesc cu unul din numele din coloana „Nume în calendar” */
 let ORG_CACHE={};
 function keyMatch(v,k){return v===k||(k.length>=8&&(" "+v+" ").includes(" "+k+" "))}
 function orgByName(v){v=norm(v);if(!v)return null;if(v in ORG_CACHE)return ORG_CACHE[v];return ORG_CACHE[v]=ORGS.find(x=>x.keys.some(k=>keyMatch(v,k)))||null}
 const orgFor=e=>orgByName(e.o)||orgByName(e.l);
-const orgLink=(v)=>{const g=orgByName(v);return g?`<a href="#org/${g.slug}">${esc(v)}</a>`:esc(v)};
-const orgEvents=o=>EV.filter(e=>e.d>=iso(TODAY)&&orgFor(e)===o).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
+const orgLink=(v)=>{const g=orgByName(v);return g?`<a href="#comunitate/${g.slug}">${esc(v)}</a>`:esc(v)};
+const orgEvents=o=>EV.filter(e=>e.d>=iso(TODAY)&&(orgByName(e.o)===o||orgByName(e.l)===o)).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
 const MONO_C=["#1F4E5F","#EE6C4D","#2f7d5b","#7a5c9e","#c2851b","#3b6ea5"];
 function mono(o,lg){
   if(o.logo)return `<span class="mono${lg?" lg":""}" style="background:#fff"><img src="${esc(o.logo)}" alt="" loading="lazy"></span>`;
@@ -951,32 +967,35 @@ function mono(o,lg){
   const w=o.n.replace(/^((teatrul|muzeul|casa|pentru|copii|și|si|tineret|de|stat|a|al)\s+)+/i,"");
   return `<span class="mono${lg?" lg":""}" style="background:${MONO_C[h%MONO_C.length]}" aria-hidden="true">${esc(w.charAt(0).toUpperCase())}</span>`;
 }
+function orgCard(o){const n=loadState==="ok"?orgEvents(o).length:0;
+  return `<a class="org-card" href="#comunitate/${o.slug}">${mono(o)}<div><h3>${esc(o.n)}</h3><span>${esc(o.tip)}${n?` · ${n} ${n===1?"eveniment":"evenimente"} în calendar`:""}</span></div></a>`}
 function renderOrgs(){
   const el=document.getElementById("org-grid");
-  if(orgState!=="ok"){el.innerHTML=`<div class="empty" style="grid-column:1/-1">${orgState==="loading"?"Se încarcă...":"Lista nu s-a putut încărca. Reîncarcă pagina."}</div>`;return}
-  const sorted=[...ORGS].sort((a,b)=>(b.pro-a.pro)||a.n.localeCompare(b.n,"ro"));
-  el.innerHTML=sorted.map(o=>{const n=loadState==="ok"?orgEvents(o).length:0;
-    return `<a class="org-card" href="#org/${o.slug}">${mono(o)}<div><h3>${esc(o.n)}</h3><span>${esc(o.tip)}${n?` · ${n} ${n===1?"eveniment":"evenimente"} în calendar`:""}</span></div></a>`}).join("");
+  if(orgState!=="ok"){el.innerHTML=`<div class="empty">${orgState==="loading"?"Se încarcă...":"Lista nu s-a putut încărca. Reîncarcă pagina."}</div>`;return}
+  const by=(a,b)=>a.n.localeCompare(b.n,"ro"),pro=ORGS.filter(o=>o.pro).sort(by),inst=ORGS.filter(o=>!o.pro).sort(by);
+  el.innerHTML=(pro.length?`<h3 class="grp">Parteneri</h3><div class="org-grid">${pro.map(orgCard).join("")}</div>`:"")
+    +(inst.length?`<h3 class="grp">Instituții și locuri din oraș</h3><div class="org-grid">${inst.map(orgCard).join("")}</div>`:"");
 }
 function mapUrl(o){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(o.ad.replace(/^Intrarea publică:\s*/i,"")+", Timișoara")}
+const artCard=a=>`<a class="art" href="#articol/${a.id}">${a.poza?`<img src="${esc(a.poza)}" alt="" loading="lazy">`:""}<span class="eyebrow">${esc(a.rub||"Recomandările noastre")}</span><b>${esc(a.t)}</b>${a.rez?`<span class="art-rez">${esc(a.rez)}</span>`:""}</a>`;
 function renderOrg(sl){
   const el=document.getElementById("org-page");
-  const back='<a class="back" href="#organizatori">← Toate locurile</a>';
+  const back='<a class="back" href="#comunitate">← Comunitatea CFCC</a>';
   if(orgState==="loading"){el.innerHTML=back+'<div class="empty">Se încarcă...</div>';return}
   const o=ORG_BY[sl];
   if(!o){el.innerHTML=back+'<div class="empty">Nu am găsit pagina asta.</div>';return}
   document.title=o.n+" | Ce facem cu copiii?";
   const ev=loadState==="ok"?orgEvents(o):[];
-  const past=loadState==="ok"?EV.filter(e=>e.d<iso(TODAY)&&orgFor(e)===o).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,6):[];
+  const past=loadState==="ok"?EV.filter(e=>e.d<iso(TODAY)&&(orgByName(e.o)===o||orgByName(e.l)===o)).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,6):[];
   const btn=(href,lbl,main,trk)=>href?`<a class="btn ${main?"btn-main":"btn-soft"}" href="${esc(href)}"${/^https?:/.test(href)?' target="_blank" rel="noopener"':""} data-trk="${trk}" data-trk-org="${esc(o.n)}">${lbl}</a>`:"";
   el.innerHTML=`${back}
     <div class="org-head">${mono(o,true)}<div><span class="eyebrow">${esc(o.tip)}</span><h2>${esc(o.n)}</h2>
       <div class="tags">${o.age?`<span class="tag age">${esc(o.age)}</span>`:""}${o.pro?'<span class="tag saved">Partener</span>':""}</div></div></div>
-    ${o.pro&&o.foto.length?`<img class="org-photo" src="${esc(o.foto[0])}" alt="" loading="lazy">`:""}
+    ${o.pro&&o.cover?`<img class="org-photo" src="${esc(o.cover)}" alt="" loading="lazy">`:""}
     ${o.desc?`<p class="org-desc">${esc(o.desc)}</p>`:""}
     <div class="org-acts">
-      ${o.pro?btn(o.web,"Site",false,"Organizator: site"):""}
       ${btn(o.ad?mapUrl(o):"","Hartă",true,"Organizator: hartă")}
+      ${o.pro?btn(o.web,"Site",false,"Organizator: site"):""}
       ${btn(o.ig,"Instagram",false,"Organizator: Instagram")}
       ${btn(o.fb,"Facebook",false,"Organizator: Facebook")}
     </div>
@@ -987,8 +1006,8 @@ function renderOrg(sl){
     </div>
     ${past.length?`<div class="org-sec"><h3>Au fost recent în calendar</h3><ul class="past">${past.map(e=>{const d=dt(e.d);return `<li><b>${esc(e.n)}</b><span>${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></li>`}).join("")}</ul></div>`:""}
     ${o.pro&&o.svc.length?`<div class="org-sec"><h3>Activități</h3><div class="acts">${o.svc.map(x=>`<div class="acts-i"><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:""}</div>`).join("")}</div></div>`:""}
-    ${o.pro&&o.foto.length>1?`<div class="org-sec"><h3>Galerie</h3><div class="gal">${o.foto.slice(1).map(f=>`<img src="${esc(f)}" alt="" loading="lazy">`).join("")}</div></div>`:""}
-    ${o.pro&&o.art.length?`<div class="org-sec"><h3>Am scris despre ei</h3><div class="arts">${o.art.map(a=>`<a class="art" href="${esc(a.l||"#recomandari")}"${/^https?:/.test(a.l)?' target="_blank" rel="noopener"':""}><span class="eyebrow">Recomandările noastre</span><b>${esc(a.t)}</b></a>`).join("")}</div></div>`:""}
+    ${o.pro&&o.foto.length?`<div class="org-sec"><h3>Galerie</h3><div class="gal">${o.foto.map(f=>`<img src="${esc(f.u)}" alt="${esc(f.alt)}" loading="lazy">`).join("")}</div></div>`:""}
+    ${o.pro&&o.art.length?`<div class="org-sec"><h3>Am scris despre ei</h3><div class="arts">${o.art.map(artCard).join("")}</div></div>`:""}
     <div class="org-sec"><h3>Informații</h3><dl class="org-info">
       ${o.ad?`<dt>Adresa</dt><dd>${esc(o.ad)}</dd>`:""}
       ${o.tel?`<dt>Telefon</dt><dd><a href="tel:${esc(o.tel.replace(/[^\d+]/g,""))}">${esc(o.tel)}</a></dd>`:""}
@@ -997,20 +1016,45 @@ function renderOrg(sl){
     </dl>${o.pro?"":`<p class="note">Informațiile sunt adunate din surse publice.</p>`}</div>`;
   track("Pagina organizator",null,{organizator:o.n});
 }
+function renderArt(id){
+  const el=document.getElementById("art-page");
+  const back='<a class="back" href="#recomandari">← Recomandările noastre</a>';
+  if(orgState==="loading"){el.innerHTML=back+'<div class="empty">Se încarcă...</div>';return}
+  const a=ART_BY[id];
+  if(!a){el.innerHTML=back+'<div class="empty">Nu am găsit articolul.</div>';return}
+  document.title=a.t+" | Ce facem cu copiii?";
+  const ps=a.parts.map(p=>ORG_BY[p]).filter(Boolean);
+  el.innerHTML=`${back}<article class="art-body"><span class="eyebrow">${esc(a.rub||"Recomandările noastre")}${a.data?" · "+esc(a.data):""}</span><h2>${esc(a.t)}</h2>
+    ${a.rez?`<p class="art-lead">${esc(a.rez)}</p>`:""}${a.poza?`<img class="org-photo" src="${esc(a.poza)}" alt="" loading="lazy">`:""}
+    ${a.text.split(/\n\s*\n/).map(p=>p.trim()).filter(Boolean).map(p=>`<p>${esc(p).replace(/\n/g,"<br>")}</p>`).join("")}
+    ${ps.length?`<div class="org-sec"><h3>Despre cine am scris</h3><div class="org-grid">${ps.map(orgCard).join("")}</div></div>`:""}</article>`;
+  track("Articol",null,{articol:a.t});
+}
+function renderRec(){
+  document.getElementById("rec-grid").innerHTML=RUBRICI.map(r=>{const arts=ARTS.filter(a=>norm(a.rub)===norm(r.t));
+    return `<article class="rec">
+  <div class="rec-top"><span class="ic" style="background:${r.c}"><svg viewBox="0 0 24 24" fill="none" stroke="${r.c==="#1F4E5F"?"#FFF8F0":"#1F4E5F"}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${RIC[r.ic]}</svg></span>${arts.length?"":'<span class="soon">În curând</span>'}</div>
+  <h3>${esc(r.t)}</h3><p>${esc(r.d)}</p>
+  ${arts.length?`<div class="rec-arts">${arts.map(a=>`<a href="#articol/${a.id}">${esc(a.t)}</a>`).join("")}</div>`:`<ul>${r.sub.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`}
+</article>`}).join("");
+}
 
 /* navigare */
-const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate","organizatori","org"];
+const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate","comunitate","org","articol"];
 function go(v,scroll){
   VIEWS.forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
-  document.querySelectorAll(".nav ul a,.tabbar a").forEach(a=>{if(a.dataset.view===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  const nv=v==="articol"?"recomandari":v;
+  document.querySelectorAll(".nav ul a,.tabbar a").forEach(a=>{if(a.dataset.view===nv)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
   if(scroll)window.scrollTo(0,0);
 }
 const BASE_TITLE=document.title;
 function route(){
   const h=location.hash.slice(1);
   document.title=BASE_TITLE;
-  if(h.startsWith("org/")){renderOrg(decodeURIComponent(h.slice(4)));go("org",true);return}
-  if(h==="organizatori"){renderOrgs();go("organizatori",true);return}
+  const m=h.match(/^(?:comunitate|org)\/(.+)$/);
+  if(m){renderOrg(decodeURIComponent(m[1]));go("org",true);return}
+  if(h==="comunitate"||h==="organizatori"){renderOrgs();go("comunitate",true);return}
+  if(h.startsWith("articol/")){renderArt(decodeURIComponent(h.slice(8)));go("articol",true);return}
   if(BYID[h]){state.per="all";document.querySelectorAll("#f-per .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v==="all"?"true":"false"));state.open=h;state.day=BYID[h].d;go("calendar");render();setTimeout(()=>document.getElementById(h)?.scrollIntoView({block:"center"}),50);return}
   go(VIEWS.includes(h)?h:"calendar",true);
 }
@@ -1116,8 +1160,10 @@ function pixel(ev,params){try{if(pixelOn&&window.fbq)fbq("track",ev,params||{})}
   if(ce)window.__cePending=ce;
 })();
 render();renderProfile();route();
-loadOrgs().then(()=>{const h=location.hash.slice(1);if(h==="organizatori"||h.startsWith("org/"))route();if(loadState==="ok")render()});
-loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();const h=location.hash.slice(1);if(BYID[h]||h==="organizatori"||h.startsWith("org/"))route()});
+renderRec();
+const comRoute=h=>/^(comunitate|organizatori|org\/|articol\/)/.test(h);
+loadCom().then(()=>{renderRec();if(comRoute(location.hash.slice(1)))route();if(loadState==="ok")render()});
+loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();const h=location.hash.slice(1);if(BYID[h]||comRoute(h))route()});
 </script>
 </body>
 </html>
