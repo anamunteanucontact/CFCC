@@ -4,6 +4,8 @@
  * 1. Primește formularele de pe site:
  *    - propunerile de evenimente -> fila „Propuneri evenimente” din acest sheet
  *    - abonările și colaborările -> sheet-ul separat „Contacte”
+ *    - formularul pentru parteneri (cefacemcucopiii.ro/#formular-partener) -> fila „Pagini parteneri - de verificat”
+ *      din „Contacte”, cu roșu, ca să le verifice un om; pozele lor se salvează în Drive, în folderul „CFCC - poze parteneri”
  *    și trimite un e-mail de confirmare celui care a completat.
  * 2. Când schimbi statusul unei propuneri în „Pregătit pentru calendar”,
  *    o mută singur în fila „Evenimente”, la ziua și ora ei, cu status „De verificat”.
@@ -30,8 +32,17 @@ const FILE = {
   abonare: {
     nume: 'Abonați', fisier: 'contacte',
     coloane: [['Primit la'], ['E-mail'], ['Vrea oferte speciale', 'Vrea oferte de la parteneri'], ['Note']]
+  },
+  pagina: {
+    nume: 'Pagini parteneri - de verificat', fisier: 'contacte', status: 'De verificat', rosu: true, lungime: 5000,
+    coloane: [['Primit la'], ['Status'], ['Nume'], ['Cum se descriu', 'Ce sunt'], ['Descriere'], ['Vârste'], ['Adresă'],
+      ['Telefon public'], ['E-mail public'], ['Instagram'], ['Facebook'], ['Website'], ['Activități'], ['Nume în calendar'],
+      ['Logo'], ['Poza principală'], ['Alte poze'], ['Folder poze'], ['Persoană de contact'], ['Telefon contact'], ['E-mail'],
+      ['Denumire legală'], ['CUI'], ['Nr. înregistrare'], ['Sediu social'], ['Observații'], ['Acord publicare'], ['Note']]
   }
 };
+
+const FOLDER_POZE = 'CFCC - poze parteneri';
 
 /* ---------- 1. formularele de pe site ---------- */
 
@@ -41,18 +52,23 @@ function doPost(e) {
     const tip = FILE[date.tip];
     if (!tip) return raspuns({ ok: false, eroare: 'tip necunoscut' });
     const campuri = date.campuri || {};
+    if (date.tip === 'pagina') salveaza_poze(campuri);
 
     const fila = ia_fila(tip);
     const rand = tip.coloane.map(function (c) {
       const titlu = c[0], cheie = c[1] || c[0];
       if (titlu === 'Primit la') return new Date();
-      if (titlu === 'Status') return 'Nou';
+      if (titlu === 'Status') return tip.status || 'Nou';
       const v = campuri[cheie];
       if (v === undefined || v === null || v === '') return '';
       // apostroful păstrează textul exact cum a fost scris (telefoane cu 0 în față, date, ore)
-      return "'" + String(v).slice(0, 2000);
+      return "'" + String(v).slice(0, tip.lungime || 2000);
     });
     fila.appendRow(rand);
+    if (tip.rosu) {
+      fila.getRange(fila.getLastRow(), 1, 1, tip.coloane.length)
+        .setBackground('#f4c7c3').setFontColor('#9c0006').setWrap(true).setVerticalAlignment('top');
+    }
 
     try { trimite_confirmare(date.tip, campuri); } catch (errMail) { /* rândul e salvat oricum */ }
     return raspuns({ ok: true });
@@ -69,8 +85,36 @@ function ia_fila(tip) {
     fila.appendRow(tip.coloane.map(function (c) { return c[0]; }));
     fila.setFrozenRows(1);
     fila.getRange(1, 1, 1, tip.coloane.length).setFontWeight('bold');
+    if (tip.rosu) fila.getRange(1, 1, 1, tip.coloane.length).setBackground('#cc0000').setFontColor('#ffffff');
   }
   return fila;
+}
+
+/** Salvează pozele trimise de partener într-un folder al lui și pune linkurile în câmpuri. */
+function salveaza_poze(c) {
+  const poze = c._poze || {};
+  delete c._poze;
+  const toate = [].concat(poze.logo || [], poze.cover || [], poze.gal || []);
+  if (!toate.length) return;
+  const radacina = folder_sau_nou(DriveApp.getRootFolder(), FOLDER_POZE);
+  const nume = String(c['Nume'] || 'Partener').replace(/[\\/:*?"<>|]/g, ' ').slice(0, 80);
+  const folder = radacina.createFolder(nume + ' - ' + Utilities.formatDate(new Date(), 'Europe/Bucharest', 'yyyy-MM-dd HH:mm'));
+  const salveaza = function (lista, prefix) {
+    return (lista || []).slice(0, 10).map(function (p, i) {
+      const tipImg = /^image\/(png|jpeg)$/.test(p.tip) ? p.tip : 'image/jpeg';
+      const blob = Utilities.newBlob(Utilities.base64Decode(p.data), tipImg, prefix + (i + 1) + '-' + String(p.nume || 'poza').slice(0, 60));
+      return folder.createFile(blob).getUrl();
+    }).join('\n');
+  };
+  c['Logo'] = salveaza(poze.logo, 'logo-');
+  c['Poza principală'] = salveaza(poze.cover, 'principala-');
+  c['Alte poze'] = salveaza(poze.gal, 'poza-');
+  c['Folder poze'] = folder.getUrl();
+}
+
+function folder_sau_nou(parinte, nume) {
+  const it = parinte.getFoldersByName(nume);
+  return it.hasNext() ? it.next() : parinte.createFolder(nume);
 }
 
 function raspuns(obj) {
@@ -105,6 +149,13 @@ function trimite_confirmare(tip, c) {
     continut =
       '<p>Bună, ' + esc(c['Persoană de contact'] || '') + '!</p>' +
       '<p>Mulțumim pentru interesul de a colabora cu Ce facem cu copiii?. Am primit detaliile despre <strong>' + esc(c['Afacere / brand']) + '</strong> și revenim în curând, ca să ne cunoaștem și să-ți propunem variante potrivite.</p>' +
+      '<p>Cu drag,<br>Ana, de la Ce facem cu copiii?</p>';
+  } else if (tip === 'pagina') {
+    subiect = 'Am primit informațiile pentru pagina voastră - Ce facem cu copiii?';
+    continut =
+      '<p>Bună, ' + esc(c['Persoană de contact'] || '') + '!</p>' +
+      '<p>Mulțumim! Am primit informațiile pentru pagina <strong>' + esc(c['Nume']) + '</strong> din Comunitatea CFCC. Un om din echipa noastră le verifică și vă contactează dacă mai avem nevoie de ceva. Când pagina e gata, v-o trimitem spre aprobare și o publicăm doar după ce ne dați ok.</p>' +
+      '<p>Dacă vreți să schimbați ceva între timp, răspundeți la acest e-mail.</p>' +
       '<p>Cu drag,<br>Ana, de la Ce facem cu copiii?</p>';
   } else {
     return;
