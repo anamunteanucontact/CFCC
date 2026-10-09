@@ -489,6 +489,15 @@ function porneste_mail_evenimente() {
   SpreadsheetApp.getActiveSpreadsheet().toast('Gata: mailurile „evenimentul e pe site” pleacă singure.');
 }
 
+/** Test: trimite pe adresa ta mailul „eveniment publicat”, cu primul eveniment publicat din calendar. */
+function testMailEvenimentPublicat() {
+  const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
+  const v = fila.getRange(3, 1, Math.max(fila.getLastRow() - 2, 1), EV_COL.nume).getValues();
+  const r = v.filter(function (x) { return String(x[0] || '').trim(); }).pop() || ['https://cefacemcucopiii.ro/#exemplu', '', '', '', '', '', '', 'Eveniment de test'];
+  const rez = trimite_confirmare('eveniment publicat', { 'E-mail': Session.getActiveUser().getEmail(), 'Nume eveniment': String(r[EV_COL.nume - 1]), _linkEv: String(r[0]) });
+  SpreadsheetApp.getActiveSpreadsheet().toast('Mail de test „eveniment publicat”: ' + (rez || 'nu a plecat'));
+}
+
 function mail_evenimente_publicate() {
   const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
   if (!fila || fila.getLastRow() < 3) return;
