@@ -834,9 +834,11 @@ function toast(t){const el=document.getElementById("toast");el.textContent=t;el.
 
 /* vârste */
 function years(s){if(!s)return null;const m=String(s).toLowerCase().match(/(\d+)\s*(luni)?/);if(!m)return null;return m[2]?(+m[1])/12:+m[1]}
-function ageRange(e){if(e.a1==="A.G"||(!e.a1&&!e.a2))return[0,99];return[years(e.a1)??0,e.a2?(years(e.a2)??99):99]}
+const allAges=e=>/^(a\.?\s?g\.?|toate v[âa]rstele)$/i.test((e.a1||"").trim())&&!e.a2;
+function ageRange(e){if(allAges(e)||(!e.a1&&!e.a2))return[0,99];return[years(e.a1)??0,e.a2?(years(e.a2)??99):99]}
 function ageLabel(e){
-  if(e.a1==="A.G")return"Toate vârstele";
+  if(allAges(e))return"Toate vârstele";
+  if(e.a1&&!/\d/.test(e.a1)&&!e.a2)return e.a1;
   if(!e.a1&&!e.a2)return"";
   if(e.a1&&e.a2){const a=/luni/i.test(e.a1)?e.a1:e.a1.replace(/\s*ani/i,"");const b=/luni|ani/i.test(e.a2)?e.a2:e.a2+" ani";return a+" - "+b}
   return /luni/i.test(e.a1)?e.a1+"+":e.a1.replace(/\s*ani/i,"").replace("+","")+"+ ani";
