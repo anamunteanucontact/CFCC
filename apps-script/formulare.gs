@@ -10,7 +10,7 @@
  *    și trimite un e-mail de confirmare celui care a completat.
  * 2. Când schimbi statusul unei propuneri în „Pregătit pentru calendar”,
  *    o mută singur în fila „Evenimente”, la ziua și ora ei, cu status „De verificat”.
- *    După ce o treci pe „Confirmat”, apare pe site.
+ *    După ce o treci pe „Publicat”, apare pe site.
  * 3. În „CFCC - Onboarding parteneri”, când un rând primește statusul „Verificat - creează pagina”,
  *    face link de previzualizare, trimite mailul spre aprobare și, la „Publicat”, copiază pagina în „Comunitatea CFCC”. Pornește o dată cu porneste_onboarding().
  */
