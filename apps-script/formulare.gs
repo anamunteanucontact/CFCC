@@ -461,7 +461,7 @@ function link_previzualizare(fila, rand, creeaza) {
     try { poze_publice(fila.getRange(rand, cols.indexOf(k) + 1).getDisplayValue()); } catch (err) { console.warn('Poze: ' + err); }
   });
   const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
-  fila.getRange(rand, colNote).setValue((nota ? nota + '\n' : '') + azi + ' - previzualizare (nu e publică): ' + link);
+  fila.getRange(rand, colNote).setValue((nota ? nota.replace(/\s+$/, '') + '\n\n' : '') + azi + ' - previzualizare (nu e publică): ' + link);
   return link;
 }
 
@@ -586,7 +586,7 @@ function mail_o_data(fila, rand, id, tip, eticheta, link) {
   if (!/^\S+@\S+\.\S+$/.test(p['E-mail'])) return 'Nu am trimis mailul „' + eticheta + '”: lipsește e-mailul persoanei de contact.';
   trimite_confirmare(tip, { 'E-mail': p['E-mail'], 'Persoană de contact': p['Persoană de contact'], 'Nume': p['Nume'], _id: id, _link: link });
   const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
-  fila.getRange(rand, colNote).setValue((p['Note'] ? p['Note'] + '\n' : '') + azi + ' - mail „' + eticheta + '” trimis la ' + p['E-mail']);
+  fila.getRange(rand, colNote).setValue((p['Note'] ? p['Note'].replace(/\s+$/, '') + '\n\n' : '') + azi + ' - mail „' + eticheta + '” trimis la ' + p['E-mail']);
   return 'Am trimis mailul „' + eticheta + '” la ' + p['E-mail'] + '.';
 }
 
@@ -627,7 +627,7 @@ function mailuri_programate() {
     // pasul 2 (după ~1 zi): mail cu recomandări către partener
     if (ore >= 20 && !/mail „recomandări” trimis/i.test(p['Note']) && /^\S+@\S+\.\S+$/.test(p['E-mail'])) {
       trimite_confirmare('pagina live - recomandări', { 'E-mail': p['E-mail'], 'Persoană de contact': p['Persoană de contact'], 'Nume': p['Nume'], _id: slug_id(p['Nume']) });
-      p['Note'] += (p['Note'] ? '\n' : '') + azi + ' - mail „recomandări” trimis la ' + p['E-mail'];
+      p['Note'] += (p['Note'] ? '\n\n' : '') + azi + ' - mail „recomandări” trimis la ' + p['E-mail'];
       fila.getRange(i + 2, colNote).setValue(p['Note']);
     }
   });
