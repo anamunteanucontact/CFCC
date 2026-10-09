@@ -160,6 +160,7 @@ const TEXTE_REZERVA = {
   'pagina live - recomandări': ['Câteva sfaturi ca pagina {pagina} să fie văzută de cât mai mulți părinți', 'Bună, {persoana}!\n\nPrima zi pe platformă s-a încheiat și am început deja să strângem datele pentru raportul de la final de lună.\n\nCa pagina să lucreze cât mai mult pentru tine, câteva lucruri simple care ajută mult la vizibilitate:\n\n1. Pune linkul paginii în bio, pe Instagram și pe Facebook: {linkpagina}\n2. Când îți dăm tag într-o postare sau într-un story, dă share sau repost, și în story, și pe profil.\n3. Când îți trimitem o invitație de colaborare (collab) pe Instagram, accept-o: postarea apare și pe profilul tău și ajunge la ambele comunități.\n4. Urmărește-ne pe {instagram} și dă-ne tag când postezi ceva pentru copii, ca să putem distribui mai departe.\n5. Trimite-ne evenimentele noi din timp, din Colaborări → Adaugă un eveniment: {linkeveniment}.\nCu cât apar mai devreme în calendar, cu atât le văd mai mulți părinți.\n\nPentru orice întrebare, suntem la hello@cefacemcucopiii.ro.\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
   'pagina': ['Gata, am primit informațiile pentru pagina ta!', 'Bună, {persoana}!\n\nMulțumim! Am primit informațiile pentru pagina {pagina} din Comunitatea CFCC.\n\nUn om (adevărat) din echipa noastră le verifică chiar acum și te contactăm cât mai repede, dacă mai avem nevoie de ceva.\n\nRămâne cum am stabilit: când pagina e gata, ți-o trimitem spre aprobare și o publicăm doar după ce ne dai ok.\n\nDacă vrei să schimbi ceva între timp, răspunde la acest e-mail.\n\nCu drag,\nAna, de la Ce facem cu copiii?']
 };
+TEXTE_REZERVA['eveniment publicat'] = ['{eveniment} e acum în calendarul Ce facem cu copiii?', 'Bună!\n\nVești bune: {eveniment} e acum în calendarul de pe {site}, locul unde părinții din Timișoara găsesc tot ce e de făcut cu copiii.\n\nLinkul direct spre eveniment: {link}\n\nCa să ajungă la cât mai mulți părinți, te rugăm:\n1. Pune linkul în postările și story-urile despre eveniment, pe Instagram și pe Facebook.\n2. Pune-l în bio sau în linkurile din profil, cât timp promovezi evenimentul.\n3. Trimite-l mai departe pe grupurile de WhatsApp ale părinților.\n4. Dă-ne tag (@cefacemcucopiii) când postezi, ca să putem distribui și noi.\n\nAi și alte evenimente pentru copii? Le poți adăuga oricând aici: {linkeveniment}\n\nCu drag,\nAna, de la Ce facem cu copiii?'];
 const CAND_PLEACA = {
   'abonare': 'Cineva se abonează la newsletter pe site',
   'abonare - oferte': 'Paragraf pus în mailul de abonare doar dacă a bifat ofertele (înlocuiește {oferte}); subiectul nu contează',
@@ -168,6 +169,7 @@ const CAND_PLEACA = {
   'pagina': 'Un partener completează formularul pentru pagina lui (#formular-partener)',
   'pagina spre aprobare': 'În Onboarding, statusul devine „Trimis spre aprobare”. Trimite partenerului linkul de previzualizare și îi cere confirmarea prin reply. Pleacă o singură dată',
   'pagina live': 'În Onboarding, statusul partenerului devine „Publicat” (pagina apare pe site). Pleacă o singură dată, la e-mailul persoanei de contact',
+  'eveniment publicat': 'Un eveniment trimis de organizator prin formular primește Status = Publicat în The Sheet (verificare la 15 minute, cam la 10-25 de minute după publicare, ca să fie deja pe site). Pleacă o singură dată, la e-mailul din Contact organizator. {link} = linkul evenimentului de pe site',
   'pagina live - recomandări': 'La 1-2 zile după mailul „pagina live” (verificare zilnică la 10:00). Pleacă o singură dată, doar dacă statusul e tot „Publicat”.'
 };
 
@@ -214,6 +216,7 @@ function trimite_confirmare(tip, c) {
     let h = esc(p).replace(/\n/g, '<br>');
     h = h.replace(/\{linkpagina\}/g, '<a href="' + link_pagina + '">' + esc(link_pagina.replace(/^https:\/\//, '')) + '</a>')
       .replace(/\{linkeveniment\}/g, '<a href="' + link_eveniment + '">' + esc(link_eveniment.replace(/^https:\/\//, '')) + '</a>')
+      .replace(/\{link\}/g, c._linkEv ? '<a href="' + c._linkEv + '">' + esc(c._linkEv.replace(/^https:\/\//, '')) + '</a>' : '')
       .replace(/\{site\}/g, '<a href="' + SITE + '">cefacemcucopiii.ro</a>')
       .replace(/\{instagram\}/g, '<a href="' + INSTAGRAM + '">Instagram</a>')
       .replace(/\{(persoana|brand|eveniment|pagina)\}/g, function (m, k) { return k === 'persoana' ? esc(val[k]) : '<strong>' + esc(val[k]) + '</strong>'; });
@@ -470,6 +473,54 @@ function adresa_cunoscuta(fila, loc, randExclus) {
     }
   }
   return '';
+}
+
+/* ---------- mail „evenimentul tău e pe site” ---------- */
+/* La fiecare 15 minute: evenimentele venite prin formular (Adăugat de = Organizator) care au Status = Publicat
+   și n-au primit încă mailul îl primesc o singură dată, la adresa din Contact organizator.
+   Ca linkul să meargă sigur, mailul pleacă abia la a doua verificare după publicare (site-ul se actualizează în câteva minute).
+   Mailul trimis se notează în „Alte detalii / note interne”. Pornire: rulează o dată porneste_mail_evenimente din editor. */
+const EV_COL_LINK = 1, EV_COL_CONTACT = 19, EV_COL_NOTE = 20, EV_COL_DE_CINE = 21;
+const MARCA_EV_LIVE = 'mail „eveniment pe site” trimis';
+
+function porneste_mail_evenimente() {
+  const exista = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'mail_evenimente_publicate'; });
+  if (!exista) ScriptApp.newTrigger('mail_evenimente_publicate').timeBased().everyMinutes(15).create();
+  SpreadsheetApp.getActiveSpreadsheet().toast('Gata: mailurile „evenimentul e pe site” pleacă singure.');
+}
+
+function mail_evenimente_publicate() {
+  const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
+  if (!fila || fila.getLastRow() < 3) return;
+  const n = fila.getLastRow() - 2;
+  const v = fila.getRange(3, 1, n, EV_COL.ordine).getValues();
+  const props = PropertiesService.getScriptProperties();
+  const asteapta = JSON.parse(props.getProperty('EV_LIVE_ASTEAPTA') || '{}');
+  const acum = Date.now(), nouAsteapta = {};
+  const tz = 'Europe/Bucharest';
+  v.forEach(function (r, i) {
+    const link = String(r[EV_COL_LINK - 1] || '').trim();
+    if (!/^publicat/i.test(String(r[EV_COL.status - 1] || '')) || !link) return;
+    if (!/^organizator/i.test(String(r[EV_COL_DE_CINE - 1] || '').trim())) return;
+    const note = String(r[EV_COL_NOTE - 1] || '');
+    if (note.indexOf(MARCA_EV_LIVE) >= 0) return;
+    const ord = r[EV_COL.ordine - 1];
+    if (ord instanceof Date && ord.getTime() < acum) return; // a trecut deja
+    const m = String(r[EV_COL_CONTACT - 1] || '').match(/[^\s,;<>]+@[^\s,;<>]+\.[a-z]{2,}/i);
+    if (!m) return;
+    // prima dată când îl vedem publicat doar îl notăm; mailul pleacă la verificarea următoare
+    if (!asteapta[link]) { nouAsteapta[link] = acum; return; }
+    if (acum - asteapta[link] < 8 * 60 * 1000) { nouAsteapta[link] = asteapta[link]; return; }
+    const c = { 'E-mail': m[0], 'Nume eveniment': String(r[EV_COL.nume - 1] || '').trim(), _linkEv: link };
+    let rez;
+    try { rez = trimite_confirmare('eveniment publicat', c); } catch (err) { rez = 'eroare: ' + err; }
+    const azi = Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy HH:mm');
+    const nota = rez === 'Brevo' || rez === 'Gmail' ? azi + ' - ' + MARCA_EV_LIVE + ' la ' + m[0]
+      : azi + ' - mail „eveniment pe site” NU a plecat la ' + m[0] + (rez ? ' (' + String(rez).slice(0, 150) + ')' : '') + '. Încercăm din nou peste 15 minute.';
+    if (rez === 'Brevo' || rez === 'Gmail') fila.getRange(i + 3, EV_COL_NOTE).setValue((note.trim() ? note.trim() + ' | ' : '') + nota);
+    else nouAsteapta[link] = asteapta[link];
+  });
+  props.setProperty('EV_LIVE_ASTEAPTA', JSON.stringify(nouAsteapta));
 }
 
 /** O singură dată, din editor (9 oct): reorganizează coloanele din Evenimente în ordinea nouă. Nu mai trebuie rulată. */
