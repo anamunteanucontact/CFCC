@@ -73,13 +73,18 @@ function doPost(e) {
       // apostroful păstrează textul exact cum a fost scris (telefoane cu 0 în față, date, ore)
       return "'" + String(v).slice(0, tip.lungime || 2000);
     });
-    fila.appendRow(rand);
+    const lacat = LockService.getScriptLock();
+    lacat.waitLock(20000);
+    let nrRand;
+    try { fila.appendRow(rand); nrRand = fila.getLastRow(); } finally { lacat.releaseLock(); }
     if (tip.rosu) {
-      fila.getRange(fila.getLastRow(), 1, 1, tip.coloane.length)
+      fila.getRange(nrRand, 1, 1, tip.coloane.length)
         .setBackground('#f4c7c3').setFontColor('#9c0006').setWrap(true).setVerticalAlignment('top');
     }
 
-    try { trimite_confirmare(date.tip, campuri); } catch (errMail) { /* rândul e salvat oricum */ }
+    let rezultatMail;
+    try { rezultatMail = trimite_confirmare(date.tip, campuri); } catch (errMail) { rezultatMail = 'eroare: ' + errMail; /* rândul e salvat oricum */ }
+    try { noteaza_mail_confirmare(fila, nrRand, tip, date.tip, campuri, rezultatMail); } catch (errNota) { console.warn('Notă: ' + errNota); }
     try { notifica_echipa(date.tip, campuri); } catch (errNotif) { console.warn('Notificare: ' + errNotif); }
     return raspuns({ ok: true });
   } catch (err) {
@@ -191,8 +196,8 @@ function texte_mailuri() {
 
 function trimite_confirmare(tip, c) {
   const catre = String(c['E-mail'] || '').trim();
-  if (!/^\S+@\S+\.\S+$/.test(catre)) return;
-  if (!TEXTE_REZERVA[tip]) return;
+  if (!/^\S+@\S+\.\S+$/.test(catre)) return '';
+  if (!TEXTE_REZERVA[tip]) return '';
   let t = {};
   try { t = texte_mailuri(); } catch (err) { console.warn('Texte: ' + err); }
   const ia = function (k) { return t[k] && t[k][1].trim() ? t[k] : TEXTE_REZERVA[k]; };
@@ -214,7 +219,26 @@ function trimite_confirmare(tip, c) {
       .replace(/\{(persoana|brand|eveniment|pagina)\}/g, function (m, k) { return k === 'persoana' ? esc(val[k]) : '<strong>' + esc(val[k]) + '</strong>'; });
     return '<p>' + h + '</p>';
   }).join('');
-  trimite_email(catre, subiect, continut);
+  return trimite_email(catre, subiect, continut);
+}
+
+/* Ce mail de confirmare pleacă după fiecare formular (numele care apare în coloana Note). */
+const ETICHETE_CONFIRMARE = { 'abonare': 'bine ai venit', 'colaborare': 'confirmare colaborare', 'pagina': 'confirmare formular' };
+
+/** Notează în coloana Note a rândului nou dacă mailul de confirmare a plecat (cu data, ora și adresa). */
+function noteaza_mail_confirmare(fila, nrRand, tip, cheieTip, c, rezultat) {
+  const colNote = tip.coloane.map(function (x) { return x[0]; }).indexOf('Note') + 1;
+  const eticheta = ETICHETE_CONFIRMARE[cheieTip];
+  if (!colNote || !eticheta) return;
+  const catre = String(c['E-mail'] || '').trim();
+  const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
+  let nota;
+  if (rezultat === 'Brevo' || rezultat === 'Gmail') nota = azi + ' - mail „' + eticheta + '” trimis la ' + catre;
+  else if (!catre) nota = azi + ' - mail „' + eticheta + '” NU a plecat: lipsește adresa de e-mail';
+  else nota = azi + ' - mail „' + eticheta + '” NU a plecat la ' + catre + (rezultat ? ' (' + String(rezultat).slice(0, 200) + ')' : '');
+  const celula = fila.getRange(nrRand, colNote);
+  const vechi = celula.getDisplayValue();
+  celula.setValue((vechi ? vechi.replace(/\s+$/, '') + '\n\n' : '') + nota);
 }
 
 /* ---------- notificări pentru echipă ---------- */
@@ -288,11 +312,12 @@ function trimite_email(catre, subiect, html) {
           to: [{ email: catre }], subject: subiect, htmlContent: html
         })
       });
-      if (r.getResponseCode() < 300) return;
+      if (r.getResponseCode() < 300) return 'Brevo';
       console.warn('Brevo ' + r.getResponseCode() + ': ' + r.getContentText());
     } catch (err) { console.warn('Brevo: ' + err); }
   }
   MailApp.sendEmail({ to: catre, subject: subiect, htmlBody: html, name: NUME_EXPEDITOR, replyTo: EMAIL_EXPEDITOR });
+  return 'Gmail';
 }
 
 function esc(s) {
