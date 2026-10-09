@@ -1,0 +1,1355 @@
+<!doctype html>
+<html lang="ro">
+<head><meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ce facem cu copiii?</title>
+<meta name="description" content="Toate evenimentele, spectacolele, atelierele și ieșirile pentru copii din Timișoara, într-un singur calendar.">
+<meta property="og:title" content="Ce facem cu copiii?">
+<meta property="og:site_name" content="Ce facem cu copiii?">
+<meta property="og:description" content="Toate evenimentele pentru copii din Timișoara, într-un singur calendar.">
+<meta property="og:image" content="https://cefacemcucopiii.ro/assets/og.png">
+<meta property="og:url" content="https://cefacemcucopiii.ro/">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#1F4E5F">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ce facem?">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+html,body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+/* Layout: site cu 5 pagini (calendar, despre, recomandări, colaborări, profil) comutate din meniul de sus; calendarul e carnetul de familie pe zile */
+:root{
+  --petrol:#1F4E5F; --coral:#EE6C4D; --galben:#F4B942; --crem:#FFF8F0;
+  --bg:#FFF8F0; --surface:#FFFFFF; --fg:#1d3640; --muted:#5b7079; --line:#ead9c6;
+  --chip:#f6e9d9; --accent:#E2603F; --accent-fg:#ffffff; --head:#1F4E5F; --head-fg:#FFF8F0; --hl:#F4B942; --ok:#2f7d5b;
+  --display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f2329; --surface:#163039; --fg:#f3e9dd; --muted:#a8b9bf; --line:#27464f;
+  --chip:#1d3a44; --accent:#F27E62; --accent-fg:#14272d; --head:#0a1a1f; --head-fg:#FFF8F0; --hl:#F4B942; --ok:#6cc79c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f2329; --surface:#163039; --fg:#f3e9dd; --muted:#a8b9bf; --line:#27464f;
+  --chip:#1d3a44; --accent:#F27E62; --accent-fg:#14272d; --head:#0a1a1f; --head-fg:#FFF8F0; --hl:#F4B942; --ok:#6cc79c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.55 var(--body);margin:0}
+a{color:inherit}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px}
+h1,h2,h3{font-family:var(--display);line-height:1.1;text-wrap:balance;margin:0}
+:focus-visible{outline:3px solid var(--hl);outline-offset:2px;border-radius:6px}
+button{font-family:inherit}
+
+/* antet cu logo */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--head);color:var(--head-fg);box-shadow:0 2px 0 rgba(0,0,0,.08)}
+.nav .wrap{display:flex;align-items:center;gap:10px;padding-block:8px;flex-wrap:wrap}
+.logo{display:block;flex:none;line-height:0}
+.logo svg{height:46px;width:auto;display:block}
+.nav ul{display:flex;gap:2px;list-style:none;margin:0 0 0 auto;padding:0;overflow-x:auto;scrollbar-width:none}
+.nav ul a{display:block;padding:7px 10px;border-radius:999px;text-decoration:none;font-weight:600;font-size:.86rem;white-space:nowrap;opacity:.8}
+.nav ul a:hover{opacity:1;background:rgba(255,255,255,.1)}
+.nav ul a[aria-current="page"]{opacity:1;background:var(--galben);color:#1F4E5F}
+.tabbar{display:none}
+@media (max-width:720px){
+  .nav ul{display:none}
+  .nav{position:static}
+  .tabbar{display:grid;grid-template-columns:repeat(6,1fr);position:sticky;top:env(safe-area-inset-top,0px);z-index:15;background:var(--surface);border-bottom:3px solid var(--galben);padding:6px 4px;box-shadow:0 6px 18px rgba(31,78,95,.14)}
+  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 1px;border-radius:12px;text-decoration:none;color:var(--fg);font-size:.62rem;font-weight:700;text-align:center;line-height:1.1}
+  .tabbar a svg{width:22px;height:22px}
+  .tabbar a[aria-current="page"]{color:var(--accent);background:var(--chip)}
+  .date{top:84px}
+}
+
+/* hero */
+.hero{background:var(--head);color:var(--head-fg);padding-block:22px 34px;position:relative;overflow:hidden}
+.hero h1{font-size:clamp(2.2rem,8vw,3.6rem);font-weight:800;max-width:14ch}
+.hero h1 .q{color:var(--coral);display:inline-block;transform:rotate(8deg)}
+.hero p{max-width:48ch;font-size:1.06rem;opacity:.92;margin:12px 0 0}
+.city{display:inline-block;background:var(--galben);color:#1F4E5F;font-weight:700;font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:6px;margin-bottom:12px}
+.hero .sym{position:absolute;right:max(16px,calc((100% - 860px)/2));top:50%;transform:translateY(-50%);width:190px;height:auto;pointer-events:none}
+@media (max-width:640px){.hero .sym{width:110px;right:-14px;top:auto;bottom:-10px;transform:none;opacity:.35}}
+.hero .wrap{position:relative;z-index:1}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;cursor:pointer;font:700 .92rem var(--body);padding:11px 16px;border-radius:12px;text-decoration:none}
+.btn-main{background:var(--accent);color:var(--accent-fg)}
+.btn-soft{background:var(--chip);color:var(--fg)}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+
+.view{padding-block:34px 48px}
+.view[hidden]{display:none}
+.eyebrow{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--accent)}
+.sec-h{display:flex;flex-direction:column;gap:4px;margin-bottom:18px}
+.sec-h h2{font-size:clamp(1.7rem,5vw,2.3rem);font-weight:800}
+.sec-h p{color:var(--muted);margin:4px 0 0;max-width:60ch}
+.note{font-size:.84rem;color:var(--muted)}
+
+/* filtre */
+.filters{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.row .lbl{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);align-self:center;margin-right:4px;white-space:nowrap;min-width:46px}
+.chip{flex:none;border:0;cursor:pointer;background:var(--chip);color:var(--fg);font:600 .88rem var(--body);padding:8px 13px;border-radius:999px}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.count{font-size:.9rem;color:var(--muted)}
+
+/* zile si evenimente */
+.days{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;margin-bottom:8px;scrollbar-width:none;scroll-behavior:smooth}
+.dpill{flex:none;width:62px;border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:16px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-family:var(--body)}
+.dpill .dz{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.dpill .dd{font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1}
+.dpill .dn{font-size:.72rem;font-weight:700;min-width:24px;padding:2px 6px;border-radius:999px;background:var(--chip)}
+.dpill.we{border-color:var(--galben)}
+.dpill.sel{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+.dpill.sel .dz{color:var(--bg)}
+.dpill.sel .dn{background:var(--galben);color:#1F4E5F}
+.dpill[data-empty]{opacity:.45}
+.dpill[data-empty].sel{opacity:1}
+.dayhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:6px 0 12px}
+.dayhead h3{font-size:1.4rem;font-weight:800}
+.dayhead span{font-size:.88rem;color:var(--muted);font-weight:600;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.days{scroll-behavior:auto}}
+.day{display:grid;grid-template-columns:76px 1fr;gap:14px;padding-block:16px;border-top:2px dashed var(--line)}
+.day:first-child{border-top:0}
+.date{position:sticky;top:110px;align-self:start;text-align:center;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:8px 4px}
+.date .dn{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.date .dd{font-family:var(--display);font-weight:800;font-size:2rem;line-height:1}
+.date .dm{font-size:.78rem;color:var(--muted)}
+.date.we{background:var(--galben);border-color:var(--galben);color:#1F4E5F}
+.date.we .dn,.date.we .dm{color:#1F4E5F}
+.evs{display:flex;flex-direction:column;gap:10px;min-width:0}
+.ev{background:var(--surface);border-radius:14px;min-width:0;border:2px solid transparent}
+.ev.open{border-color:var(--galben)}
+.ev-head{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:58px 1fr 22px;gap:10px;padding:12px 14px;width:100%;border-radius:12px}
+.ev-head:focus-visible{outline:3px solid var(--hl)}
+.tm{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1.3;white-space:pre-line}
+.ev h3{font-family:var(--body);font-weight:700;font-size:1rem;line-height:1.3}
+.meta{font-size:.86rem;color:var(--muted);margin-top:3px}
+.meta.org{color:var(--head);font-weight:600}
+.meta.loc{display:flex;align-items:center;gap:4px;margin-top:2px}.meta.loc svg{flex:none;opacity:.7}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.tag{font-size:.74rem;font-weight:600;padding:3px 8px;border-radius:6px;background:var(--chip)}
+.tag.age{background:transparent;box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--accent)}
+.tag.acc{background:transparent;box-shadow:inset 0 0 0 1.5px var(--muted);color:var(--fg)}
+.tag.saved{background:var(--galben);color:#1F4E5F}
+.caret{align-self:center;transition:transform .2s;color:var(--muted)}
+.ev.open .caret{transform:rotate(180deg)}
+@media (prefers-reduced-motion:reduce){.caret{transition:none}}
+.det{padding:0 14px 14px 82px;display:flex;flex-direction:column;gap:12px}
+.det dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:.9rem}
+.det dt{color:var(--muted)}
+.det dd{margin:0;font-weight:600;min-width:0}
+.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:8px}
+.act-go{background:var(--accent);color:var(--accent-fg)}
+.act{border:0;cursor:pointer;background:var(--chip);color:var(--fg);border-radius:12px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;font:700 .8rem var(--body);text-decoration:none;text-align:center}
+.act svg{width:22px;height:22px}
+.act.on{background:var(--galben);color:#1F4E5F}
+.desc{margin:0;font-size:.92rem;line-height:1.55;max-width:60ch}
+.sharebox{display:flex;flex-wrap:wrap;gap:6px}
+.sharebox a,.sharebox button{font:600 .82rem var(--body);padding:7px 11px;border-radius:999px;border:0;background:var(--chip);color:var(--fg);text-decoration:none;cursor:pointer}
+.empty{padding:26px;text-align:center;color:var(--muted);background:var(--surface);border-radius:14px}
+@media (max-width:520px){
+  .day{grid-template-columns:1fr}
+  .date{position:static;display:flex;gap:8px;align-items:baseline;padding:8px 12px;text-align:left}
+  .date .dd{font-size:1.5rem}
+  .det{padding:0 14px 14px}
+}
+
+/* recomandari */
+.rec-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:620px){.rec-grid{grid-template-columns:1fr}}
+.rec{background:var(--surface);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:8px;border:2px solid var(--line)}
+.rec-top{display:flex;justify-content:space-between;align-items:center}
+.rec .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center}
+.rec .ic svg{width:26px;height:26px}
+.rec h3{font-size:1.35rem;font-weight:800}
+.rec p{margin:0;color:var(--muted);font-size:.92rem}
+.rec ul{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.rec li{font-size:.8rem;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--chip)}
+.rec .soon{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border:1.5px dashed var(--line);padding:3px 8px;border-radius:999px}
+
+/* formulare */
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+form{scroll-margin-top:90px;display:flex;flex-direction:column;gap:12px;background:var(--surface);border-radius:16px;padding:18px}
+label{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:.88rem}
+label small{font-weight:400;color:var(--muted)}
+input,textarea,select{font:inherit;font-weight:400;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);width:100%}
+input,select{min-height:46px}
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;display:block;line-height:1.3}
+input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left}
+input[type=checkbox]{min-height:0;accent-color:var(--accent)}
+.inline>*,.fr>*{min-width:0}
+label{min-width:0}
+textarea{min-height:90px;resize:vertical}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.fr{grid-template-columns:1fr}}
+.msg{border-radius:12px;padding:12px 14px;font-weight:600;font-size:.9rem;background:var(--galben);color:#1F4E5F}
+.err{color:var(--accent);font-size:.86rem;font-weight:600}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+@media (max-width:620px){.rules{grid-template-columns:1fr}}
+.rule{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border-radius:16px;padding:16px;border:2px solid var(--line);display:flex;flex-direction:column;gap:6px;color:var(--fg);font-family:var(--body)}
+.rule:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+.rule[aria-pressed="true"]{border-color:var(--galben);box-shadow:0 0 0 2px var(--galben)}
+.rule .pick{margin-top:auto;padding-top:6px;font-size:.85rem;font-weight:700;color:var(--muted)}
+.rule[aria-pressed="true"] .pick{color:var(--accent)}
+.rule[aria-pressed="true"] .pick::after{content:" ↓"}
+.rule h3{font-size:1.2rem;font-weight:800;margin-bottom:4px}
+.rule .who{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+
+/* profil */
+.login{background:var(--surface);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.gbtn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#1f1f1f;border:1.5px solid #dadce0;border-radius:999px;padding:10px 18px;font:600 .95rem var(--body);align-self:flex-start;cursor:pointer}
+#auth-out,#auth-in{display:flex;flex-direction:column;gap:12px}
+#auth-out h3{font-size:1.3rem;font-weight:800}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.82rem}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.linkbtn{all:unset;cursor:pointer;color:var(--accent);font-weight:600;font-size:.88rem;text-decoration:underline;align-self:flex-start}
+.linkbtn:focus-visible{outline:3px solid var(--hl)}
+.panel{background:var(--surface);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.panel h3{font-size:1.3rem;font-weight:800}
+.mini{display:flex;flex-direction:column;gap:8px}
+.mini-ev{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 12px;background:var(--bg);border-radius:12px}
+.mini-ev b{display:block;font-size:.95rem}
+.mini-ev span{font-size:.82rem;color:var(--muted)}
+.x{border:0;background:var(--chip);color:var(--fg);border-radius:999px;padding:6px 10px;font:600 .8rem var(--body);cursor:pointer}
+.x.on{background:var(--ok);color:#fff}
+.kid{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border-radius:12px}
+.inline{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+@media (max-width:520px){.inline{grid-template-columns:1fr 1fr}.inline .btn{grid-column:1/-1}}
+
+.check{flex-direction:row;align-items:center;gap:8px;font-weight:500}
+.check input{width:18px;height:18px;flex:none}
+.follow-box{margin-top:24px;background:var(--surface);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.follow-box h3{font-size:1.25rem;font-weight:800}
+.follow{display:flex;flex-wrap:wrap;gap:10px}
+.about h3{font-size:1.2rem;font-weight:800;margin:22px 0 4px}
+.about p{max-width:62ch}
+footer{background:var(--head);color:var(--head-fg);padding-block:24px;font-size:.85rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;align-items:center}
+.install{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--surface);color:var(--fg);border:2px solid var(--galben);border-radius:18px;padding:14px;display:grid;grid-template-columns:48px 1fr;gap:12px;box-shadow:0 10px 30px rgba(31,78,95,.25);max-width:520px;margin:0 auto}
+.install img{border-radius:12px}
+.install-txt{display:flex;flex-direction:column;gap:4px;font-size:.9rem;min-width:0}
+.install-txt strong{font-size:1rem}
+.install-act{grid-column:1/-1;display:flex;gap:14px;align-items:center}
+.install-steps{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:8px;line-height:1.45}
+.install-steps .ii{width:18px;height:18px;vertical-align:-3px;margin:0 1px;color:var(--accent)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
+
+/* pagini organizatori */
+.grp{font-size:1.25rem;font-weight:800;margin:6px 0 12px}
+.org-grid+.grp{margin-top:28px}
+.org-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:620px){.org-grid{grid-template-columns:1fr}}
+.org-card{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:14px;text-decoration:none;color:var(--fg)}
+.org-card:hover{border-color:var(--galben)}
+.org-card h3{font-family:var(--body);font-size:1rem;font-weight:700;line-height:1.25}
+.org-card div>span{font-size:.82rem;color:var(--muted)}
+.mono{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font:800 1.35rem var(--display);color:#fff;flex:none;overflow:hidden}
+.mono img{width:100%;height:100%;object-fit:cover}
+.mono.lg{width:72px;height:72px;font-size:1.9rem;border-radius:20px}
+.back{display:inline-block;margin-bottom:14px;font-weight:600;font-size:.9rem;color:var(--muted);text-decoration:none}
+.org-head{display:grid;grid-template-columns:72px 1fr;gap:16px;align-items:center;margin-bottom:16px}
+.org-head h2{font-size:clamp(1.6rem,5vw,2.2rem);font-weight:800}
+.org-head .tags{margin-top:8px}
+.org-photo{width:100%;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:18px;margin-bottom:16px;display:block}
+.org-desc{margin:0 0 16px;max-width:62ch;font-size:1rem}
+.org-acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-bottom:22px}
+.org-acts .btn{padding:10px 14px}
+.org-sec{margin-top:26px}
+.org-sec>h3{font-size:1.35rem;font-weight:800;margin-bottom:10px}
+.svc{display:grid;gap:10px}
+.svc-i{background:var(--surface);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:5px solid var(--galben)}
+.svc-i b{font-size:1rem}
+.svc-i span{font-size:.9rem;color:var(--muted)}
+.svc-i a{font-weight:700;font-size:.86rem;color:var(--accent);margin-top:2px}
+.org-info{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:.92rem;background:var(--surface);border-radius:14px;padding:14px 16px}
+.org-info dt{color:var(--muted)}
+.org-info dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
+.acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.acts{grid-template-columns:1fr}}
+.acts-i{display:flex;flex-direction:column;gap:3px;padding:14px 16px;border-radius:14px;background:var(--surface)}
+.acts-i b{font-size:1rem}
+.acts-i span{font-size:.88rem;color:var(--muted)}
+.gal{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:thin}
+.gal img{flex:none;width:72%;max-width:340px;aspect-ratio:4/3;object-fit:cover;border-radius:14px;scroll-snap-align:start}
+.arts{display:flex;flex-direction:column;gap:10px}
+.art{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-radius:14px;background:var(--surface);text-decoration:none;color:var(--fg);border:2px solid var(--line)}
+.art b{font-size:1rem;line-height:1.3}
+.art img{width:100%;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin-bottom:6px}
+.art-rez{font-size:.88rem;color:var(--muted)}
+.art-body{max-width:65ch;display:flex;flex-direction:column;gap:12px}
+.art-body h2{font-size:clamp(1.7rem,5vw,2.3rem);font-weight:800}
+.art-body p{margin:0}
+.art-lead{font-size:1.1rem;color:var(--muted)}
+.rec-arts{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.rec-arts a{font-weight:700;font-size:.92rem;color:var(--accent)}
+.fs{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;min-width:0}
+.fs+.fs{margin-top:14px}
+.fs legend{font:800 1.2rem var(--display);padding:0;margin-bottom:4px}
+.fs .note{margin:0}
+.tips{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.88rem;color:var(--muted)}
+.act-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+@media (max-width:520px){.act-row{grid-template-columns:1fr auto}.act-row label:first-child{grid-column:1/-1}}
+.act-row .x{margin-bottom:8px}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px}
+.thumbs:empty{display:none}
+.th{position:relative;width:88px;height:88px;border-radius:12px;overflow:hidden;background:var(--chip)}
+.th img{width:100%;height:100%;object-fit:cover}
+.th .x{position:absolute;top:4px;right:4px;padding:2px 8px}
+.cnt{align-self:flex-end}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.past{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.past li{display:flex;flex-direction:column;gap:2px;padding:10px 2px;border-top:1px solid var(--line)}
+.past li:first-child{border-top:0}
+.past b{font-weight:600;font-size:.95rem}
+.past span{font-size:.82rem;color:var(--muted)}
+.det dd a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+
+<nav class="nav" aria-label="Meniu">
+  <div class="wrap">
+    <a class="logo" href="#calendar"><svg viewBox="-50 -30 620 210" role="img" aria-label="Ce facem cu copiii?"><g transform="rotate(-14 -14 18)"><ellipse cx="-20" cy="34" rx="9" ry="7" fill="#EE6C4D"/><path d="M-12 33 V4 L4 0 V10" fill="none" stroke="#EE6C4D" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g><g transform="rotate(12 128 4)"><path d="M110 -12 H146 V8 C146 22 138 30 128 30 C118 30 110 22 110 8 Z" fill="#F4B942"/><circle cx="120" cy="2" r="3" fill="#1F4E5F"/><circle cx="136" cy="2" r="3" fill="#1F4E5F"/><path d="M119 13 Q128 22 137 13" fill="none" stroke="#1F4E5F" stroke-width="3" stroke-linecap="round"/></g><path d="M134 70 L139 81 L151 82 L142 90 L145 102 L134 96 L123 102 L126 90 L117 82 L129 81 Z" fill="#EE6C4D" stroke="#EE6C4D" stroke-width="2" stroke-linejoin="round"/><g transform="rotate(35 -16 92)"><rect x="-20" y="64" width="8" height="30" rx="3" fill="#FFF8F0"/><path d="M-24 94 H-8 C-8 106 -12 114 -16 118 C-20 114 -24 106 -24 94 Z" fill="#F4B942"/></g><g stroke="#F4B942" stroke-width="4" stroke-linecap="round"><path d="M70 -14 V-4"/><path d="M48 -8 L53 0"/><path d="M92 -8 L87 0"/></g><path d="M30 52 C30 28 46 16 62 16 C80 16 92 28 92 46 C92 62 80 70 70 78 C62 84 60 86 60 92" fill="none" stroke="#FFF8F0" stroke-width="22" stroke-linecap="round"/><circle cx="60" cy="132" r="22" fill="#EE6C4D"/><path d="M61 110 C61 104 66 101 70 104" fill="none" stroke="#1F4E5F" stroke-width="3.5" stroke-linecap="round"/><circle cx="52" cy="129" r="3" fill="#1F4E5F"/><circle cx="68" cy="129" r="3" fill="#1F4E5F"/><path d="M51 137 Q60 146 69 137" fill="none" stroke="#1F4E5F" stroke-width="3.5" stroke-linecap="round"/><circle cx="45.5" cy="138" r="3.5" fill="#FFB4A2"/><circle cx="74.5" cy="138" r="3.5" fill="#FFB4A2"/><g transform="translate(175 75)"><path d="M31.378 -30.044Q31.378 -28.594 30.624000000000002 -27.463Q29.87 -26.332 28.884 -25.694000000000003Q27.434 -26.68 25.694000000000003 -27.376Q23.954 -28.072000000000003 21.692 -28.072000000000003Q18.734 -28.072000000000003 16.675 -26.825000000000003Q14.616000000000001 -25.578000000000003 13.543000000000001 -23.229000000000003Q12.47 -20.880000000000003 12.47 -17.574Q12.47 -12.47 15.051000000000002 -9.802Q17.632 -7.134 22.214000000000002 -7.134Q24.592000000000002 -7.134 26.245 -7.772Q27.898 -8.41 29.406000000000002 -9.222000000000001Q30.392000000000003 -8.468 30.943000000000005 -7.308Q31.494000000000003 -6.148000000000001 31.494000000000003 -4.640000000000001Q31.494000000000003 -3.306 30.798000000000002 -2.204Q30.102 -1.102 28.42 -0.34800000000000003Q27.376 0.116 25.462000000000003 0.5800000000000001Q23.548000000000002 1.044 20.822000000000003 1.044Q15.602 1.044 11.339 -0.9280000000000002Q7.0760000000000005 -2.9000000000000004 4.553000000000001 -7.018000000000001Q2.0300000000000002 -11.136000000000001 2.0300000000000002 -17.574Q2.0300000000000002 -23.606 4.466 -27.753Q6.902 -31.900000000000002 11.049000000000001 -34.075Q15.196000000000002 -36.25 20.184 -36.25Q23.722 -36.25 26.216 -35.438Q28.71 -34.626000000000005 30.044 -33.234Q31.378 -31.842000000000002 31.378 -30.044Z M40.89 -9.686 40.542 -16.182000000000002 53.940000000000005 -18.386Q53.824 -19.546 52.78 -20.706Q51.736000000000004 -21.866 49.532000000000004 -21.866Q47.212 -21.866 45.675000000000004 -20.358Q44.138000000000005 -18.85 44.022000000000006 -16.066000000000003L44.370000000000005 -11.194Q44.95 -8.526 47.009 -7.482Q49.068000000000005 -6.438000000000001 51.620000000000005 -6.438000000000001Q54.056000000000004 -6.438000000000001 56.260000000000005 -7.0760000000000005Q58.464 -7.714 59.798 -8.468Q60.726 -7.888000000000001 61.364000000000004 -6.844000000000001Q62.002 -5.800000000000001 62.002 -4.640000000000001Q62.002 -2.726 60.581 -1.479Q59.160000000000004 -0.232 56.666000000000004 0.34800000000000003Q54.172000000000004 0.928 50.92400000000001 0.928Q46.400000000000006 0.928 42.775000000000006 -0.7830000000000001Q39.150000000000006 -2.494 37.033 -5.916Q34.916000000000004 -9.338000000000001 34.916000000000004 -14.5Q34.916000000000004 -18.328 36.163000000000004 -21.112000000000002Q37.410000000000004 -23.896 39.498000000000005 -25.636000000000003Q41.586 -27.376 44.167 -28.217Q46.748000000000005 -29.058 49.474000000000004 -29.058Q53.592 -29.058 56.666 -27.463Q59.74 -25.868000000000002 61.480000000000004 -23.113Q63.22 -20.358 63.22 -16.762Q63.22 -14.790000000000001 62.118 -13.746Q61.016000000000005 -12.702 59.044000000000004 -12.412Z  M87.58 -18.444000000000003V-25.984H98.542Q98.89 -25.404 99.209 -24.418Q99.528 -23.432000000000002 99.528 -22.272000000000002Q99.528 -20.242 98.629 -19.343000000000004Q97.73 -18.444000000000003 96.22200000000001 -18.444000000000003ZM89.03 -27.84V-19.604000000000003H79.69200000000001V-28.188000000000002Q79.69200000000001 -32.132000000000005 81.432 -34.59700000000001Q83.172 -37.062000000000005 86.101 -38.22200000000001Q89.03 -39.382000000000005 92.568 -39.382000000000005Q96.86 -39.382000000000005 98.89 -38.251000000000005Q100.92 -37.120000000000005 100.92 -34.394Q100.92 -33.234 100.42699999999999 -32.306Q99.934 -31.378 99.354 -30.914Q98.25200000000001 -31.204 97.063 -31.407000000000004Q95.874 -31.610000000000003 94.308 -31.610000000000003Q91.81400000000001 -31.610000000000003 90.422 -30.769000000000002Q89.03 -29.928 89.03 -27.84ZM79.69200000000001 -21.054000000000002H89.552V-0.058Q88.914 0.116 87.725 0.29000000000000004Q86.536 0.464 85.144 0.464Q82.302 0.464 80.99700000000001 -0.522Q79.69200000000001 -1.508 79.69200000000001 -4.176Z M116.58 -6.264Q117.566 -6.264 118.755 -6.4670000000000005Q119.944 -6.67 120.524 -7.018000000000001V-11.658000000000001L116.348 -11.31Q114.724 -11.194 113.68 -10.614Q112.636 -10.034 112.636 -8.874Q112.636 -7.714 113.535 -6.989000000000001Q114.434 -6.264 116.58 -6.264ZM116.116 -29.058Q122.438 -29.058 126.237 -26.477Q130.036 -23.896 130.036 -18.444000000000003V-5.452Q130.036 -3.9440000000000004 129.195 -2.987Q128.354 -2.0300000000000002 127.194 -1.334Q125.338 -0.232 122.67 0.34800000000000003Q120.00200000000001 0.928 116.58 0.928Q110.49 0.928 106.80699999999999 -1.421Q103.124 -3.77 103.124 -8.526Q103.124 -12.528 105.531 -14.674Q107.938 -16.82 112.868 -17.342000000000002L120.46600000000001 -18.154V-18.560000000000002Q120.46600000000001 -20.242 118.987 -20.967Q117.508 -21.692 114.724 -21.692Q112.578 -21.692 110.461 -21.228Q108.344 -20.764 106.662 -20.068Q105.908 -20.59 105.386 -21.663Q104.864 -22.736 104.864 -23.896Q104.864 -26.68 107.822 -27.84Q109.504 -28.478 111.795 -28.768Q114.086 -29.058 116.116 -29.058Z M151.95999999999998 -21.286Q149.06 -21.286 146.94299999999998 -19.43Q144.826 -17.574 144.826 -13.978000000000002Q144.826 -10.382 146.856 -8.642Q148.886 -6.902 151.902 -6.902Q153.642 -6.902 155.005 -7.337Q156.368 -7.772 157.296 -8.236Q158.398 -7.424 158.949 -6.496Q159.5 -5.5680000000000005 159.5 -4.234Q159.5 -1.9140000000000001 157.209 -0.522Q154.918 0.87 150.684 0.87Q145.87 0.87 142.303 -0.812Q138.736 -2.494 136.793 -5.829Q134.85 -9.164 134.85 -13.978000000000002Q134.85 -19.082 136.99599999999998 -22.417Q139.142 -25.752000000000002 142.68 -27.405Q146.218 -29.058 150.394 -29.058Q154.512 -29.058 156.803 -27.55Q159.094 -26.042 159.094 -23.664Q159.094 -22.562 158.572 -21.605Q158.04999999999998 -20.648 157.35399999999998 -19.952Q156.368 -20.416 154.976 -20.851Q153.584 -21.286 151.95999999999998 -21.286Z M169.18599999999998 -9.686 168.838 -16.182000000000002 182.236 -18.386Q182.11999999999998 -19.546 181.07599999999996 -20.706Q180.03199999999998 -21.866 177.82799999999997 -21.866Q175.50799999999998 -21.866 173.971 -20.358Q172.434 -18.85 172.31799999999998 -16.066000000000003L172.666 -11.194Q173.24599999999998 -8.526 175.30499999999998 -7.482Q177.36399999999998 -6.438000000000001 179.916 -6.438000000000001Q182.35199999999998 -6.438000000000001 184.55599999999998 -7.0760000000000005Q186.76 -7.714 188.094 -8.468Q189.022 -7.888000000000001 189.66 -6.844000000000001Q190.298 -5.800000000000001 190.298 -4.640000000000001Q190.298 -2.726 188.877 -1.479Q187.456 -0.232 184.962 0.34800000000000003Q182.468 0.928 179.22 0.928Q174.696 0.928 171.071 -0.7830000000000001Q167.446 -2.494 165.329 -5.916Q163.212 -9.338000000000001 163.212 -14.5Q163.212 -18.328 164.459 -21.112000000000002Q165.706 -23.896 167.79399999999998 -25.636000000000003Q169.88199999999998 -27.376 172.46299999999997 -28.217Q175.04399999999998 -29.058 177.76999999999998 -29.058Q181.88799999999998 -29.058 184.962 -27.463Q188.036 -25.868000000000002 189.776 -23.113Q191.516 -20.358 191.516 -16.762Q191.516 -14.790000000000001 190.414 -13.746Q189.31199999999998 -12.702 187.33999999999997 -12.412Z M222.72 -19.372V-12.818000000000001H212.86V-18.038Q212.86 -19.778000000000002 211.84500000000003 -20.561Q210.83 -21.344 209.38 -21.344Q208.278 -21.344 207.466 -21.025Q206.654 -20.706 206.132 -20.416V-12.818000000000001H196.272V-21.634Q196.272 -23.200000000000003 196.939 -24.186Q197.606 -25.172 198.766 -25.984Q200.738 -27.376 203.667 -28.217Q206.596 -29.058 209.786 -29.058Q212.512 -29.058 215.006 -28.217Q217.5 -27.376 219.53 -25.52Q219.994 -25.114 220.487 -24.708Q220.98 -24.302 221.212 -23.838Q221.85 -22.852 222.285 -21.692Q222.72 -20.532 222.72 -19.372ZM239.308 -18.328V-12.818000000000001H229.448V-18.038Q229.448 -19.778000000000002 228.51999999999998 -20.561Q227.59199999999998 -21.344 226.084 -21.344Q224.982 -21.344 223.99599999999998 -20.909Q223.01 -20.474 222.372 -19.952L216.978 -25.462Q219.008 -26.912000000000003 221.473 -27.985Q223.938 -29.058 227.59199999999998 -29.058Q230.55 -29.058 233.247 -28.014000000000003Q235.94400000000002 -26.970000000000002 237.626 -24.621000000000002Q239.308 -22.272000000000002 239.308 -18.328ZM196.272 -15.312000000000001H206.132V-0.058Q205.494 0.116 204.305 0.29000000000000004Q203.116 0.464 201.724 0.464Q198.882 0.464 197.577 -0.522Q196.272 -1.508 196.272 -4.176ZM212.86 -15.312000000000001H222.72V-0.058Q222.082 0.116 220.893 0.29000000000000004Q219.704 0.464 218.312 0.464Q215.47 0.464 214.16500000000002 -0.522Q212.86 -1.508 212.86 -4.176ZM229.448 -15.312000000000001H239.308V-0.058Q238.67000000000002 0.116 237.481 0.29000000000000004Q236.292 0.464 234.9 0.464Q232.058 0.464 230.753 -0.522Q229.448 -1.508 229.448 -4.176Z" fill="#FFF8F0"/></g><g transform="translate(175 130.1)"><path d="M18.908 -21.286Q16.008 -21.286 13.891 -19.43Q11.774000000000001 -17.574 11.774000000000001 -13.978000000000002Q11.774000000000001 -10.382 13.804000000000002 -8.642Q15.834000000000001 -6.902 18.85 -6.902Q20.59 -6.902 21.953000000000003 -7.337Q23.316000000000003 -7.772 24.244 -8.236Q25.346 -7.424 25.897 -6.496Q26.448 -5.5680000000000005 26.448 -4.234Q26.448 -1.9140000000000001 24.157 -0.522Q21.866 0.87 17.632 0.87Q12.818000000000001 0.87 9.251000000000001 -0.812Q5.684 -2.494 3.741 -5.829Q1.798 -9.164 1.798 -13.978000000000002Q1.798 -19.082 3.9440000000000004 -22.417Q6.090000000000001 -25.752000000000002 9.628 -27.405Q13.166 -29.058 17.342000000000002 -29.058Q21.46 -29.058 23.751 -27.55Q26.042 -26.042 26.042 -23.664Q26.042 -22.562 25.520000000000003 -21.605Q24.998 -20.648 24.302 -19.952Q23.316000000000003 -20.416 21.924 -20.851Q20.532 -21.286 18.908 -21.286Z M31.378 -11.194V-15.022H41.238V-11.194Q41.238 -8.874 42.427 -7.83Q43.616 -6.7860000000000005 45.762 -6.7860000000000005Q47.096000000000004 -6.7860000000000005 47.966 -7.018000000000001Q48.836 -7.25 49.242000000000004 -7.482V-15.022H59.102000000000004V-6.032Q59.102000000000004 -4.582 58.493 -3.509Q57.884 -2.436 56.666000000000004 -1.6820000000000002Q54.636 -0.406 51.82300000000001 0.261Q49.010000000000005 0.928 45.70400000000001 0.928Q41.528000000000006 0.928 38.28 -0.319Q35.032000000000004 -1.566 33.205 -4.234Q31.378 -6.902 31.378 -11.194ZM59.102000000000004 -12.528H49.242000000000004V-28.072000000000003Q49.88 -28.246000000000002 51.069 -28.42Q52.258 -28.594 53.650000000000006 -28.594Q56.550000000000004 -28.594 57.82600000000001 -27.637Q59.102000000000004 -26.68 59.102000000000004 -23.954ZM41.238 -12.528H31.378V-28.072000000000003Q32.016000000000005 -28.246000000000002 33.205000000000005 -28.42Q34.394000000000005 -28.594 35.786 -28.594Q38.686 -28.594 39.962 -27.637Q41.238 -26.68 41.238 -23.954Z  M92.626 -21.286Q89.726 -21.286 87.60900000000001 -19.43Q85.492 -17.574 85.492 -13.978000000000002Q85.492 -10.382 87.522 -8.642Q89.552 -6.902 92.56800000000001 -6.902Q94.308 -6.902 95.671 -7.337Q97.034 -7.772 97.962 -8.236Q99.06400000000001 -7.424 99.61500000000001 -6.496Q100.166 -5.5680000000000005 100.166 -4.234Q100.166 -1.9140000000000001 97.875 -0.522Q95.584 0.87 91.35000000000001 0.87Q86.536 0.87 82.969 -0.812Q79.402 -2.494 77.459 -5.829Q75.516 -9.164 75.516 -13.978000000000002Q75.516 -19.082 77.662 -22.417Q79.808 -25.752000000000002 83.346 -27.405Q86.884 -29.058 91.06 -29.058Q95.178 -29.058 97.469 -27.55Q99.76 -26.042 99.76 -23.664Q99.76 -22.562 99.238 -21.605Q98.71600000000001 -20.648 98.02000000000001 -19.952Q97.034 -20.416 95.642 -20.851Q94.25 -21.286 92.626 -21.286Z M134.27 -14.094000000000001Q134.27 -9.454 132.385 -6.09Q130.5 -2.726 127.107 -0.899Q123.71400000000001 0.928 119.07400000000001 0.928Q114.49200000000002 0.928 111.07000000000002 -0.8700000000000001Q107.64800000000001 -2.668 105.763 -6.032Q103.87800000000001 -9.396 103.87800000000001 -14.094000000000001Q103.87800000000001 -18.676000000000002 105.79200000000002 -22.04Q107.70600000000002 -25.404 111.12800000000001 -27.231Q114.55000000000001 -29.058 119.07400000000001 -29.058Q123.656 -29.058 127.049 -27.201999999999998Q130.442 -25.346 132.356 -21.982Q134.27 -18.618000000000002 134.27 -14.094000000000001ZM119.07400000000001 -21.344Q116.69600000000001 -21.344 115.33300000000001 -19.459000000000003Q113.97000000000001 -17.574 113.97000000000001 -14.094000000000001Q113.97000000000001 -10.498000000000001 115.30400000000002 -8.642000000000001Q116.63800000000002 -6.7860000000000005 119.07400000000001 -6.7860000000000005Q121.51000000000002 -6.7860000000000005 122.84400000000002 -8.671000000000001Q124.17800000000001 -10.556000000000001 124.17800000000001 -14.094000000000001Q124.17800000000001 -17.516000000000002 122.81500000000001 -19.43Q121.45200000000001 -21.344 119.07400000000001 -21.344Z M153.64200000000002 0.87Q157.818 0.87 161.09500000000003 -0.8700000000000001Q164.372 -2.6100000000000003 166.286 -5.974Q168.20000000000002 -9.338000000000001 168.20000000000002 -14.268Q168.20000000000002 -19.43 166.228 -22.707Q164.25600000000003 -25.984 160.71800000000002 -27.521Q157.18 -29.058 152.48200000000003 -29.058Q149.06 -29.058 146.21800000000002 -28.333Q143.376 -27.608 141.578 -26.448Q140.418 -25.694000000000003 139.751 -24.650000000000002Q139.084 -23.606 139.084 -22.040000000000003V-3.19H148.88600000000002V-20.474Q149.524 -20.822000000000003 150.452 -21.083000000000002Q151.38000000000002 -21.344 152.48200000000003 -21.344Q154.33800000000002 -21.344 155.58500000000004 -20.590000000000003Q156.83200000000002 -19.836000000000002 157.47000000000003 -18.299Q158.108 -16.762 158.108 -14.268Q158.108 -10.672 156.57100000000003 -8.787Q155.03400000000002 -6.902 152.13400000000001 -6.902Q150.51000000000002 -6.902 149.23400000000004 -7.540000000000001Q147.95800000000003 -8.178 146.972 -8.932V-0.6960000000000001Q148.364 -0.058 149.959 0.40599999999999997Q151.554 0.87 153.64200000000002 0.87ZM148.94400000000002 -5.5680000000000005H139.084V6.206Q139.084 8.874 140.389 9.86Q141.69400000000002 10.846 144.536 10.846Q145.92800000000003 10.846 147.11700000000002 10.672Q148.306 10.498000000000001 148.94400000000002 10.324Z M172.782 -36.018Q172.782 -38.222 174.29000000000002 -39.730000000000004Q175.79800000000003 -41.238 178.17600000000002 -41.238Q180.55400000000003 -41.238 182.062 -39.730000000000004Q183.57000000000002 -38.222 183.57000000000002 -36.018Q183.57000000000002 -33.872 182.062 -32.335Q180.55400000000003 -30.798000000000002 178.17600000000002 -30.798000000000002Q175.79800000000003 -30.798000000000002 174.29000000000002 -32.335Q172.782 -33.872 172.782 -36.018ZM173.246 -15.312000000000001H183.10600000000002V-0.058Q182.46800000000002 0.116 181.27900000000002 0.29000000000000004Q180.09000000000003 0.464 178.698 0.464Q175.85600000000002 0.464 174.55100000000002 -0.522Q173.246 -1.508 173.246 -4.176ZM183.10600000000002 -10.15H173.246V-27.782Q173.88400000000001 -27.956000000000003 175.07300000000004 -28.130000000000003Q176.26200000000003 -28.304000000000002 177.65400000000002 -28.304000000000002Q180.55400000000003 -28.304000000000002 181.83000000000004 -27.347Q183.10600000000002 -26.39 183.10600000000002 -23.664Z M189.138 -36.018Q189.138 -38.222 190.64600000000002 -39.730000000000004Q192.15400000000002 -41.238 194.532 -41.238Q196.91000000000003 -41.238 198.418 -39.730000000000004Q199.92600000000002 -38.222 199.92600000000002 -36.018Q199.92600000000002 -33.872 198.418 -32.335Q196.91000000000003 -30.798000000000002 194.532 -30.798000000000002Q192.15400000000002 -30.798000000000002 190.64600000000002 -32.335Q189.138 -33.872 189.138 -36.018ZM189.602 -15.312000000000001H199.46200000000002V-0.058Q198.824 0.116 197.63500000000002 0.29000000000000004Q196.44600000000003 0.464 195.054 0.464Q192.21200000000002 0.464 190.907 -0.522Q189.602 -1.508 189.602 -4.176ZM199.46200000000002 -10.15H189.602V-27.782Q190.24 -27.956000000000003 191.42900000000003 -28.130000000000003Q192.61800000000002 -28.304000000000002 194.01000000000002 -28.304000000000002Q196.91000000000003 -28.304000000000002 198.18600000000004 -27.347Q199.46200000000002 -26.39 199.46200000000002 -23.664Z M205.494 -36.018Q205.494 -38.222 207.002 -39.730000000000004Q208.51000000000002 -41.238 210.888 -41.238Q213.26600000000002 -41.238 214.774 -39.730000000000004Q216.282 -38.222 216.282 -36.018Q216.282 -33.872 214.774 -32.335Q213.26600000000002 -30.798000000000002 210.888 -30.798000000000002Q208.51000000000002 -30.798000000000002 207.002 -32.335Q205.494 -33.872 205.494 -36.018ZM205.958 -15.312000000000001H215.818V-0.058Q215.18 0.116 213.991 0.29000000000000004Q212.80200000000002 0.464 211.41 0.464Q208.568 0.464 207.263 -0.522Q205.958 -1.508 205.958 -4.176ZM215.818 -10.15H205.958V-27.782Q206.596 -27.956000000000003 207.78500000000003 -28.130000000000003Q208.97400000000002 -28.304000000000002 210.366 -28.304000000000002Q213.26600000000002 -28.304000000000002 214.54200000000003 -27.347Q215.818 -26.39 215.818 -23.664Z" fill="#FFF8F0"/><g transform="translate(219.066 0)"><path d="M13.746 -13.34 7.888000000000001 -12.180000000000001Q6.902 -12.818000000000001 6.032 -14.152000000000001Q5.162 -15.486 5.162 -17.284000000000002Q5.162 -19.082 6.119 -19.981Q7.0760000000000005 -20.880000000000003 8.932 -21.344L13.456000000000001 -22.446Q14.964 -22.91 15.66 -23.606Q16.356 -24.302 16.356 -25.578000000000003Q16.356 -26.68 15.283000000000001 -27.637Q14.21 -28.594 11.600000000000001 -28.594Q9.280000000000001 -28.594 7.163 -28.014000000000003Q5.046 -27.434 3.77 -26.564Q2.842 -27.318 2.117 -28.42Q1.3920000000000001 -29.522000000000002 1.3920000000000001 -30.972Q1.3920000000000001 -34.046 4.6690000000000005 -35.467Q7.946000000000001 -36.888000000000005 12.992 -36.888000000000005Q17.574 -36.888000000000005 20.648000000000003 -35.438Q23.722 -33.988 25.288000000000004 -31.436Q26.854000000000003 -28.884 26.854000000000003 -25.578000000000003Q26.854000000000003 -20.532 23.577 -17.603Q20.3 -14.674000000000001 13.746 -13.34ZM5.974 -4.466Q5.974 -6.844 7.482 -8.381Q8.99 -9.918000000000001 11.542 -9.918000000000001Q14.094000000000001 -9.918000000000001 15.602 -8.381Q17.11 -6.844 17.11 -4.466Q17.11 -2.088 15.602 -0.5509999999999999Q14.094000000000001 0.9860000000000001 11.542 0.9860000000000001Q8.99 0.9860000000000001 7.482 -0.5509999999999999Q5.974 -2.088 5.974 -4.466Z" fill="#EE6C4D"/></g></g></svg></a>
+    <ul>
+      <li><a href="#calendar" data-view="calendar">Calendar</a></li>
+      <li><a href="#despre" data-view="despre">Despre proiect</a></li>
+      <li><a href="#recomandari" data-view="recomandari">Recomandările noastre</a></li>
+      <li><a href="#comunitate" data-view="comunitate">Comunitate</a></li>
+      <li><a href="#colaborari" data-view="colaborari">Colaborări</a></li>
+      <li><a href="#profil" data-view="profil">Agenda mea</a></li>
+    </ul>
+  </div>
+</nav>
+<nav class="tabbar" aria-label="Meniu"><a href="#calendar" data-view="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Calendar</span></a><a href="#profil" data-view="profil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Agenda mea</span></a><a href="#recomandari" data-view="recomandari"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/></svg><span>Recomandări</span></a><a href="#comunitate" data-view="comunitate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9.5" r="2.5"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.6c.8-.4 1.6-.6 2.5-.6 2.1 0 3.7 1.4 4.2 3.8"/></svg><span>Comunitate</span></a><a href="#colaborari" data-view="colaborari"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12l3 3 5-6"/><circle cx="12" cy="12" r="9"/></svg><span>Colaborări</span></a><a href="#despre" data-view="despre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span>Despre</span></a></nav>
+
+<main>
+<!-- CALENDAR -->
+<div id="v-calendar" class="vwrap">
+  <header class="hero">
+    <div class="wrap">
+      <span class="city">Timișoara</span>
+      <h1>Ce facem cu copiii<span class="q">?</span></h1>
+      <p>Zilnic adăugăm în calendar toate evenimentele, spectacolele, atelierele și ieșirile pentru copii din oraș. Tu alegi ce vi se potrivește.</p>
+    </div>
+    <svg class="sym" viewBox="-48 -30 216 204" aria-hidden="true"><g transform="rotate(-14 -14 18)"><ellipse cx="-20" cy="34" rx="9" ry="7" fill="#EE6C4D"/><path d="M-12 33 V4 L4 0 V10" fill="none" stroke="#EE6C4D" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g><g transform="rotate(12 128 4)"><path d="M110 -12 H146 V8 C146 22 138 30 128 30 C118 30 110 22 110 8 Z" fill="#F4B942"/><circle cx="120" cy="2" r="3" fill="#1F4E5F"/><circle cx="136" cy="2" r="3" fill="#1F4E5F"/><path d="M119 13 Q128 22 137 13" fill="none" stroke="#1F4E5F" stroke-width="3" stroke-linecap="round"/></g><path d="M134 70 L139 81 L151 82 L142 90 L145 102 L134 96 L123 102 L126 90 L117 82 L129 81 Z" fill="#EE6C4D" stroke="#EE6C4D" stroke-width="2" stroke-linejoin="round"/><g transform="rotate(35 -16 92)"><rect x="-20" y="64" width="8" height="30" rx="3" fill="#FFF8F0"/><path d="M-24 94 H-8 C-8 106 -12 114 -16 118 C-20 114 -24 106 -24 94 Z" fill="#F4B942"/></g><g stroke="#F4B942" stroke-width="4" stroke-linecap="round"><path d="M70 -14 V-4"/><path d="M48 -8 L53 0"/><path d="M92 -8 L87 0"/></g><path d="M30 52 C30 28 46 16 62 16 C80 16 92 28 92 46 C92 62 80 70 70 78 C62 84 60 86 60 92" fill="none" stroke="#FFF8F0" stroke-width="22" stroke-linecap="round"/><circle cx="60" cy="132" r="22" fill="#EE6C4D"/><path d="M61 110 C61 104 66 101 70 104" fill="none" stroke="#1F4E5F" stroke-width="3.5" stroke-linecap="round"/><circle cx="52" cy="129" r="3" fill="#1F4E5F"/><circle cx="68" cy="129" r="3" fill="#1F4E5F"/><path d="M51 137 Q60 146 69 137" fill="none" stroke="#1F4E5F" stroke-width="3.5" stroke-linecap="round"/><circle cx="45.5" cy="138" r="3.5" fill="#FFB4A2"/><circle cx="74.5" cy="138" r="3.5" fill="#FFB4A2"/></svg>
+  </header>
+  <section class="view">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="eyebrow">Calendar</span>
+        <h2>Ce e de făcut în oraș</h2>
+        <p>Apasă pe un eveniment ca să-i vezi detaliile. Îl poți pune direct în calendarul tău personal, îl poți trimite cuiva interesat sau îl poți salva în agenda ta, aici pe platformă.</p>
+      </div>
+      <div class="filters">
+        <div class="row" id="f-per" role="group" aria-label="Perioada">
+          <span class="lbl">Când</span>
+          <button class="chip" type="button" data-v="all" aria-pressed="true">Toată luna</button>
+          <button class="chip" type="button" data-v="week" aria-pressed="false">Săptămâna asta</button>
+          <button class="chip" type="button" data-v="weekend" aria-pressed="false">Weekendul ăsta</button>
+        </div>
+        <div class="row" id="f-age" role="group" aria-label="Vârsta">
+          <span class="lbl">Vârsta</span>
+          <button class="chip" type="button" data-v="" aria-pressed="true">Oricare</button>
+          <button class="chip" type="button" data-v="kids" aria-pressed="false" id="age-kids" hidden>Copiii mei</button>
+          <button class="chip" type="button" data-v="0-3" aria-pressed="false">0-3 ani</button>
+          <button class="chip" type="button" data-v="3-6" aria-pressed="false">3-6 ani</button>
+          <button class="chip" type="button" data-v="6-12" aria-pressed="false">6-12 ani</button>
+          <button class="chip" type="button" data-v="12-18" aria-pressed="false">12+ ani</button>
+        </div>
+        <div class="row" id="f-cat" role="group" aria-label="Tipul activității"><span class="lbl">Ce</span></div>
+        <div class="count" id="count" aria-live="polite"></div>
+      </div>
+      <div class="days" id="days" role="tablist" aria-label="Alege ziua"></div>
+      <div id="list"></div>
+    </div>
+  </section>
+</div>
+
+<!-- DESPRE -->
+<section id="v-despre" class="view vwrap about" hidden>
+  <div class="wrap">
+    <div class="sec-h">
+      <span class="eyebrow">Despre proiect</span>
+      <h2>Ceau!</h2>
+    </div>
+    <p>Sunt Ana, mamă a cinci copii cu vârste între 0 și 14 ani, din Timișoara.</p>
+    <p>Luni la rând am petrecut ore întregi căutând ce putem face cu copiii în timpul liber: spectacole, expoziții, ateliere, concerte, ieșiri. Le adunam de pe zeci de site-uri, pagini greu de găsit și postări de pe social media, le salvam cum puteam (printscreen-uri, notițe), apoi cumpăram bilete și le treceam în calendarul familiei. Și, cu toate orele astea, tot mai ratam câte un eveniment fain din oraș.</p>
+    <p>Așa a apărut <strong>„Ce facem cu copiii?”</strong>. Mi-am dorit un singur loc în care să găsești tot ce se întâmplă în oraș pentru copii, de la bebeluși la adolescenți: citești descrierile, alegi ce vi se potrivește, cumperi biletul sau te înscrii și pui totul în agenda ta.</p>
+    <p>În calendarul săptămânal și în cel lunar nu facem recomandări. Doar adunăm totul, ca să-ți fie cât mai ușor să alegi. Când mergem undeva și ne place, scriem despre asta separat, la Recomandările noastre.</p>
+    <p>Simplu și ușor, ca să-ți rămână cât mai mult timp de calitate alături de familia ta.</p>
+    <div class="follow-box">
+      <h3>Urmărește-ne și pe social media</h3>
+      <div class="follow">
+        <a class="btn btn-main" href="https://www.instagram.com/cefacemcucopiii/" target="_blank" rel="noopener">Instagram</a>
+        <a class="btn btn-main" href="https://www.facebook.com/share/1Dk1phx9mW/" target="_blank" rel="noopener">Facebook</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RECOMANDARI -->
+<section id="v-recomandari" class="view vwrap" hidden>
+  <div class="wrap">
+    <div class="sec-h">
+      <span class="eyebrow">Recomandările noastre</span>
+      <h2>Locuri, oameni și sfaturi pentru părinți</h2>
+      <p>Aici scriem doar despre ce am încercat noi.</p>
+    </div>
+    
+    <div class="rec-grid" id="rec-grid"></div>
+  </div>
+</section>
+
+<!-- COMUNITATEA CFCC -->
+<section id="v-comunitate" class="view vwrap" hidden>
+  <div class="wrap">
+    <div class="sec-h">
+      <span class="eyebrow">Comunitatea CFCC</span>
+      <h2>Locurile și oamenii din spatele calendarului</h2>
+      <p>Fă cunoștință cu fiecare-n parte.</p>
+    </div>
+    <div id="org-grid"></div>
+  </div>
+</section>
+
+<!-- ARTICOL -->
+<section id="v-articol" class="view vwrap" hidden>
+  <div class="wrap" id="art-page"></div>
+</section>
+
+<!-- PAGINA ORGANIZATOR -->
+<section id="v-org" class="view vwrap" hidden>
+  <div class="wrap" id="org-page"></div>
+</section>
+
+<!-- FORMULAR PARTENER (pagină ascunsă, se trimite doar partenerilor: cefacemcucopiii.ro/#formular-partener) -->
+<section id="v-formular" class="view vwrap" hidden>
+  <div class="wrap">
+    <div class="sec-h">
+      <span class="eyebrow">Comunitatea CFCC</span>
+      <h2>Hai să construim împreună pagina voastră pe platforma Ce facem cu copiii?</h2>
+      <p>Completați aici tot ce vreți să apară pe pagina voastră de prezentare.</p>
+      <p><strong>Ce se întâmplă după ce trimiteți formularul:</strong> un om (adevărat) verifică tot ce ați completat. Dacă mai avem nevoie de ceva, vă contactăm. Când pagina e gata, v-o trimitem spre aprobare și o publicăm doar după ce ne dați ok.</p>
+    </div>
+    <form id="form-pg" novalidate>
+      <fieldset class="fs">
+        <legend>Despre voi</legend>
+        <label for="pg-name">Numele brandului <small>(cum vă știe lumea, nu cum apare în Registrul Comerțului)</small><input id="pg-name" required></label>
+        <label for="pg-tip">Cum vă descrieți pe scurt<input id="pg-tip" required placeholder="ex. centru educațional, bibliotecă, comunitate, atelier"></label>
+        <label for="pg-desc">Descriere<textarea id="pg-desc" required maxlength="900" placeholder="Ce faceți, pentru cine, ce vă face diferiți. 3-5 propoziții."></textarea><small class="cnt" data-for="pg-desc"></small></label>
+        <label for="pg-age">Vârste<input id="pg-age" placeholder="ex. 18 luni - 6 ani"></label>
+      </fieldset>
+
+      <fieldset class="fs">
+        <legend>Unde vă găsesc părinții</legend>
+        <p class="note">Apar pe pagină, la Informații.</p>
+        <label for="pg-addr">Adresa<input id="pg-addr" placeholder="ex. Str. Cluj nr. 26"></label>
+        <div class="fr">
+          <label for="pg-tel">Telefon pentru părinți<input id="pg-tel" type="tel"></label>
+          <label for="pg-mail">E-mail pentru părinți<input id="pg-mail" type="email"></label>
+        </div>
+        <div class="fr">
+          <label for="pg-ig">Instagram <small>(opțional)</small><input id="pg-ig" placeholder="link sau @nume"></label>
+          <label for="pg-fb">Facebook <small>(opțional)</small><input id="pg-fb" placeholder="link"></label>
+        </div>
+        <label for="pg-web">Website <small>(opțional)</small><input id="pg-web" type="url" placeholder="https://"></label>
+      </fieldset>
+
+      <fieldset class="fs">
+        <legend>Ce oferiți</legend>
+        <p class="note">Câte un rând pentru fiecare program, curs sau activitate. Le afișăm în ordinea de aici.</p>
+        <div id="pg-acts"></div>
+        <button class="btn btn-soft" type="button" id="pg-add">+ Adaugă încă o activitate sau tip de eveniment</button>
+      </fieldset>
+
+      <fieldset class="fs">
+        <legend>Poze</legend>
+        <p class="note">Cu cât pozele sunt mai bune, cu atât pagina voastră de prezentare arată mai profesionist. Câteva sfaturi:</p>
+        <ul class="tips">
+          <li>Format JPG sau PNG, în calitatea cea mai bună pe care o aveți. Nu trimiteți capturi de ecran sau poze luate de pe Instagram, sunt prea mici.</li>
+          <li>Poze clare, luminoase, făcute la lumină naturală, fără text, logo sau filtre puse peste.</li>
+          <li>Arătați locul și activitățile reale: sala, curtea, copiii la lucru, oamenii din echipă.</li>
+          <li>Nu folosiți poze generate cu AI. Slăbesc credibilitatea brandului: părinții sunt oameni reali și vor să vadă fotografii reale.</li>
+          <li>Dacă în poze apar copii, trebuie să aveți acordul părinților pentru publicare.</li>
+        </ul>
+        <label for="pg-logo">Logo <small>(pătrat, cel puțin 500 × 500 px, ideal PNG cu fundal transparent. Dacă nu aveți un logo, lăsați liber și vă contactăm noi.)</small><input id="pg-logo" type="file" accept="image/*"></label>
+        <div class="thumbs" id="th-logo"></div>
+        <label for="pg-cover">Poza principală <small>(apare sus pe pagină: orizontală, cel puțin 1600 px lățime, cea mai reprezentativă poză a voastră)</small><input id="pg-cover" type="file" accept="image/*"></label>
+        <div class="thumbs" id="th-cover"></div>
+        <label for="pg-gal">Alte poze <small>(cel mult 8, cel puțin 1200 px pe latura mare)</small><input id="pg-gal" type="file" accept="image/*" multiple></label>
+        <div class="thumbs" id="th-gal"></div>
+      </fieldset>
+
+      <fieldset class="fs">
+        <legend>Cum vă mai știe lumea</legend>
+        <label for="pg-names">Alte nume sub care apar evenimentele voastre <small>(dacă e cazul)</small><textarea id="pg-names" placeholder="ex. numele sălii, al festivalului sau prescurtări. Câte unul pe rând."></textarea></label>
+      </fieldset>
+
+      <fieldset class="fs">
+        <legend>Persoana de contact</legend>
+        <p class="note">Nu apare pe site. O folosim doar ca să vă trimitem pagina spre aprobare.</p>
+        <label for="pg-cname">Nume și prenume<input id="pg-cname" required></label>
+        <div class="fr">
+          <label for="pg-ctel">Telefon<input id="pg-ctel" type="tel" required></label>
+          <label for="pg-cmail">E-mail<input id="pg-cmail" type="email" required></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="fs">
+        <legend>Datele firmei</legend>
+        <p class="note">Entitatea legală, ca în Registrul Comerțului sau în Registrul asociațiilor. Nu apar pe site!</p>
+        <label for="pg-legal">Denumirea legală<input id="pg-legal" required placeholder="ex. Exemplu Kids S.R.L."></label>
+        <div class="fr">
+          <label for="pg-cui">CUI<input id="pg-cui" required placeholder="ex. RO12345678"></label>
+          <label for="pg-reg">Nr. de înregistrare<input id="pg-reg" required placeholder="ex. J35/1234/2020"></label>
+        </div>
+        <label for="pg-seat">Sediul social<input id="pg-seat" required placeholder="Strada, numărul, localitatea, județul"></label>
+        <label for="pg-note">Altceva ce vreți să știm <small>(opțional)</small><textarea id="pg-note"></textarea></label>
+      </fieldset>
+
+      <label for="pg-ok" class="check"><input id="pg-ok" type="checkbox" required> Confirm că avem dreptul să folosim pozele și textele trimise și suntem de acord să apară pe cefacemcucopiii.ro, după ce aprobăm pagina.</label>
+      <input id="pg-hp" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn btn-main" type="submit">Trimite informațiile</button>
+      <div class="err" id="pg-err" hidden></div>
+      <div class="msg" id="pg-ok-msg" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- COLABORARI -->
+<section id="v-colaborari" class="view vwrap" hidden>
+  <div class="wrap">
+    <div class="sec-h">
+      <span class="eyebrow">Colaborări</span>
+      <h2>Pentru organizatori și branduri</h2>
+      <p>Alege ce ai nevoie și completează formularul. Revenim noi cu răspuns.</p>
+    </div>
+    <div class="rules" id="f-type" role="group" aria-label="Ce vrei să ne trimiți">
+      <button class="rule" type="button" data-v="ev" aria-pressed="false"><span class="who">Evenimente cu dată</span><h3>Adaug un eveniment în calendar</h3><span class="note">Spectacole, ateliere, lansări, sesiuni demo. Listarea în calendar este și rămâne gratuită.</span><span class="pick">Completează formularul</span></button>
+      <button class="rule" type="button" data-v="pr" aria-pressed="false"><span class="who">Cursuri, cluburi, abonamente, branduri</span><h3>Vreau să colaborăm</h3><span class="note">Înainte de orice trebuie să ne cunoaștem, apoi alegem împreună varianta cea mai faină de colaborare în funcție de nevoile brandului tău.</span><span class="pick">Completează formularul</span></button>
+    </div>
+
+    <form id="form-ev" novalidate hidden>
+      <label for="ev-name">Numele evenimentului<input id="ev-name" required></label>
+      <label for="ev-org">Organizator<input id="ev-org" required></label>
+      <div class="fr">
+        <label for="ev-date">Data<input id="ev-date" type="date" required></label>
+        <label for="ev-time">Ora<input id="ev-time" type="time" required></label>
+      </div>
+      <label for="ev-place">Locația<input id="ev-place" placeholder="ex. Teatrul Merlin" required></label>
+      <label for="ev-addr">Adresa<input id="ev-addr" placeholder="ex. Bd. Regele Carol I nr. 3"></label>
+      <div class="fr">
+        <label for="ev-amin">Vârsta minimă recomandată<input id="ev-amin" placeholder="ex. 3 ani"></label>
+        <label for="ev-amax">Vârsta maximă recomandată<input id="ev-amax" placeholder="ex. 8 ani"></label>
+      </div>
+      <label for="ev-acc">Acces<select id="ev-acc"><option value="">Alege</option><option>Gratuit</option><option>Cu înscriere</option><option>Cu bilet</option></select></label>
+      <label for="ev-link" id="ev-link-wrap" hidden><span id="ev-link-lbl">Link</span><input id="ev-link" type="url" placeholder="https://"></label>
+      <label for="ev-desc">Descriere scurtă<textarea id="ev-desc" placeholder="Ce se întâmplă, cât durează, dacă e nevoie de înscriere"></textarea></label>
+      <div class="fr">
+        <label for="ev-mail">E-mailul tău<input id="ev-mail" type="email" required></label>
+        <label for="ev-tel">Telefon <small>(opțional)</small><input id="ev-tel" type="tel"></label>
+      </div>
+      <p class="note" style="margin:0">Folosim datele doar ca să verificăm evenimentul și să te contactăm despre el. Detalii în <a href="#confidentialitate">Politica de confidențialitate</a>.</p>
+      <button class="btn btn-main" type="submit">Trimite evenimentul</button>
+      <div class="err" id="ev-err" hidden></div>
+      <div class="msg" id="ev-ok" hidden></div>
+    </form>
+
+    <form id="form-pr" novalidate hidden>
+      <label for="pr-name">Numele afacerii sau al brandului<input id="pr-name" required></label>
+      <label for="pr-person">Persoana de contact<input id="pr-person" required></label>
+      <div class="fr">
+        <label for="pr-mail">E-mail<input id="pr-mail" type="email" required></label>
+        <label for="pr-tel">Telefon<input id="pr-tel" type="tel" required></label>
+      </div>
+      <div class="fr">
+        <label for="pr-ig">Instagram <small>(opțional)</small><input id="pr-ig" placeholder="@"></label>
+        <label for="pr-fb">Facebook <small>(opțional)</small><input id="pr-fb"></label>
+      </div>
+      <label for="pr-web">Website <small>(opțional)</small><input id="pr-web" type="url" placeholder="https://"></label>
+      <label for="pr-about">Spune-ne câte ceva despre voi<textarea id="pr-about" required placeholder="Ce faceți, pentru ce vârste, de cât timp"></textarea></label>
+      <label for="pr-need">Cam ce ai nevoie de la noi?<textarea id="pr-need" placeholder="ex. promovarea unui curs nou, o postare dedicată, un reel"></textarea></label>
+      <p class="note" style="margin:0">Folosim datele doar ca să te contactăm despre colaborare. Detalii în <a href="#confidentialitate">Politica de confidențialitate</a>.</p>
+      <button class="btn btn-main" type="submit">Trimite</button>
+      <div class="err" id="pr-err" hidden></div>
+      <div class="msg" id="pr-ok" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- PROFIL -->
+<section id="v-profil" class="view vwrap" hidden>
+  <div class="wrap">
+    <div class="sec-h">
+      <span class="eyebrow">Agenda mea</span>
+      <h2>Agenda familiei tale</h2>
+      <p>Salvează evenimentele care îți plac și la care vrei să mergi. Adaugă-ți copiii, ca să-ți putem arăta ce li se potrivește. Și nu uita să te abonezi la newsletter, ca să primești programul săptămânal pe e-mail, plus reduceri și oferte speciale pentru familii.</p>
+    </div>
+    <div class="login" id="auth-box">
+      <div id="auth-out">
+        <h3>Intră în cont</h3>
+        <p class="note" style="margin:0">Cu un cont, agenda ta te urmează pe orice telefon sau calculator. Fără cont, ce salvezi rămâne doar pe acest telefon.</p>
+        <button class="gbtn" type="button" id="g-login">
+          <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.2l7.8 6C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.8A14.5 14.5 0 0 1 9.5 24c0-1.7.3-3.3.9-4.8l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.2-13.5-9.9l-7.9 6C6.6 42.6 14.6 48 24 48z"/></svg>
+          Intră cu Google
+        </button>
+        <div class="or"><span>sau cu e-mail</span></div>
+        <form id="mail-form" novalidate style="padding:0;background:transparent">
+          <label for="au-mail">E-mail<input id="au-mail" type="email" autocomplete="email"></label>
+          <label for="au-pass">Parolă <small id="au-hint">(minim 6 caractere)</small><input id="au-pass" type="password" autocomplete="current-password"></label>
+          <div class="fr">
+            <button class="btn btn-main" type="submit" data-mode="in">Intră</button>
+            <button class="btn btn-soft" type="button" id="au-new">Creează cont</button>
+          </div>
+          <button class="linkbtn" type="button" id="au-reset">Am uitat parola</button>
+        </form>
+      </div>
+      <div id="auth-in" hidden>
+        <p style="margin:0">Ești conectat ca <strong id="au-who"></strong>. Agenda ta se salvează în cont.</p>
+        <div class="fr">
+          <button class="btn btn-soft" type="button" id="au-out">Ieși din cont</button>
+          <button class="linkbtn" type="button" id="au-del">Șterge contul</button>
+        </div>
+        <div id="au-del-confirm" class="msg" hidden>
+          Sigur? Se șterg contul și tot ce ai salvat în el, iar pasul nu se poate anula.
+          <div class="fr" style="margin-top:8px"><button class="btn btn-main" type="button" id="au-del-yes">Da, șterge</button><button class="btn btn-soft" type="button" id="au-del-no">Renunț</button></div>
+        </div>
+      </div>
+      <div class="err" id="au-err" hidden></div>
+      <div class="msg" id="au-ok" hidden></div>
+    </div>
+
+    <div class="panel">
+      <h3>Evenimente salvate</h3>
+      <div class="mini" id="saved-list"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Unde am fost</h3>
+      <p class="note" style="margin:0">Evenimentele salvate pe care le bifezi cu „Am fost" ajung aici, ca istoric al familiei.</p>
+      <div class="mini" id="hist-list"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Copiii mei</h3>
+      <p class="note" style="margin:0">Ne ajută să-ți arătăm evenimentele potrivite vârstei lor.</p>
+      <div class="mini" id="kids-list"></div>
+      <form id="kid-form" class="inline" novalidate style="padding:0;background:transparent">
+        <label for="kid-name">Prenume<input id="kid-name"></label>
+        <label for="kid-bday">Data nașterii<input id="kid-bday" type="date"></label>
+        <button class="btn btn-soft" type="submit">Adaugă</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h3 id="nl-title">Abonează-te</h3>
+      <p class="note" id="nl-done" hidden style="margin:0"></p>
+      <div id="nl-box" style="display:flex;flex-direction:column;gap:12px">
+      <p class="note" style="margin:0">Programul săptămânii, direct în inbox.</p>
+      <form id="nl-form" class="inline" novalidate style="padding:0;background:transparent;grid-template-columns:1fr auto">
+        <label for="nl-mail">E-mail<input id="nl-mail" type="email"></label>
+        <button class="btn btn-main" type="submit">Mă abonez</button>
+        <label for="nl-offers" class="check" style="grid-column:1/-1"><input id="nl-offers" type="checkbox"> Vreau să primesc și reduceri și oferte speciale pentru familii, de la organizatorii și brandurile cu care colaborați</label>
+      </form>
+      <p class="note" style="margin:0">Te poți dezabona oricând. Detalii în <a href="#confidentialitate">Politica de confidențialitate</a>.</p>
+      </div>
+      <div class="msg" id="nl-ok" hidden></div>
+    </div>
+  </div>
+</section>
+<section id="v-confidentialitate" class="view vwrap about" hidden>
+  <div class="wrap">
+    <div class="sec-h">
+      <span class="eyebrow">Confidențialitate</span>
+      <h2>Politica de confidențialitate</h2>
+      <p>Ultima actualizare: 7 octombrie 2026</p>
+    </div>
+    <h3>Cine suntem</h3>
+    <p>Site-ul cefacemcucopiii.ro și conturile „Ce facem cu copiii?” sunt administrate de DOING GOOD S.R.L., cu sediul în Timișoara, str. Deliblata nr. 21, bl. T1, parter, ap. 1, cam. 1, jud. Timiș, înregistrată la Registrul Comerțului sub nr. J35/776/2023, CUI 47675624. Noi suntem operatorul datelor tale.</p>
+    <h3>Ce date strângem și de ce</h3>
+    <p><strong>Formularul de eveniment:</strong> numele evenimentului, organizatorul, detaliile evenimentului, e-mailul și, opțional, telefonul. Le folosim ca să verificăm evenimentul, să-l publicăm în calendar și să te contactăm dacă avem întrebări.</p>
+    <p><strong>Formularul de colaborare:</strong> numele afacerii, persoana de contact, e-mailul, telefonul, conturile de social media și ce ne scrii despre voi. Le folosim ca să te contactăm și să-ți trimitem o ofertă.</p>
+    <p><strong>Abonarea pe e-mail:</strong> adresa de e-mail, ca să-ți trimitem programul săptămânal. Reduceri și oferte speciale de la organizatorii și brandurile cu care colaborăm îți trimitem doar dacă ai bifat separat că vrei asta. Nu le dăm adresa ta, ofertele vin de la noi.</p>
+    <p><strong>Agenda mea fără cont:</strong> evenimentele salvate, istoricul și copiii adăugați rămân doar în browserul de pe telefonul tău. Nu ajung la noi.</p>
+    <p><strong>Agenda mea cu cont:</strong> dacă intri în cont (cu Google sau cu e-mail și parolă), păstrăm adresa ta de e-mail, evenimentele salvate, istoricul și, dacă le adaugi, prenumele și data nașterii copiilor, ca să-ți arătăm evenimentele potrivite vârstei lor. Le adaugi tu, ca părinte, și le poți șterge oricând. Datele stau în Google Firebase, pe servere din Uniunea Europeană, și le vezi doar tu. Din Agenda mea poți șterge oricând contul, împreună cu toate datele lui.</p>
+    <h3>Temeiul legal</h3>
+    <p>Pentru formulare, temeiul este cererea ta de a fi contactat. Pentru contul din Agenda mea, temeiul este contractul de utilizare a serviciului, pe care îl închei când îți faci cont. Pentru e-mailuri, temeiul este consimțământul tău, pe care îl poți retrage oricând.</p>
+    <h3>Unde stau datele și cât timp</h3>
+    <p>Datele trimise prin formulare sunt păstrate în Google Workspace (Google Sheets), un serviciu al Google, pe care îl folosim ca furnizor. Nu vindem și nu dăm datele tale altor firme. Păstrăm datele de contact cât timp colaborăm sau ești abonat, iar după aceea cel mult un an.</p>
+    <h3>Cookie-uri</h3>
+    <p>Dacă accepți cookie-urile pentru reclame, folosim Meta Pixel, de la Meta Platforms (Facebook, Instagram). El ne arată câți oameni au venit pe site din reclamele noastre și dacă s-au abonat sau și-au făcut cont, ca să plătim doar pentru reclamele care ajung la părinți interesați. Meta primește date despre vizita ta și le poate lega de contul tău Meta, conform politicii proprii. Dacă refuzi, pixelul nu pornește. Îți poți schimba alegerea oricând, din linkul „Cookie-uri” din josul paginii.</p>
+    <p>Site-ul nu folosește cookie-uri de reclamă sau de urmărire. Salvăm în browserul tău doar ce adaugi în Agenda mea.</p>
+    <p>Pentru statistici folosim Umami, un serviciu care nu folosește cookie-uri și nu te identifică. Vedem doar cifre generale, de exemplu câte vizite are site-ul sau de câte ori a fost apăsat butonul de bilete al unui eveniment, ca să le putem arăta organizatorilor cât interes au evenimentele lor.</p>
+    <h3>Drepturile tale</h3>
+    <p>Ai dreptul să ceri acces la datele tale, corectarea sau ștergerea lor, să restrângi sau să te opui prelucrării și să-ți retragi consimțământul. Ne poți scrie pe Instagram, la @cefacemcucopiii. Dacă nu ești mulțumit de răspuns, te poți plânge la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (www.dataprotection.ro).</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Ce facem cu copiii? · Timișoara · <a href="#comunitate">Comunitatea CFCC</a> · <a href="#confidentialitate">Confidențialitate</a> · <a href="#" id="cookie-settings">Cookie-uri</a></span>
+    <span>cefacemcucopiii.ro · <a href="https://www.instagram.com/cefacemcucopiii/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.facebook.com/share/1Dk1phx9mW/" target="_blank" rel="noopener">Facebook</a></span>
+  </div>
+</footer>
+<div class="toast" id="toast" hidden></div>
+<div class="install consent" id="consent" hidden role="dialog" aria-label="Cookie-uri">
+  <div class="install-txt" style="grid-column:1/-1">
+    <strong>Despre ce prăjituri folosim</strong>
+    <span>Folosim cookie-uri Meta ca să vedem cum ajung părinții pe site-ul nostru. Le pornim doar dacă ești de acord. Detalii în <a href="#confidentialitate">Politica de confidențialitate</a>.</span>
+  </div>
+  <div class="install-act">
+    <button class="btn btn-main" type="button" id="consent-yes">Accept</button>
+    <button class="btn btn-soft" type="button" id="consent-no">Refuz</button>
+  </div>
+</div>
+<div class="install" id="install" hidden role="dialog" aria-label="Adaugă pe ecranul principal">
+  <img src="/assets/icon-192.png" alt="" width="48" height="48">
+  <div class="install-txt">
+    <strong>Pune calendarul pe ecranul telefonului</strong>
+    <span id="install-how">Se deschide ca o aplicație, dintr-o singură atingere.</span>
+  </div>
+  <div class="install-act">
+    <button class="btn btn-main" type="button" id="install-yes">Adaugă</button>
+    <button class="linkbtn" type="button" id="install-no">Nu acum</button>
+  </div>
+</div>
+
+
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// Sursa datelor: fila „Site" din centralizator, publicată ca CSV
+const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSbnUHTjwgSj9bQj79waxY-7mZqMM9n0mU9-dUEnyN2bgrpqm9OTJ4aKtRZujKrBX9ayFyU0ORrU4-D/pub?gid=900001&single=true&output=csv";
+// Formularele ajung în sheet prin scriptul Google (Apps Script)
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyMalcghERr4EJrRW9luAg1HptnBazb8bGd8ZSKJMX-TU1MWHNpIgkJLUZY1wYRYKscqw/exec";
+let EV=[],BYID={},loadState="loading";
+function parseCSV(t){
+  const rows=[];let row=[],f="",q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===","){row.push(f);f=""}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f=""}
+    else f+=c}
+  if(f||row.length){row.push(f);rows.push(row)}
+  return rows;
+}
+const slug=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40);
+// linkuri curate: doar titlul (max ~60 caractere, tăiat la cuvânt întreg); la titluri repetate se adaugă data, ex. detectivii-beta-18-octombrie
+const LUNI_SLUG=["ianuarie","februarie","martie","aprilie","mai","iunie","iulie","august","septembrie","octombrie","noiembrie","decembrie"];
+const RESERVED_IDS=new Set(["calendar","despre","recomandari","colaborari","profil","confidentialitate","formular","formular-partener","adauga-eveniment","colaborare-promovare"]);
+function titleSlug(n){let x=n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");if(x.length>60){x=x.slice(0,61);x=x.includes("-")?x.slice(0,x.lastIndexOf("-")):x.slice(0,60)}return x||"eveniment"}
+const dateSlug=d=>{const p=d.split("-");return (+p[2])+"-"+LUNI_SLUG[+p[1]-1]};
+function cleanUrl(u){u=(u||"").trim();if(!/^https?:\/\//i.test(u))return"";try{const x=new URL(u);["stkn","fbclid","igsh","mibextid","utm_source","utm_medium","utm_campaign"].forEach(k=>x.searchParams.delete(k));return x.toString()}catch(_){return""}}
+function accFrom(b){b=(b||"").toLowerCase();if(b.includes("donați")||b.includes("donati"))return"D";if(b.includes("înscriere")||b.includes("inscriere"))return"I";if(b.includes("bilet"))return"B";if(b.includes("gratuit"))return"G";return"-"}
+function isoFrom(ordine,data){
+  let m=(ordine||"").match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})/)||(data||"").trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if(!m)return null;return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
+}
+function toEvents(rows){
+  const out=[],seen={};
+  rows.slice(1).forEach(r=>{
+    const g=i=>(r[i]||"").trim();
+    const n=g(5).replace(/\s+/g," ");const d=isoFrom(g(0),g(1));if(!n||!d)return;
+    let t=g(2).replace(/\?/g,"").trim(),te=g(3).replace(/\?/g,"").trim();
+    let oid="e"+d.replace(/-/g,"")+"-"+slug(n);if(seen[oid])oid+="-"+(++seen[oid]);else seen[oid]=1;
+    let id=titleSlug(n);if(RESERVED_IDS.has(id))id="eveniment-"+id;
+    if(seen[id]){id+="-"+dateSlug(d);if(seen[id])id+="-"+(++seen[id]);else seen[id]=1}else seen[id]=1;
+    out.push({id,oid,d,t,te,o:g(4),n,c:g(6)||"Altele",a1:g(7),a2:g(8),l:g(9),ad:g(10),acc:accFrom(g(11)),link:cleanUrl(g(12))||cleanUrl(g(13)),desc:g(14)});
+  });
+  return out;
+}
+// linkurile vechi (#e20261009-...) și agendele salvate cu id-uri vechi trec pe id-ul nou
+function normIds(){if(typeof saved==="undefined")return;const m=id=>BYID[id]?BYID[id].id:id;const a=uniqIds(saved.map(m)),b=uniqIds(went.map(m));if(a.join()!==saved.join()||b.join()!==went.join()){saved=a;went=b;store.set("saved",saved);store.set("went",went)}}
+const uniqIds=a=>[...new Set(a)];
+async function loadEvents(){
+  try{
+    const r=await fetch(CSV_URL+"&t="+Math.floor(Date.now()/60000),{cache:"no-store"});if(!r.ok)throw new Error(r.status);
+    EV=toEvents(parseCSV(await r.text()));BYID=Object.fromEntries([...EV.map(e=>[e.oid,e]),...EV.map(e=>[e.id,e])]);loadState="ok";normIds();
+  }catch(err){loadState="error"}
+}
+const ACC_LBL={G:"Gratuit",I:"Cu înscriere",B:"Cu bilet",D:"Donație"};
+const PART_LBL={B:"Bilete",I:"Înscriere",G:"Participare"};
+const accKey=e=>e.acc==="D"?"G":e.acc;
+
+// Rubricile din Recomandări (articolele vin din fila Articole a sheet-ului Comunitatea CFCC)
+const RUBRICI=[
+ {t:"Unde mergem",d:"Locuri din oraș testate cu copiii.",c:"#EE6C4D",ic:"pin",sub:["Locații baby friendly","Restaurante și cafenele","Locuri de joacă","Grădinițe și creșe"]},
+ {t:"Am fost, ne-a plăcut",d:"Spectacole, ateliere și ieșiri la care am fost noi.",c:"#F4B942",ic:"heart",sub:["Recomandări personale"]},
+ {t:"Ghiduri pentru părinți",d:"Ce e bine de știut înainte să ieșiți din casă.",c:"#7fb7a4",ic:"book",sub:["Cum ne purtăm la teatru, operă, filarmonică, expoziții","Etape de creștere","De ce nu stă copilul pe scaun la teatru"]},
+ {t:"De vorbă cu...",d:"Oamenii din spatele locurilor și al poveștilor.",c:"#1F4E5F",ic:"chat",sub:["Psihologul","Oameni din oraș","Părinți care povestesc"]}
+];
+
+const TODAY=(()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate());})();
+const ZILE=["Duminică","Luni","Marți","Miercuri","Joi","Vineri","Sâmbătă"];
+const LUNI=["ian","feb","mar","apr","mai","iun","iul","aug","sep","oct","nov","dec"];
+const LUNI_LUNG=["ianuarie","februarie","martie","aprilie","mai","iunie","iulie","august","septembrie","octombrie","noiembrie","decembrie"];
+const dt=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const addDays=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// Stocare pe telefonul vizitatorului (până la logarea cu Google)
+const mem={};
+let pushHook=null;
+const store={get(k,f){try{const v=localStorage.getItem("cfcc_"+k);return v?JSON.parse(v):(mem[k]??f)}catch(_){return mem[k]??f}},
+             set(k,v){mem[k]=v;try{localStorage.setItem("cfcc_"+k,JSON.stringify(v))}catch(_){}}};
+let saved=store.get("saved",[]), went=store.get("went",[]), kids=store.get("kids",[]), sub=store.get("sub",null);
+const _set=store.set.bind(store);store.set=(k,v)=>{_set(k,v);if(pushHook&&["saved","went","kids","sub"].includes(k))pushHook()};
+
+function toast(t){const el=document.getElementById("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>el.hidden=true,2200)}
+
+/* vârste */
+function years(s){if(!s)return null;const m=String(s).toLowerCase().match(/(\d+)\s*(luni)?/);if(!m)return null;return m[2]?(+m[1])/12:+m[1]}
+function ageRange(e){if(e.a1==="A.G"||(!e.a1&&!e.a2))return[0,99];return[years(e.a1)??0,e.a2?(years(e.a2)??99):99]}
+function ageLabel(e){
+  if(e.a1==="A.G")return"Toate vârstele";
+  if(!e.a1&&!e.a2)return"";
+  if(e.a1&&e.a2){const a=/luni/i.test(e.a1)?e.a1:e.a1.replace(/\s*ani/i,"");const b=/luni|ani/i.test(e.a2)?e.a2:e.a2+" ani";return a+" - "+b}
+  return /luni/i.test(e.a1)?e.a1+"+":e.a1.replace(/\s*ani/i,"").replace("+","")+"+ ani";
+}
+const firstTime=e=>(e.t.match(/\d{1,2}:\d{2}/)||[null])[0];
+const timeLabel=e=>e.t?e.t.replace(/ si /g,"\n")+(e.te&&/^\d\d:\d\d$/.test(e.te)&&e.te>e.t?"\n- "+e.te:""):"ora\nîn curând";
+const dateLong=e=>{const d=dt(e.d);return `${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}`};
+const where=e=>[e.l,e.ad].filter(Boolean).join(", ");
+
+/* link Google Calendar */
+function gcalUrl(e){
+  const ymd=e.d.replace(/-/g,""),t=firstTime(e);let dates;
+  if(t){
+    const[h,m]=t.split(":").map(Number);
+    let end=/^\d\d:\d\d$/.test(e.te)&&e.te>t?e.te:null;
+    if(!end){const eh=h+1;end=String(eh).padStart(2,"0")+":"+String(m).padStart(2,"0")}
+    dates=`${ymd}T${t.replace(":","").padStart(4,"0")}00/${ymd}T${end.replace(":","")}00`;
+  }else{const n=addDays(dt(e.d),1);dates=`${ymd}/${n.getFullYear()}${String(n.getMonth()+1).padStart(2,"0")}${String(n.getDate()).padStart(2,"0")}`}
+  const det=[e.o&&"Organizator: "+e.o,ageLabel(e)&&"Vârstă: "+ageLabel(e),"Găsit pe cefacemcucopiii.ro"].filter(Boolean).join("\n");
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(e.n)+"&dates="+dates+"&ctz=Europe/Bucharest&location="+encodeURIComponent(where(e)+", Timișoara")+"&details="+encodeURIComponent(det);
+}
+const eventLink=e=>"https://cefacemcucopiii.ro/#"+e.id;
+const shareText=e=>`${e.n} - ${dateLong(e)}${firstTime(e)?", ora "+firstTime(e):""}, ${e.l}. Am găsit pe Ce facem cu copiii?`;
+
+/* filtre */
+const state={per:"all",age:"",cat:"",open:null};
+const fcat=document.getElementById("f-cat");
+function buildCats(){
+  fcat.querySelectorAll(".chip").forEach(c=>c.remove());
+  const cats=[...new Set(EV.map(e=>e.c))].filter(c=>c!=="Altele").sort((a,b)=>a.localeCompare(b,"ro"));
+  [["","Toate"],...cats.map(c=>[c,c])].forEach(([v,t],i)=>{const b=document.createElement("button");b.type="button";b.className="chip";b.dataset.v=v;b.textContent=t;b.setAttribute("aria-pressed",i===0?"true":"false");fcat.appendChild(b)});
+}
+function bindChips(id,fn){document.getElementById(id).addEventListener("click",ev=>{const b=ev.target.closest(".chip");if(!b)return;[...ev.currentTarget.querySelectorAll(".chip")].forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));fn(b.dataset.v)})}
+bindChips("f-per",v=>{state.per=v;render()});bindChips("f-age",v=>{state.age=v;render()});bindChips("f-cat",v=>{state.cat=v;render()});
+
+function inPeriod(e){
+  const d=dt(e.d);if(d<TODAY)return false;
+  if(state.per==="week")return d<=addDays(TODAY,7);
+  if(state.per==="weekend")return d<=addDays(TODAY,7)&&(d.getDay()===6||d.getDay()===0);
+  return true;
+}
+const I={
+ cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>',
+ share:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>',
+ save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
+ saved:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
+ ticket:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 8a2 2 0 0 0 0 4v4h18v-4a2 2 0 0 1 0-4V4H3z" transform="translate(0 2)"/><path d="M14 6v12" stroke-dasharray="2 2" transform="translate(0 0)"/></svg>',
+ pin:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+ caret:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>'
+};
+function evCard(e){
+  const open=state.open===e.id, isSaved=saved.includes(e.id), al=ageLabel(e);
+  return `<article class="ev${open?" open":""}" id="${e.id}">
+    <button class="ev-head" type="button" data-open="${e.id}" aria-expanded="${open}">
+      <div class="tm">${esc(timeLabel(e))}</div>
+      <div><h3>${esc(e.n)}</h3>${(()=>{const same=e.o&&e.l&&e.l.trim().toLowerCase()===e.o.trim().toLowerCase();return same?`<div class="meta org loc">${I.pin}${esc(e.o)}</div>`:(e.o?`<div class="meta org">${esc(e.o)}</div>`:"")+(e.l?`<div class="meta loc">${I.pin}${esc(e.l)}</div>`:"")})()}
+        <div class="tags"><span class="tag">${esc(e.c)}</span>${al?`<span class="tag age">${esc(al)}</span>`:""}${isSaved?'<span class="tag saved">Salvat</span>':""}</div></div>
+      <span class="caret">${I.caret}</span>
+    </button>
+    ${open?`<div class="det">
+      <dl>
+        <dt>Când</dt><dd>${esc(dateLong(e))}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}</dd>
+        <dt>Unde</dt><dd>${orgLink(e.l)}</dd>
+        ${e.ad?`<dt>Adresa</dt><dd>${esc(e.ad)}</dd>`:""}
+        ${al?`<dt>Vârsta</dt><dd>${esc(al)}</dd>`:""}
+        <dt>Tip</dt><dd>${esc(e.c)}</dd>
+        ${e.o?`<dt>Organizator</dt><dd>${orgLink(e.o)}</dd>`:""}
+      </dl>
+      ${e.desc?`<p class="desc">${esc(e.desc)}</p>`:""}
+      <div class="actions">
+        <a class="act" href="${gcalUrl(e)}" target="_blank" rel="noopener" data-trk="Adaugă în calendar" data-trk-id="${e.id}">${I.cal}Adaugă în calendar</a>
+        <button class="act" type="button" data-share="${e.id}">${I.share}Distribuie</button>
+        <button class="act${isSaved?" on":""}" type="button" data-save="${e.id}">${isSaved?I.saved:I.save}${isSaved?"Salvat":"Salvează"}</button>
+        ${e.link?`<a class="act act-go" href="${esc(e.link)}" target="_blank" rel="noopener" data-trk="Click bilete / înscriere" data-trk-id="${e.id}">${I.ticket}${PART_LBL[accKey(e)]||"Participare"}</a>`:""}
+      </div>
+      <div class="sharebox" id="sb-${e.id}" hidden>
+        <a href="https://wa.me/?text=${encodeURIComponent(shareText(e)+" "+eventLink(e))}" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventLink(e))}" target="_blank" rel="noopener">Facebook</a>
+        <button type="button" data-copy="${e.id}">Copiază linkul</button>
+      </div>
+    </div>`:""}
+  </article>`;
+}
+const ZS=["Du","Lu","Ma","Mi","Jo","Vi","Sâ"];
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+function dayRange(){
+  const last=EV.reduce((m,e)=>e.d>m?e.d:m,iso(TODAY));
+  const end=state.per==="all"?dt(last):addDays(TODAY,7);
+  const out=[];for(let d=TODAY;d<=end;d=addDays(d,1)){if(state.per==="weekend"&&d.getDay()!==6&&d.getDay()!==0)continue;out.push(iso(d))}
+  return out;
+}
+function render(){
+  const list=document.getElementById("list");
+  if(loadState!=="ok"){document.getElementById("days").innerHTML="";document.getElementById("count").textContent="";
+    list.innerHTML=loadState==="loading"?'<div class="empty">Se încarcă calendarul...</div>':'<div class="empty">Calendarul nu s-a putut încărca. Verifică internetul și reîncarcă pagina.</div>';return}
+  let rows=EV.filter(inPeriod);
+  if(state.age==="kids"){const ages=kids.map(k=>kidYears(k.b));rows=rows.filter(e=>{const[a,b]=ageRange(e);return ages.some(x=>x>=a&&x<=b+0.99)})}
+  else if(state.age){const[lo,hi]=state.age.split("-").map(Number);rows=rows.filter(e=>{const[a,b]=ageRange(e);return a<hi&&b>=lo})}
+  if(state.cat)rows=rows.filter(e=>e.c===state.cat);
+  rows.sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
+  const by={};rows.forEach(e=>(by[e.d]=by[e.d]||[]).push(e));
+  const days=dayRange();
+  if(!state.day||!days.includes(state.day)||(!by[state.day]&&!state.dayPicked))state.day=days.find(k=>by[k])||null;
+  document.getElementById("count").textContent=rows.length?`${rows.length} ${rows.length===1?"activitate":"activități"} în perioada aleasă. Alege ziua:`:"";
+  const strip=document.getElementById("days");
+  strip.innerHTML=days.map(k=>{const d=dt(k),n=(by[k]||[]).length,we=d.getDay()===0||d.getDay()===6,sel=k===state.day;
+    return `<button type="button" class="dpill${we?" we":""}${sel?" sel":""}" data-day="${k}" role="tab" aria-selected="${sel}" ${n?"":'data-empty="1"'} aria-label="${ZILE[d.getDay()]} ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}, ${n} activități">
+      <span class="dz">${ZS[d.getDay()]}</span><span class="dd">${d.getDate()}</span><span class="dn">${n||"-"}</span></button>`}).join("");
+  const selEl=strip.querySelector(".sel");if(selEl)strip.scrollLeft=Math.max(0,selEl.offsetLeft-strip.offsetLeft-16);
+  if(!state.day){list.innerHTML='<div class="empty">Nu am găsit nimic pentru filtrele alese. Încearcă altă vârstă sau toată luna.</div>';return}
+  const d=dt(state.day),ev=by[state.day];
+  if(!ev){const filt=state.age||state.cat;
+    list.innerHTML=`<div class="dayhead"><h3>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}</h3></div>
+    <div class="empty" style="display:flex;flex-direction:column;gap:12px;align-items:center">
+      <span>${filt?"Nu am găsit evenimente pentru filtrele alese în ziua asta.":"Încă nu am găsit evenimente pentru copii în ziua asta."} Organizezi tu ceva? Scrie-ne și îl adăugăm în calendar.</span>
+      <a class="btn btn-main" href="#adauga-eveniment">Adaugă evenimentul tău</a></div>`;return}
+  list.innerHTML=`<div class="dayhead"><h3>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}</h3><span>${ev.length} ${ev.length===1?"activitate":"activități"}</span></div><div class="evs">${ev.map(evCard).join("")}</div>`;
+}
+document.getElementById("days").addEventListener("click",ev=>{const b=ev.target.closest("[data-day]");if(!b)return;state.day=b.dataset.day;state.dayPicked=!!b.dataset.empty;state.open=null;render()});
+
+/* statistici (Umami, fără cookie-uri): numără click-urile pe acțiunile fiecărui eveniment */
+function track(name,id,extra){try{if(!window.umami)return;const e=id&&BYID[id];const data=Object.assign(e?{eveniment:e.n,organizator:e.o||"",locatie:e.l||"",data:e.d,categorie:e.c}:{},extra||{});window.umami.track(name,data)}catch(_){}}
+document.addEventListener("click",ev=>{const a=ev.target.closest("[data-trk]");if(a)track(a.dataset.trk,a.dataset.trkId,a.dataset.trkOrg?{organizator:a.dataset.trkOrg}:null)},true);
+function toggleSave(id){
+  saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];if(saved.includes(id))track("Salvează",id);
+  if(!saved.includes(id))went=went.filter(x=>x!==id);
+  store.set("saved",saved);store.set("went",went);
+  toast(saved.includes(id)?"Salvat în Agenda mea":"Scos din salvate");
+  render();renderProfile();
+}
+async function share(id){
+  const e=BYID[id];track("Distribuie",id);
+  if(navigator.share){try{await navigator.share({title:e.n,text:shareText(e),url:eventLink(e)});return}catch(err){if(err&&err.name==="AbortError")return}}
+  const sb=document.getElementById("sb-"+id);if(sb)sb.hidden=!sb.hidden;
+}
+async function copyLink(id){
+  const t=eventLink(BYID[id]);
+  try{await navigator.clipboard.writeText(t);toast("Link copiat")}catch(_){toast(t)}
+}
+document.addEventListener("click",ev=>{
+  const o=ev.target.closest("[data-open]");if(o){const id=o.dataset.open;state.open=state.open===id?null:id;if(state.open)track("Detalii eveniment",id);render();return}
+  const s=ev.target.closest("[data-save]");if(s){toggleSave(s.dataset.save);return}
+  const sh=ev.target.closest("[data-share]");if(sh){share(sh.dataset.share);return}
+  const c=ev.target.closest("[data-copy]");if(c){copyLink(c.dataset.copy);return}
+  const w=ev.target.closest("[data-went]");if(w){const id=w.dataset.went;went=went.includes(id)?went.filter(x=>x!==id):[...went,id];if(went.includes(id))track("Am fost",id);store.set("went",went);renderProfile();return}
+  const u=ev.target.closest("[data-unsave]");if(u){toggleSave(u.dataset.unsave);return}
+  const k=ev.target.closest("[data-kid]");if(k){kids.splice(+k.dataset.kid,1);store.set("kids",kids);renderProfile();return}
+  const g=ev.target.closest("[data-goto]");if(g){go(g.dataset.goto,true);return}
+});
+
+/* recomandari */
+const RIC={
+ pin:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.6"/>',
+ heart:'<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/>',
+ book:'<path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5V19c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5z"/><path d="M12 6v13.5"/>',
+ chat:'<path d="M5 5h14v10H10l-4 3.5V15H5z"/><path d="M9 9.5h6M9 12h4"/>'
+};
+
+
+/* formulare colaborari */
+function openForm(v,scroll){
+  document.querySelectorAll("#f-type .rule").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===v?"true":"false"));
+  document.getElementById("form-ev").hidden=v!=="ev";document.getElementById("form-pr").hidden=v!=="pr";
+  if(v&&scroll)setTimeout(()=>document.getElementById(v==="ev"?"form-ev":"form-pr").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}),60);
+}
+document.getElementById("f-type").addEventListener("click",ev=>{const b=ev.target.closest(".rule");if(!b)return;openForm(b.dataset.v,true)});
+async function sendForm(tip,campuri){
+  await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({tip,campuri})});
+}
+const val=id=>document.getElementById(id).value.trim();
+function wireForm(fid,req,errId,okId,okText,tip,build){
+  const form=document.getElementById(fid);
+  form.addEventListener("submit",async ev=>{
+    ev.preventDefault();
+    const missing=req.filter(id=>!val(id));
+    const mailEl=[...form.querySelectorAll('input[type=email]')][0];
+    const badMail=mailEl&&mailEl.value&&!/^\S+@\S+\.\S+$/.test(mailEl.value.trim());
+    const err=document.getElementById(errId),ok=document.getElementById(okId);
+    if(missing.length||badMail){err.textContent=badMail?"Verifică adresa de e-mail.":"Completează câmpurile obligatorii.";err.hidden=false;ok.hidden=true;document.getElementById(missing[0]||mailEl.id).focus();return}
+    const btn=form.querySelector('button[type=submit]');btn.disabled=true;const lbl=btn.textContent;btn.textContent="Se trimite...";
+    try{await sendForm(tip,build());track(tip==="eveniment"?"Formular eveniment trimis":"Formular colaborare trimis");err.hidden=true;ok.textContent=okText;ok.hidden=false;form.reset();form.dispatchEvent(new Event("sent"))}
+    catch(_){err.textContent="Nu s-a putut trimite. Verifică internetul și încearcă din nou.";err.hidden=false;ok.hidden=true}
+    finally{btn.disabled=false;btn.textContent=lbl}
+  });
+}
+const evAcc=document.getElementById("ev-acc"),linkWrap=document.getElementById("ev-link-wrap");
+evAcc.addEventListener("change",()=>{
+  const v=evAcc.value, show=v==="Cu înscriere"||v==="Cu bilet";
+  linkWrap.hidden=!show;
+  document.getElementById("ev-link-lbl").textContent=v==="Cu bilet"?"Link spre bilete":"Link spre formularul de înscriere";
+});
+document.getElementById("form-ev").addEventListener("submit",ev=>{
+  const l=document.getElementById("ev-link");
+  if(linkWrap.hidden)return;
+  if(!/^https?:\/\/\S+\.\S+/.test(l.value.trim())){ev.stopImmediatePropagation();ev.preventDefault();const err=document.getElementById("ev-err");err.textContent=l.value.trim()?"Linkul trebuie să înceapă cu https://":"Adaugă linkul spre "+(evAcc.value==="Cu bilet"?"bilete.":"formularul de înscriere.");err.hidden=false;document.getElementById("ev-ok").hidden=true;l.focus();}
+});
+wireForm("form-ev",["ev-name","ev-org","ev-date","ev-time","ev-place","ev-acc","ev-mail"],"ev-err","ev-ok","Mulțumim! Verificăm evenimentul și îl adăugăm în calendar.","eveniment",()=>({
+  "Nume eveniment":val("ev-name"),"Organizator":val("ev-org"),"Data":val("ev-date"),"Ora":val("ev-time"),"Locație":val("ev-place"),"Adresă":val("ev-addr"),
+  "Vârstă minimă":val("ev-amin"),"Vârstă maximă":val("ev-amax"),"Acces":val("ev-acc"),"Link bilete / înscriere":linkWrap.hidden?"":val("ev-link"),
+  "Descriere":val("ev-desc"),"E-mail":val("ev-mail"),"Telefon":val("ev-tel")}));
+document.getElementById("form-ev").addEventListener("sent",()=>{linkWrap.hidden=true});
+wireForm("form-pr",["pr-name","pr-person","pr-mail","pr-tel","pr-about"],"pr-err","pr-ok","Mulțumim! Te contactăm curând ca să ne cunoaștem.","colaborare",()=>({
+  "Afacere / brand":val("pr-name"),"Persoană de contact":val("pr-person"),"E-mail":val("pr-mail"),"Telefon":val("pr-tel"),"Instagram":val("pr-ig"),
+  "Facebook":val("pr-fb"),"Website":val("pr-web"),"Despre ei":val("pr-about"),"Ce au nevoie":val("pr-need")}));
+
+/* profil */
+function miniEv(e,mode){
+  return `<div class="mini-ev"><div><b>${esc(e.n)}</b><span>${esc(dateLong(e))}${firstTime(e)?", "+firstTime(e):""} · ${esc(e.l)}</span></div>
+  ${mode==="saved"?`<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="x" type="button" data-went="${e.id}">Am fost</button><button class="x" type="button" data-unsave="${e.id}" aria-label="Scoate ${esc(e.n)} din salvate">Scoate</button></div>`
+   :`<button class="x on" type="button" data-went="${e.id}">Am fost ✓</button>`}</div>`;
+}
+function kidYears(b){const d=dt(b);return (TODAY-d)/(365.25*864e5)}
+function age(b){const d=dt(b);let y=TODAY.getFullYear()-d.getFullYear(),m=TODAY.getMonth()-d.getMonth();if(TODAY.getDate()<d.getDate())m--;if(m<0){y--;m+=12}return y>=2?y+" ani":(y*12+m)+" luni"}
+function syncKidsChip(){const c=document.getElementById("age-kids");c.hidden=!kids.length;if(!kids.length&&state.age==="kids"){state.age="";document.querySelectorAll("#f-age .chip").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===""?"true":"false"));render()}}
+function renderSub(){const on=!!(sub&&sub.email);document.getElementById("nl-box").hidden=on;const d=document.getElementById("nl-done");d.hidden=!on;
+  document.getElementById("nl-title").textContent=on?"Ești abonat":"Abonează-te";
+  if(on)d.textContent=`Primești programul în fiecare săptămână pe ${sub.email}${sub.offers?", plus reduceri și oferte speciale":""}.`}
+function renderProfile(){
+  syncKidsChip();renderSub();
+  const sv=saved.filter(id=>BYID[id]&&!went.includes(id)).map(id=>BYID[id]).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
+  document.getElementById("saved-list").innerHTML=sv.length?sv.map(e=>miniEv(e,"saved")).join(""):'<p class="note" style="margin:0">Nu ai salvat încă nimic. Deschide un eveniment din <a href="#calendar" data-goto="calendar">Calendar</a> și apasă Salvează.</p>';
+  const h=went.filter(id=>BYID[id]).map(id=>BYID[id]);
+  document.getElementById("hist-list").innerHTML=h.length?h.map(e=>miniEv(e,"went")).join(""):"";
+  document.getElementById("kids-list").innerHTML=kids.map((k,i)=>`<div class="kid"><span><b>${esc(k.n)}</b> · ${esc(age(k.b))}</span><button class="x" type="button" data-kid="${i}">Șterge</button></div>`).join("");
+}
+document.getElementById("kid-form").addEventListener("submit",ev=>{ev.preventDefault();const n=document.getElementById("kid-name").value.trim(),b=document.getElementById("kid-bday").value;if(!n||!b){toast("Completează prenumele și data nașterii");return}kids.push({n,b});store.set("kids",kids);ev.target.reset();renderProfile()});
+document.getElementById("nl-form").addEventListener("submit",async ev=>{ev.preventDefault();const m=val("nl-mail");const ok=document.getElementById("nl-ok");if(!/^\S+@\S+\.\S+$/.test(m)){toast("Verifică adresa de e-mail");return}
+  const btn=ev.target.querySelector("button[type=submit]");btn.disabled=true;
+  try{await sendForm("abonare",{"E-mail":m,"Vrea oferte de la parteneri":document.getElementById("nl-offers").checked?"Da":"Nu"});const offers=document.getElementById("nl-offers").checked;sub={email:m,offers};store.set("sub",sub);track("Abonare newsletter",null,{oferte:offers?"da":"nu"});pixel("Lead",{content_name:"Abonare newsletter"});ok.textContent="Gata, te-am notat!";ok.hidden=false;ev.target.reset();renderSub()}
+  catch(_){toast("Nu s-a putut trimite. Încearcă din nou.")}finally{btn.disabled=false}});
+
+/* formular partener: pagina ascunsă #formular-partener. Trimite totul în fila „Pagini parteneri - de verificat” din centralizator. */
+(()=>{
+  const $f=id=>document.getElementById(id);
+  const acts=$f("pg-acts");
+  const EX=[["Curs de înot pentru începători","4-7 ani, de 2 ori pe săptămână"],["Atelier de ceramică părinte-copil","3-10 ani, în fiecare sâmbătă"],["Petreceri aniversare","grupuri de până la 15 copii"],["Ora de povești","1-4 ani, joi dimineața"]];
+  const addAct=()=>{if(acts.children.length>=12)return;const ex=EX[acts.children.length%EX.length];
+    const d=document.createElement("div");d.className="act-row";
+    d.innerHTML=`<label>Activitate<input class="pa-t" placeholder="ex. ${ex[0]}"></label><label>Detalii<input class="pa-d" placeholder="ex. ${ex[1]}"></label><button type="button" class="x" aria-label="Șterge activitatea">Șterge</button>`;
+    d.querySelector(".x").addEventListener("click",()=>{d.remove();if(!acts.children.length)addAct()});acts.appendChild(d)};
+  addAct();addAct();$f("pg-add").addEventListener("click",addAct);
+  const cnt=document.querySelector('.cnt[data-for="pg-desc"]');const upd=()=>{cnt.textContent=$f("pg-desc").value.length+" / 900"};$f("pg-desc").addEventListener("input",upd);upd();
+  /* poze: micșorate în browser, ca să nu trimitem fișiere uriașe */
+  async function shrink(file,max){
+    const url=URL.createObjectURL(file);
+    try{const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});
+      const k=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement("canvas");
+      c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);
+      const png=/png/i.test(file.type)&&max<=800;const x=c.getContext("2d");if(!png){x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height)}
+      x.drawImage(img,0,0,c.width,c.height);
+      const tip=png?"image/png":"image/jpeg";const data=c.toDataURL(tip,.82);
+      return {nume:file.name.replace(/\.[^.]+$/,"")+(png?".png":".jpg"),tip,data:data.split(",")[1],prev:data}}
+    finally{URL.revokeObjectURL(url)}
+  }
+  const POZE={logo:[],cover:[],gal:[]};
+  const showThumbs=k=>{$f("th-"+k).innerHTML=POZE[k].map((p,i)=>`<span class="th"><img src="${p.prev}" alt=""><button type="button" class="x" data-k="${k}" data-i="${i}" aria-label="Scoate poza">×</button></span>`).join("")};
+  document.addEventListener("click",ev=>{const b=ev.target.closest(".th .x");if(!b)return;POZE[b.dataset.k].splice(+b.dataset.i,1);showThumbs(b.dataset.k)});
+  const wire=(id,k,max,limit)=>$f(id).addEventListener("change",async ev=>{const files=[...ev.target.files].filter(f=>/^image\//.test(f.type));
+    const err=$f("pg-err");err.hidden=true;
+    for(const f of files){if(POZE[k].length>=limit){if(limit===1)POZE[k]=[];else{err.textContent="Cel mult 8 poze în plus.";err.hidden=false;break}}
+      try{POZE[k].push(await shrink(f,max))}catch(_){err.textContent="O poză nu s-a putut citi. Încercați JPG sau PNG.";err.hidden=false}}
+    ev.target.value="";showThumbs(k)});
+  wire("pg-logo","logo",600,1);wire("pg-cover","cover",1800,1);wire("pg-gal","gal",1600,8);
+  const form=$f("form-pg");
+  form.addEventListener("submit",async ev=>{
+    ev.preventDefault();
+    const err=$f("pg-err"),ok=$f("pg-ok-msg");
+    if($f("pg-hp").value)return;
+    const req=["pg-name","pg-tip","pg-desc","pg-cname","pg-ctel","pg-cmail","pg-legal","pg-cui","pg-reg","pg-seat"];const miss=req.filter(id=>!val(id));
+    const badMail=["pg-mail","pg-cmail"].find(id=>val(id)&&!/^\S+@\S+\.\S+$/.test(val(id)));
+    if(miss.length||badMail||!$f("pg-ok").checked){err.textContent=badMail?"Verificați adresa de e-mail.":miss.length?"Completați câmpurile obligatorii: numele brandului, descrierea, persoana de contact și datele firmei.":"Bifați acordul de la final.";
+      err.hidden=false;ok.hidden=true;(miss[0]?$f(miss[0]):badMail?$f(badMail):$f("pg-ok")).focus();return}
+    const activ=[...acts.children].map(r=>[r.querySelector(".pa-t").value.trim(),r.querySelector(".pa-d").value.trim()]).filter(a=>a[0]).map(a=>a[1]?a[0]+" | "+a[1]:a[0]).join("\n");
+    const strip=p=>({nume:p.nume,tip:p.tip,data:p.data});
+    const btn=form.querySelector('button[type=submit]');btn.disabled=true;const lbl=btn.textContent;btn.textContent="Se trimite...";
+    try{
+      await sendForm("pagina",{"Nume":val("pg-name"),"Ce sunt":val("pg-tip"),"Descriere":val("pg-desc"),"Vârste":val("pg-age"),"Adresă":val("pg-addr"),
+        "Telefon public":val("pg-tel"),"E-mail public":val("pg-mail"),"Instagram":val("pg-ig"),"Facebook":val("pg-fb"),"Website":val("pg-web"),
+        "Activități":activ,"Nume în calendar":val("pg-names"),"Persoană de contact":val("pg-cname"),"Telefon contact":val("pg-ctel"),"E-mail":val("pg-cmail"),
+        "Denumire legală":val("pg-legal"),"CUI":val("pg-cui"),"Nr. înregistrare":val("pg-reg"),"Sediu social":val("pg-seat"),"Observații":val("pg-note"),"Acord publicare":"Da",
+        "_poze":{logo:POZE.logo.map(strip),cover:POZE.cover.map(strip),gal:POZE.gal.map(strip)}});
+      track("Formular pagină partener trimis");err.hidden=true;ok.textContent="Mulțumim! Am primit informațiile. Un om din echipa noastră le verifică, vă contactează dacă mai e nevoie de ceva și vă trimite pagina spre aprobare înainte s-o publicăm.";ok.hidden=false;
+      form.reset();POZE.logo=[];POZE.cover=[];POZE.gal=[];["logo","cover","gal"].forEach(showThumbs);acts.innerHTML="";addAct();addAct();upd();ok.scrollIntoView({block:"center"});
+    }catch(_){err.textContent="Nu s-a putut trimite. Verificați internetul și încercați din nou.";err.hidden=false;ok.hidden=true}
+    finally{btn.disabled=false;btn.textContent=lbl}
+  });
+})();
+
+/* Comunitatea CFCC: paginile partenerilor și articolele vin live din sheet-ul „Comunitatea CFCC - pagini parteneri”
+   (partajat „oricine are linkul poate vedea”). Dacă sheet-ul nu răspunde, site-ul folosește comunitate.json. */
+const COM_SHEET="19VxFnrcRzF8sMIG0tUiQSexOE1I21g5tXm9CQw2n7hQ";
+const COM_TABS={parteneri:0,activitati:1001,galerie:1002,articole:1003};
+let ORGS=[],ORG_BY={},ARTS=[],ART_BY={},orgState="loading";
+const norm=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+/* imagini: link https sau fișier din site (ex. assets/logos/merlin.png) */
+const imgUrl=u=>{u=(u||"").trim();return /^[\w\-./]+\.(png|jpe?g|webp|svg)$/i.test(u)&&!u.includes("..")?u:cleanUrl(u)};
+const da=v=>/^da/i.test((v||"").trim());
+function buildCom(t){
+  const rows=k=>(t[k]||[]).slice(1).map(r=>{const g=i=>(r[i]||"").trim();return g});
+  ARTS=rows("articole").filter(g=>g(1)&&da(g(8))).map(g=>({id:slug(g(0)||g(1)),t:g(1),rub:g(2),data:g(3),rez:g(4),text:g(5),poza:imgUrl(g(6)),
+    parts:g(7).split(/[,\n]+/).map(x=>slug(x)).filter(Boolean)}));
+  ART_BY=Object.fromEntries(ARTS.map(a=>[a.id,a]));
+  const acts=rows("activitati"),gal=rows("galerie");
+  ORGS=rows("parteneri").filter(g=>g(1)&&da(g(4))).map(g=>{const id=slug(g(0)||g(1));
+    return {slug:id,n:g(1),tip:g(2),pro:/^partener/i.test(g(3)),desc:g(5),age:g(6),ad:g(7),tel:g(8),mail:g(9),ig:cleanUrl(g(10)),fb:cleanUrl(g(11)),web:cleanUrl(g(12)),
+      logo:imgUrl(g(13)),cover:imgUrl(g(14)),keys:[g(1),...g(15).split(/\n+/)].map(norm).filter(Boolean),
+      svc:acts.filter(a=>slug(a(0))===id&&a(1)).map(a=>({t:a(1),d:a(2)})),
+      foto:gal.filter(a=>slug(a(0))===id).map(a=>({u:imgUrl(a(1)),alt:a(2)})).filter(x=>x.u),
+      art:ARTS.filter(a=>a.parts.includes(id))}});
+  ORG_BY=Object.fromEntries(ORGS.map(o=>[o.slug,o]));ORG_CACHE={};orgState="ok";
+}
+async function loadCom(){
+  if(COM_SHEET){try{const t={},v=Math.floor(Date.now()/60000);
+    await Promise.all(Object.entries(COM_TABS).map(async([k,gid])=>{const r=await fetch(`https://docs.google.com/spreadsheets/d/${COM_SHEET}/gviz/tq?tqx=out:csv&headers=1&gid=${gid}&t=${v}`,{cache:"no-store"});
+      if(!r.ok)throw new Error(r.status);const x=await r.text();if(/^\s*</.test(x))throw new Error("html");t[k]=parseCSV(x)}));
+    buildCom(t);return}catch(_){}}
+  try{const r=await fetch("comunitate.json?t="+Math.floor(Date.now()/3600000),{cache:"no-store"});if(!r.ok)throw 0;buildCom(await r.json());return}catch(_){}
+  orgState="error";
+}
+/* un eveniment aparține unui partener dacă organizatorul sau locația („Unde”) se potrivesc cu unul din numele din coloana „Nume în calendar” */
+let ORG_CACHE={};
+function keyMatch(v,k){return v===k||(k.length>=8&&(" "+v+" ").includes(" "+k+" "))}
+function orgByName(v){v=norm(v);if(!v)return null;if(v in ORG_CACHE)return ORG_CACHE[v];return ORG_CACHE[v]=ORGS.find(x=>x.keys.some(k=>keyMatch(v,k)))||null}
+const orgFor=e=>orgByName(e.o)||orgByName(e.l);
+const orgLink=(v)=>{const g=orgByName(v);return g?`<a href="#comunitate/${g.slug}">${esc(v)}</a>`:esc(v)};
+const orgEvents=o=>EV.filter(e=>e.d>=iso(TODAY)&&(orgByName(e.o)===o||orgByName(e.l)===o)).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
+const MONO_C=["#1F4E5F","#EE6C4D","#2f7d5b","#7a5c9e","#c2851b","#3b6ea5"];
+function mono(o,lg){
+  if(o.logo)return `<span class="mono${lg?" lg":""}" style="background:#fff"><img src="${esc(o.logo)}" alt="" loading="lazy"></span>`;
+  const h=[...o.slug].reduce((a,c)=>a+c.charCodeAt(0),0);
+  const w=o.n.replace(/^((teatrul|muzeul|casa|pentru|copii|și|si|tineret|de|stat|a|al)\s+)+/i,"");
+  return `<span class="mono${lg?" lg":""}" style="background:${MONO_C[h%MONO_C.length]}" aria-hidden="true">${esc(w.charAt(0).toUpperCase())}</span>`;
+}
+function orgCard(o){const n=loadState==="ok"?orgEvents(o).length:0;
+  return `<a class="org-card" href="#comunitate/${o.slug}">${mono(o)}<div><h3>${esc(o.n)}</h3><span>${esc(o.tip)}${n?` · ${n} ${n===1?"eveniment":"evenimente"} în calendar`:""}</span></div></a>`}
+function renderOrgs(){
+  const el=document.getElementById("org-grid");
+  if(orgState!=="ok"){el.innerHTML=`<div class="empty">${orgState==="loading"?"Se încarcă...":"Lista nu s-a putut încărca. Reîncarcă pagina."}</div>`;return}
+  const by=(a,b)=>a.n.localeCompare(b.n,"ro"),pro=ORGS.filter(o=>o.pro).sort(by),inst=ORGS.filter(o=>!o.pro).sort(by);
+  el.innerHTML=(pro.length?`<h3 class="grp">Parteneri</h3><div class="org-grid">${pro.map(orgCard).join("")}</div>`:"")
+    +(inst.length?`<h3 class="grp">Instituții și locuri din oraș</h3><div class="org-grid">${inst.map(orgCard).join("")}</div>`:"");
+}
+function mapUrl(o){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(o.ad.replace(/^Intrarea publică:\s*/i,"")+", Timișoara")}
+const artCard=a=>`<a class="art" href="#articol/${a.id}">${a.poza?`<img src="${esc(a.poza)}" alt="" loading="lazy">`:""}<span class="eyebrow">${esc(a.rub||"Recomandările noastre")}</span><b>${esc(a.t)}</b>${a.rez?`<span class="art-rez">${esc(a.rez)}</span>`:""}</a>`;
+function renderOrg(sl){
+  const el=document.getElementById("org-page");
+  const back='<a class="back" href="#comunitate">← Comunitatea CFCC</a>';
+  if(orgState==="loading"){el.innerHTML=back+'<div class="empty">Se încarcă...</div>';return}
+  const o=ORG_BY[sl];
+  if(!o){el.innerHTML=back+'<div class="empty">Nu am găsit pagina asta.</div>';return}
+  document.title=o.n+" | Ce facem cu copiii?";
+  const ev=loadState==="ok"?orgEvents(o):[];
+  const past=loadState==="ok"?EV.filter(e=>e.d<iso(TODAY)&&(orgByName(e.o)===o||orgByName(e.l)===o)).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,6):[];
+  const btn=(href,lbl,main,trk)=>href?`<a class="btn ${main?"btn-main":"btn-soft"}" href="${esc(href)}"${/^https?:/.test(href)?' target="_blank" rel="noopener"':""} data-trk="${trk}" data-trk-org="${esc(o.n)}">${lbl}</a>`:"";
+  el.innerHTML=`${back}
+    <div class="org-head">${mono(o,true)}<div><span class="eyebrow">${esc(o.tip)}</span><h2>${esc(o.n)}</h2>
+      <div class="tags">${o.age?`<span class="tag age">${esc(o.age)}</span>`:""}${o.pro?'<span class="tag saved">Partener</span>':""}</div></div></div>
+    ${o.pro&&o.cover?`<img class="org-photo" src="${esc(o.cover)}" alt="" loading="lazy">`:""}
+    ${o.desc?`<p class="org-desc">${esc(o.desc)}</p>`:""}
+    <div class="org-acts">
+      ${btn(o.ad?mapUrl(o):"","Hartă",true,"Organizator: hartă")}
+      ${o.pro?btn(o.web,"Site",false,"Organizator: site"):""}
+      ${btn(o.ig,"Instagram",false,"Organizator: Instagram")}
+      ${btn(o.fb,"Facebook",false,"Organizator: Facebook")}
+    </div>
+    <div class="org-sec"><h3>În calendar acum</h3>
+      ${loadState==="loading"?'<div class="empty">Se încarcă evenimentele...</div>':ev.length?`<div class="mini">${ev.map(e=>{const d=dt(e.d);
+        return `<a class="mini-ev" href="#${e.id}" style="text-decoration:none;color:inherit"><div><b>${esc(e.n)}</b><span>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></div><span class="x">Detalii</span></a>`}).join("")}</div>`
+      :'<div class="empty">Momentan nu avem evenimente de aici în calendar. Revino curând.</div>'}
+    </div>
+    ${past.length?`<div class="org-sec"><h3>Au fost recent în calendar</h3><ul class="past">${past.map(e=>{const d=dt(e.d);return `<li><b>${esc(e.n)}</b><span>${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></li>`}).join("")}</ul></div>`:""}
+    ${o.pro&&o.svc.length?`<div class="org-sec"><h3>Activități</h3><div class="acts">${o.svc.map(x=>`<div class="acts-i"><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:""}</div>`).join("")}</div></div>`:""}
+    ${o.pro&&o.foto.length?`<div class="org-sec"><div class="gal">${o.foto.map(f=>`<img src="${esc(f.u)}" alt="${esc(f.alt)}" loading="lazy">`).join("")}</div></div>`:""}
+    ${o.pro&&o.art.length?`<div class="org-sec"><h3>Am scris despre ei</h3><div class="arts">${o.art.map(artCard).join("")}</div></div>`:""}
+    <div class="org-sec"><h3>Informații</h3><dl class="org-info">
+      ${o.ad?`<dt>Adresa</dt><dd>${esc(o.ad)}</dd>`:""}
+      ${o.tel?`<dt>Telefon</dt><dd><a href="tel:${esc(o.tel.replace(/[^\d+]/g,""))}">${esc(o.tel)}</a></dd>`:""}
+      ${o.mail?`<dt>E-mail</dt><dd><a href="mailto:${esc(o.mail)}">${esc(o.mail)}</a></dd>`:""}
+      ${o.pro&&o.web?`<dt>Site</dt><dd><a href="${esc(o.web)}" target="_blank" rel="noopener">${esc(o.web.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,""))}</a></dd>`:""}
+    </dl>${o.pro?"":`<p class="note">Informațiile sunt adunate din surse publice.</p>`}</div>`;
+  track("Pagina organizator",null,{organizator:o.n});
+}
+function renderArt(id){
+  const el=document.getElementById("art-page");
+  const back='<a class="back" href="#recomandari">← Recomandările noastre</a>';
+  if(orgState==="loading"){el.innerHTML=back+'<div class="empty">Se încarcă...</div>';return}
+  const a=ART_BY[id];
+  if(!a){el.innerHTML=back+'<div class="empty">Nu am găsit articolul.</div>';return}
+  document.title=a.t+" | Ce facem cu copiii?";
+  const ps=a.parts.map(p=>ORG_BY[p]).filter(Boolean);
+  el.innerHTML=`${back}<article class="art-body"><span class="eyebrow">${esc(a.rub||"Recomandările noastre")}${a.data?" · "+esc(a.data):""}</span><h2>${esc(a.t)}</h2>
+    ${a.rez?`<p class="art-lead">${esc(a.rez)}</p>`:""}${a.poza?`<img class="org-photo" src="${esc(a.poza)}" alt="" loading="lazy">`:""}
+    ${a.text.split(/\n\s*\n/).map(p=>p.trim()).filter(Boolean).map(p=>`<p>${esc(p).replace(/\n/g,"<br>")}</p>`).join("")}
+    ${ps.length?`<div class="org-sec"><h3>Despre cine am scris</h3><div class="org-grid">${ps.map(orgCard).join("")}</div></div>`:""}</article>`;
+  track("Articol",null,{articol:a.t});
+}
+function renderRec(){
+  document.getElementById("rec-grid").innerHTML=RUBRICI.map(r=>{const arts=ARTS.filter(a=>norm(a.rub)===norm(r.t));
+    return `<article class="rec">
+  <div class="rec-top"><span class="ic" style="background:${r.c}"><svg viewBox="0 0 24 24" fill="none" stroke="${r.c==="#1F4E5F"?"#FFF8F0":"#1F4E5F"}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${RIC[r.ic]}</svg></span>${arts.length?"":'<span class="soon">În curând</span>'}</div>
+  <h3>${esc(r.t)}</h3><p>${esc(r.d)}</p>
+  ${arts.length?`<div class="rec-arts">${arts.map(a=>`<a href="#articol/${a.id}">${esc(a.t)}</a>`).join("")}</div>`:`<ul>${r.sub.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`}
+</article>`}).join("");
+}
+
+/* navigare */
+const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate","comunitate","org","articol","formular"];
+function go(v,scroll){
+  VIEWS.forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
+  const nv=v==="articol"?"recomandari":v==="org"?"comunitate":v;
+  document.querySelectorAll(".nav ul a,.tabbar a").forEach(a=>{if(a.dataset.view===nv)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  if(scroll)window.scrollTo(0,0);
+}
+const BASE_TITLE=document.title;
+function route(){
+  let h=location.hash.slice(1);
+  if(BYID[h]&&BYID[h].id!==h){h=BYID[h].id;history.replaceState(null,"","#"+h)}
+  document.title=BASE_TITLE;
+  const m=h.match(/^(?:comunitate|org)\/(.+)$/);
+  if(m){renderOrg(decodeURIComponent(m[1]));go("org",true);return}
+  if(h==="comunitate"||h==="organizatori"){renderOrgs();go("comunitate",true);return}
+  if(h==="formular-partener"){go("formular",true);return}
+  if(h.startsWith("articol/")){renderArt(decodeURIComponent(h.slice(8)));go("articol",true);return}
+  if(BYID[h]){state.per="all";document.querySelectorAll("#f-per .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v==="all"?"true":"false"));state.open=h;state.day=BYID[h].d;go("calendar");render();setTimeout(()=>document.getElementById(h)?.scrollIntoView({block:"center"}),50);return}
+  if(h==="adauga-eveniment"||h==="colaborare-promovare"){go("colaborari",true);openForm(h==="adauga-eveniment"?"ev":"pr",true);return}
+  if(h==="colaborari")openForm(null);
+  go(VIEWS.includes(h)?h:"calendar",true);
+}
+window.addEventListener("hashchange",route);
+
+/* cont: Firebase (Google + e-mail/parolă), agenda salvată în users/{uid} */
+const FB_CONFIG={apiKey:"AIzaSyDJR2Ynv13EXtNWqOvUYTGYHcJadL_fkKc",authDomain:"cefacemcucopiii.firebaseapp.com",projectId:"cefacemcucopiii",storageBucket:"cefacemcucopiii.firebasestorage.app",messagingSenderId:"30162882104",appId:"1:30162882104:web:48e0a46593740a8f6e60cd"};
+const AU_ERR={"auth/invalid-email":"Adresa de e-mail nu e scrisă corect.","auth/missing-password":"Scrie parola.","auth/weak-password":"Parola trebuie să aibă minim 6 caractere.",
+ "auth/email-already-in-use":"Există deja un cont cu adresa asta. Apasă „Intră”.","auth/invalid-credential":"E-mailul sau parola nu se potrivesc.","auth/wrong-password":"E-mailul sau parola nu se potrivesc.",
+ "auth/user-not-found":"Nu există cont cu adresa asta. Apasă „Creează cont”.","auth/too-many-requests":"Prea multe încercări. Mai încearcă peste câteva minute.",
+ "auth/popup-closed-by-user":"Fereastra Google s-a închis înainte de logare.","auth/network-request-failed":"Nu am internet. Verifică conexiunea.",
+ "auth/requires-recent-login":"Din motive de siguranță, ieși din cont, intră din nou și apoi șterge contul."};
+let fbUser=null,db=null,auth=null,pushTimer=null;
+const $a=id=>document.getElementById(id);
+function auMsg(err,ok){const e=$a("au-err"),o=$a("au-ok");e.hidden=!err;e.textContent=err||"";o.hidden=!ok;o.textContent=ok||""}
+const auErr=x=>AU_ERR[x&&x.code]||"Ceva n-a mers. Încearcă din nou.";
+const uniq=a=>[...new Set(a)];
+function mergeKids(a,b){const m={};[...a,...b].forEach(k=>{if(k&&k.n&&k.b)m[k.n+"|"+k.b]=k});return Object.values(m)}
+async function pushNow(){if(!fbUser||!db)return;try{await db.collection("users").doc(fbUser.uid).set({email:fbUser.email||"",saved,went,kids,sub,updated:firebase.firestore.FieldValue.serverTimestamp()})}catch(_){toast("Nu am putut salva în cont. Reîncearcă mai târziu.")}}
+pushHook=()=>{clearTimeout(pushTimer);pushTimer=setTimeout(pushNow,600)};
+async function pullAndMerge(){
+  try{const snap=await db.collection("users").doc(fbUser.uid).get();const d=snap.exists?snap.data():{};
+    saved=uniq([...(d.saved||[]),...saved]);went=uniq([...(d.went||[]),...went]);if(EV.length)normIds();kids=mergeKids(d.kids||[],kids);sub=sub||d.sub||null;
+    _set("saved",saved);_set("went",went);_set("kids",kids);_set("sub",sub);render();renderProfile();await pushNow();
+  }catch(_){toast("Nu am putut încărca agenda din cont.")}
+}
+function initAuth(){
+  if(!window.firebase){$a("auth-box").hidden=true;return}
+  firebase.initializeApp(FB_CONFIG);auth=firebase.auth();db=firebase.firestore();auth.languageCode="ro";
+  auth.onAuthStateChanged(u=>{fbUser=u;$a("auth-out").hidden=!!u;$a("auth-in").hidden=!u;$a("au-del-confirm").hidden=true;
+    if(u){$a("au-who").textContent=u.email||u.displayName||"utilizator";pullAndMerge()}});
+  $a("g-login").addEventListener("click",async()=>{auMsg();const pr=new firebase.auth.GoogleAuthProvider();pr.setCustomParameters({prompt:"select_account"});
+    try{const res=await auth.signInWithPopup(pr);if(res&&res.additionalUserInfo&&res.additionalUserInfo.isNewUser){track("Cont creat",null,{metoda:"google"});pixel("CompleteRegistration",{content_name:"google"})}}catch(e){if(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment"){try{await auth.signInWithRedirect(pr)}catch(e2){auMsg(auErr(e2))}}else if(e.code!=="auth/cancelled-popup-request")auMsg(auErr(e))}});
+  const creds=()=>[$a("au-mail").value.trim(),$a("au-pass").value];
+  $a("mail-form").addEventListener("submit",async ev=>{ev.preventDefault();auMsg();const[m,p]=creds();try{await auth.signInWithEmailAndPassword(m,p);$a("mail-form").reset()}catch(e){auMsg(auErr(e))}});
+  $a("au-new").addEventListener("click",async()=>{auMsg();const[m,p]=creds();try{await auth.createUserWithEmailAndPassword(m,p);track("Cont creat",null,{metoda:"email"});pixel("CompleteRegistration",{content_name:"email"});$a("mail-form").reset();toast("Cont creat. Bine ai venit!")}catch(e){auMsg(auErr(e))}});
+  $a("au-reset").addEventListener("click",async()=>{const m=$a("au-mail").value.trim();if(!m){auMsg("Scrie mai întâi adresa de e-mail, apoi apasă din nou „Am uitat parola”.");return}
+    try{await auth.sendPasswordResetEmail(m);auMsg(null,"Ți-am trimis pe e-mail un link pentru parolă nouă. Uită-te și în Spam.")}catch(e){auMsg(auErr(e))}});
+  $a("au-out").addEventListener("click",async()=>{await auth.signOut();auMsg(null,"Ai ieșit din cont. Ce era salvat rămâne și pe acest telefon.")});
+  $a("au-del").addEventListener("click",()=>{$a("au-del-confirm").hidden=false});
+  $a("au-del-no").addEventListener("click",()=>{$a("au-del-confirm").hidden=true});
+  $a("au-del-yes").addEventListener("click",async()=>{auMsg();try{await db.collection("users").doc(fbUser.uid).delete();await fbUser.delete();auMsg(null,"Contul și datele lui au fost șterse.")}catch(e){auMsg(auErr(e))}});
+}
+initAuth();
+
+/* „Adaugă pe ecranul principal”: pe Android butonul instalează direct, pe iPhone arătăm pașii */
+(function(){
+  if("serviceWorker" in navigator)Promise.resolve().catch(()=>{});
+  const box=document.getElementById("install");if(!box)return;
+  const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const mobile=/android|iphone|ipad|ipod/i.test(navigator.userAgent);
+  const later=+(store.get("installLater",0)||0);
+  if(standalone||!mobile||Date.now()<later)return;
+  let deferred=null;
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e});
+  const show=()=>{if(!box.hidden)return;if(META_PIXEL_ID&&!store.get("consent",null)){setTimeout(show,8000);return}box.hidden=false;track("Banner aplicație afișat")};
+  setTimeout(show,12000);
+  const close=days=>{box.hidden=true;store.set("installLater",Date.now()+days*864e5)};
+  document.getElementById("install-no").addEventListener("click",()=>close(7));
+  document.getElementById("install-yes").addEventListener("click",async()=>{
+    if(deferred){deferred.prompt();const r=await deferred.userChoice;track("Instalare aplicație",null,{rezultat:r.outcome});deferred=null;close(r.outcome==="accepted"?3650:7);return}
+    const how=document.getElementById("install-how");
+    const crios=/crios/i.test(navigator.userAgent);
+    how.innerHTML=ios&&crios
+      ?'<ol class="install-steps"><li>Sus, în dreapta adresei, apasă <svg class=ii viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg> <b>Distribuie</b>.</li><li>Alege <svg class=ii viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg> <b>Adaugă pe ecranul principal</b>.</li><li>Apasă <b>Adaugă</b>, sus în dreapta.</li></ol>'
+      :ios
+      ?'<ol class="install-steps"><li>Apasă <b>☰</b> de lângă adresa site-ului, apoi <svg class=ii viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg> <b>Distribuie</b> <small>(Share)</small>.</li><li>Derulează până jos și alege <svg class=ii viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg> <b>Adaugă pe ecranul principal</b> <small>(Add to Home Screen)</small>. Dacă nu-l vezi, apasă întâi <b>Mai multe</b> <small>(View More)</small>.</li><li>Apasă <b>Adaugă</b> <small>(Add)</small>. O singură dată, și apoi deschizi calendarul direct din iconiță.</li></ol>'
+
+      :'<ol class="install-steps"><li>Sus, în dreapta, apasă <svg class=ii viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg> meniul browserului.</li><li>Alege <b>Adaugă pe ecranul principal</b> sau <b>Instalează aplicația</b>.</li><li>Confirmă cu <b>Adaugă</b> sau <b>Instalează</b>.</li></ol>';
+    document.getElementById("install-yes").hidden=true;document.getElementById("install-no").textContent="Am înțeles";track("Instrucțiuni aplicație",null,{sistem:ios?"iOS":"Android"});
+  });
+  window.addEventListener("appinstalled",()=>{track("Aplicație instalată");close(3650)});
+})();
+
+/* Meta Pixel, doar cu acordul vizitatorului */
+const META_PIXEL_ID=""; // Meta Events Manager, pornește doar după acordul la cookie-uri
+let pixelOn=false;
+function loadPixel(){if(pixelOn||!META_PIXEL_ID)return;pixelOn=true;
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");
+  fbq("init",META_PIXEL_ID);fbq("track","PageView");}
+function pixel(ev,params){try{if(pixelOn&&window.fbq)fbq("track",ev,params||{})}catch(_){}}
+(function(){
+  const box=document.getElementById("consent");
+  const choice=store.get("consent",null);
+  if(choice==="da")loadPixel();
+  const ask=()=>{if(META_PIXEL_ID)box.hidden=false};
+  if(!choice)setTimeout(ask,1500);
+  document.getElementById("consent-yes").addEventListener("click",()=>{store.set("consent","da");box.hidden=true;loadPixel()});
+  document.getElementById("consent-no").addEventListener("click",()=>{store.set("consent","nu");box.hidden=true;if(pixelOn)location.reload()});
+  document.getElementById("cookie-settings").addEventListener("click",e=>{e.preventDefault();if(META_PIXEL_ID)box.hidden=false;else toast("Site-ul nu folosește cookie-uri de reclamă.")});
+})();
+
+/* linkuri directe pentru reclame: ?cand=weekend|saptamana|luna &varsta=0-3|3-6|6-12|12 &ce=Teatru... */
+(function(){
+  const q=new URLSearchParams(location.search);
+  const per={weekend:"weekend",saptamana:"week",luna:"all"}[(q.get("cand")||"").toLowerCase()];
+  const age={"0-3":"0-3","3-6":"3-6","6-12":"6-12","12":"12-18","12+":"12-18"}[q.get("varsta")||""];
+  const press=(id,v)=>document.querySelectorAll("#"+id+" .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v===v?"true":"false"));
+  if(per){state.per=per;press("f-per",per)}
+  if(age){state.age=age;press("f-age",age)}
+  const ce=(q.get("ce")||"").toLowerCase();
+  if(ce)window.__cePending=ce;
+})();
+render();renderProfile();route();
+renderRec();
+const comRoute=h=>/^(comunitate|organizatori|org\/|articol\/)/.test(h);
+loadCom().then(()=>{renderRec();if(comRoute(location.hash.slice(1)))route();if(loadState==="ok")render()});
+loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();const h=location.hash.slice(1);if(BYID[h]||comRoute(h))route()});
+</script>
+</body>
+</html>
