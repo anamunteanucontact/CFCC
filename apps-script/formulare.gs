@@ -386,13 +386,13 @@ function muta_in_calendar(filaProp, rand) {
   const contact = [p['E-mail'], p['Telefon']].filter(String).join(', ');
   const primit = p['Primit la'] instanceof Date ? Utilities.formatDate(p['Primit la'], tz, 'dd.MM.yyyy HH:mm') : String(p['Primit la'] || '');
 
-  // rândul nou: coloanele B-W din „Evenimente” (coloana A e formula cu linkul de pe site)
+  // rândul nou: coloanele B-V din „Evenimente” (coloana A e formula cu linkul de pe site)
   const notaProp = 'Din propunerea primită pe ' + primit + '. De completat: categoria.';
   const nou = [
     'De verificat', 'Nu', "'" + dataTxt, ZILE[data.getDay()], ora ? "'" + ora : '', '',
     p['Nume eveniment'], p['Organizator'], p['Locație'], p['Descriere'],
     p['Vârstă minimă'], p['Vârstă maximă'], '', p['Adresă'] || adresa_cunoscuta(ev, p['Locație']),
-    bilet, '', p['Link bilete / înscriere'], '', contact, notaProp,
+    bilet, p['Link bilete / înscriere'], '', contact, notaProp,
     'Organizator', Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy')
   ];
 
@@ -419,10 +419,10 @@ function muta_in_calendar(filaProp, rand) {
 
 /* ---------- „Evenimente” (The Sheet): coloanele, după reorganizarea din 9 oct ---------- */
 // A ID (link pe site, formulă) | B Status | C Recomandare | D Data | E Zi | F Ora start | G Ora sfârșit | H Nume eveniment
-// I Organizator | J Locație | K Descriere | L Vârstă de la | M Vârstă până la | N Categorie | O Adresă | P Bilet | Q Preț
-// R Link bilete | S Link sursă (doar intern) | T Contact organizator | U Alte detalii / note interne | V Adăugat de
-// W Data adăugării | X Ordine (formulă)
-const EV_COL = { status: 2, data: 4, nume: 8, organizator: 9, locatie: 10, adresa: 15, adaugat: 23, ordine: 24 };
+// I Organizator | J Locație | K Descriere | L Vârstă de la | M Vârstă până la | N Categorie | O Adresă | P Bilet
+// Q Link bilete | R Link sursă (doar intern) | S Contact organizator | T Alte detalii / note interne | U Adăugat de
+// V Data adăugării | W Ordine (formulă)
+const EV_COL = { status: 2, data: 4, nume: 8, organizator: 9, locatie: 10, adresa: 15, adaugat: 22, ordine: 23 };
 
 /** La editare în Evenimente: adresa se completează singură după locație, iar data adăugării se pune singură. */
 function la_editare_evenimente(e) {
