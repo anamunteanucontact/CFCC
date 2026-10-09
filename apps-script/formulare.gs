@@ -402,7 +402,7 @@ function ca_ora(x, tz) {
 
 const COMUNITATE_ID = '19VxFnrcRzF8sMIG0tUiQSexOE1I21g5tXm9CQw2n7hQ'; // „Comunitatea CFCC - pagini parteneri” (public)
 const STATUS_CREEAZA = 'Verificat - creează pagina';
-const STATUS_CREATA = 'Pagină creată (Pe site = Nu)';
+const STATUS_CREATA = 'Pagină creată (Pe site = Nu)'; // status vechi, nu mai e în listă; îl tratăm la fel ca STATUS_CREEAZA
 
 /** Rulează o singură dată din editor: pornește automatizarea din sheet-ul de onboarding. */
 function porneste_onboarding() {
@@ -415,7 +415,6 @@ function porneste_onboarding() {
 
 /* Fluxul din Onboarding (totul se face aici; în Comunitatea CFCC ajunge doar ce e publicat):
    3. Verificat - creează pagina  -> link de previzualizare în Note (pagina NU se copiază în Comunitatea CFCC)
-   4. Pagină creată (Pe site = Nu) -> la fel, dacă linkul nu există încă
    5. Trimis spre aprobare        -> mail către partener cu linkul de previzualizare
    6. Publicat                    -> pagina se copiază în Comunitatea CFCC cu Pe site = Da + mail „pagina e live” */
 function la_editare_onboarding(e) {
@@ -427,12 +426,11 @@ function la_editare_onboarding(e) {
   const nume = fila.getRange(rand, 3).getDisplayValue().trim();
   const id = slug_id(nume);
   const titlu = 'Ce facem cu copiii?';
-  coloreaza_rand(fila, rand, val === STATUS_CREEAZA ? STATUS_CREATA : val);
+  coloreaza_rand(fila, rand, val);
   try {
     if (val === STATUS_CREEAZA || val === STATUS_CREATA) {
       if (!nume) throw new Error('lipsește numele');
       const link = link_previzualizare(fila, rand, true);
-      if (val === STATUS_CREEAZA) e.range.setValue(STATUS_CREATA);
       e.source.toast('Pagina „' + nume + '” e gata de verificat. Linkul de previzualizare e în coloana Note: ' + link, titlu, 15);
     } else if (/aprobare/i.test(val)) {
       const link = link_previzualizare(fila, rand, true);
