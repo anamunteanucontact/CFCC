@@ -357,6 +357,7 @@ const ZILE = ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmb
 function onEdit(e) {
   try {
     const fila = e.range.getSheet();
+    if (fila.getName() === 'Evenimente') { la_editare_evenimente(e); return; }
     if (fila.getName() !== FILE.eveniment.nume) return;
     const colStatus = FILE.eveniment.coloane.length; // ultima coloană
     if (e.range.getColumn() !== colStatus || e.range.getRow() < 2) return;
@@ -375,6 +376,7 @@ function muta_in_calendar(filaProp, rand) {
   const p = {};
   FILE.eveniment.coloane.forEach(function (c, i) { p[c[0]] = v[i]; });
 
+  const ev = ss.getSheetByName('Evenimente');
   const data = ca_data(p['Data'], tz);
   if (!data) throw new Error('data nu e completată corect');
   const ora = ca_ora(p['Ora'], tz);
@@ -384,36 +386,128 @@ function muta_in_calendar(filaProp, rand) {
   const contact = [p['E-mail'], p['Telefon']].filter(String).join(', ');
   const primit = p['Primit la'] instanceof Date ? Utilities.formatDate(p['Primit la'], tz, 'dd.MM.yyyy HH:mm') : String(p['Primit la'] || '');
 
-  const ev = ss.getSheetByName('Evenimente');
-  // rândul nou: coloanele A-AC din „Evenimente”
+  // rândul nou: coloanele B-W din „Evenimente” (coloana A e formula cu linkul de pe site)
+  const notaProp = 'Din propunerea primită pe ' + primit + '. De completat: categoria.';
   const nou = [
-    '', 'De verificat', 'Da', "'" + dataTxt, ZILE[data.getDay()], ora ? "'" + ora : '', '',
-    p['Organizator'], p['Nume eveniment'], '', p['Vârstă minimă'], p['Vârstă maximă'],
-    p['Locație'], p['Adresă'], '', bilet, '', p['Link bilete / înscriere'], '',
-    acces === 'Cu înscriere' || acces === 'Cu bilet' ? 'Da' : '', '', '', p['Descriere'], '',
-    contact, 'Formular site', 'Organizator', Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy'),
-    'Din propunerea primită pe ' + primit + '. De completat: categoria.'
+    'De verificat', 'Nu', "'" + dataTxt, ZILE[data.getDay()], ora ? "'" + ora : '', '',
+    p['Nume eveniment'], p['Organizator'], p['Locație'], p['Descriere'],
+    p['Vârstă minimă'], p['Vârstă maximă'], '', p['Adresă'] || adresa_cunoscuta(ev, p['Locație']),
+    bilet, '', p['Link bilete / înscriere'], '', contact, notaProp,
+    'Organizator', Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy')
   ];
 
   // îl punem la locul lui, după zi și oră
   const cand = new Date(data.getTime());
   if (ora) { const hm = ora.split(':'); cand.setHours(+hm[0], +hm[1]); }
   const prim = 3, ultim = Math.max(ev.getLastRow(), prim);
-  const ordini = ev.getRange(prim, 30, ultim - prim + 1, 1).getValues();
+  const ordini = ev.getRange(prim, EV_COL.ordine, ultim - prim + 1, 1).getValues();
   let tinta = ultim + 1;
   for (let i = 0; i < ordini.length; i++) {
     const o = ordini[i][0];
     if (o instanceof Date && o.getTime() > cand.getTime()) { tinta = prim + i; break; }
   }
   if (tinta <= ultim) ev.insertRowBefore(tinta);
-  ev.getRange(tinta, 1, 1, nou.length).setValues([nou]);
+  ev.getRange(tinta, 2, 1, nou.length).setValues([nou]);
   // formula din coloana „Ordine”, copiată de pe rândul vecin
   const vecin = tinta > prim ? tinta - 1 : tinta + 1;
-  const f = ev.getRange(vecin, 30).getFormulaR1C1();
-  if (f) ev.getRange(tinta, 30).setFormulaR1C1(f);
+  const f = ev.getRange(vecin, EV_COL.ordine).getFormulaR1C1();
+  if (f) ev.getRange(tinta, EV_COL.ordine).setFormulaR1C1(f);
 
   filaProp.getRange(rand, nr).setValue(STATUS_MUTAT);
   ss.toast('Am mutat „' + p['Nume eveniment'] + '” în Evenimente, rândul ' + tinta + ', cu status „De verificat”.', 'Ce facem cu copiii?', 8);
+}
+
+/* ---------- „Evenimente” (The Sheet): coloanele, după reorganizarea din 9 oct ---------- */
+// A ID (link pe site, formulă) | B Status | C Recomandare | D Data | E Zi | F Ora start | G Ora sfârșit | H Nume eveniment
+// I Organizator | J Locație | K Descriere | L Vârstă de la | M Vârstă până la | N Categorie | O Adresă | P Bilet | Q Preț
+// R Link bilete | S Link sursă (doar intern) | T Contact organizator | U Alte detalii / note interne | V Adăugat de
+// W Data adăugării | X Ordine (formulă)
+const EV_COL = { status: 2, data: 4, nume: 8, organizator: 9, locatie: 10, adresa: 15, adaugat: 23, ordine: 24 };
+
+/** La editare în Evenimente: adresa se completează singură după locație, iar data adăugării se pune singură. */
+function la_editare_evenimente(e) {
+  const fila = e.range.getSheet();
+  const r0 = e.range.getRow(), c0 = e.range.getColumn(), nr = e.range.getNumRows(), nc = e.range.getNumColumns();
+  if (r0 + nr - 1 < 3) return;
+  const tz = e.source.getSpreadsheetTimeZone();
+  for (let r = Math.max(r0, 3); r < r0 + nr; r++) {
+    // locația s-a schimbat și adresa e goală -> o luăm din intrările de dinainte sau din Organizatori
+    if (c0 <= EV_COL.locatie && EV_COL.locatie < c0 + nc) {
+      const loc = String(fila.getRange(r, EV_COL.locatie).getValue() || '').trim();
+      const adr = fila.getRange(r, EV_COL.adresa);
+      if (loc && !String(adr.getValue() || '').trim()) {
+        const gasita = adresa_cunoscuta(fila, loc, r);
+        if (gasita) { adr.setValue(gasita); e.source.toast('Am completat adresa pentru „' + loc + '”.', 'Ce facem cu copiii?', 4); }
+      }
+    }
+    // rând nou (are nume sau dată) -> data adăugării, automat
+    const ad = fila.getRange(r, EV_COL.adaugat);
+    if (!String(ad.getValue() || '').trim()) {
+      const are = String(fila.getRange(r, EV_COL.nume).getValue() || '').trim() || String(fila.getRange(r, EV_COL.data).getValue() || '').trim();
+      if (are) ad.setValue("'" + Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy'));
+    }
+  }
+}
+
+/** Caută adresa unei locații: întâi în Evenimente (cea mai recentă intrare cu aceeași locație), apoi în Organizatori. */
+function adresa_cunoscuta(fila, loc, randExclus) {
+  const cheie = String(loc || '').trim().toLowerCase();
+  if (!cheie) return '';
+  const ultim = fila.getLastRow();
+  if (ultim >= 3) {
+    const v = fila.getRange(3, EV_COL.locatie, ultim - 2, EV_COL.adresa - EV_COL.locatie + 1).getValues();
+    for (let i = v.length - 1; i >= 0; i--) {
+      if (i + 3 === randExclus) continue;
+      const a = String(v[i][EV_COL.adresa - EV_COL.locatie] || '').trim();
+      if (a && String(v[i][0] || '').trim().toLowerCase() === cheie) return a;
+    }
+  }
+  const org = fila.getParent().getSheetByName('Organizatori');
+  if (org && org.getLastRow() >= 3) {
+    const o = org.getRange(3, 1, org.getLastRow() - 2, 3).getValues();
+    for (let i = 0; i < o.length; i++) {
+      if (String(o[i][0] || '').trim().toLowerCase() === cheie && String(o[i][2] || '').trim()) return String(o[i][2]).trim();
+    }
+  }
+  return '';
+}
+
+/** O singură dată, din editor (9 oct): reorganizează coloanele din Evenimente în ordinea nouă. Nu mai trebuie rulată. */
+function reorganizeaza_evenimente() {
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
+  const cap = function () { return sh.getRange(2, 1, 1, sh.getLastColumn()).getValues()[0].map(function (x) { return String(x).trim(); }); };
+  const col = function (inceput) { const h = cap(); for (let i = 0; i < h.length; i++) if (h[i].indexOf(inceput) === 0) return i + 1; return 0; };
+  if (!col('Interior') && !col('Note interne')) { SpreadsheetApp.getActiveSpreadsheet().toast('Coloanele sunt deja reorganizate.'); return; }
+  const n = sh.getLastRow() - 2;
+  // 1. Note interne se adaugă la Alte detalii (nu se pierde nimic)
+  const cA = col('Alte detalii'), cN = col('Note interne');
+  if (cA && cN && n > 0) {
+    const a = sh.getRange(3, cA, n, 1).getValues(), b = sh.getRange(3, cN, n, 1).getValues();
+    sh.getRange(3, cA, n, 1).setValues(a.map(function (x, i) { return [[String(x[0] || '').trim(), String(b[i][0] || '').trim()].filter(String).join(' | ')]; }));
+  }
+  // 2. coloanele de care nu mai avem nevoie
+  ['Instagram organizator', 'Conținut dedicat', 'Note interne', 'Unde am găsit', 'Recurență', 'Limbă', 'Rezervare', 'Interior'].forEach(function (h) {
+    const c = col(h); if (c) sh.deleteColumn(c);
+  });
+  // 3. ordinea nouă
+  const ordine = ['ID', 'Status', 'Recomandare', 'Data', 'Zi', 'Ora start', 'Ora sfârșit', 'Nume eveniment', 'Organizator', 'Locație', 'Descriere',
+    'Vârstă de la', 'Vârstă până la', 'Categorie', 'Adresă', 'Bilet', 'Preț', 'Link bilete', 'Link eveniment', 'Contact organizator', 'Alte detalii',
+    'Adăugat de', 'Data adăugării', 'Ordine'];
+  sh.getRange(2, 2).setValue('Status');
+  ordine.forEach(function (h, p) {
+    const c = col(h);
+    if (c && c !== p + 1) sh.moveColumns(sh.getRange(1, c, sh.getMaxRows(), 1), p + 1);
+  });
+  // 4. numele noi din capul de tabel
+  sh.getRange(2, 1, 1, 24).setValues([['ID - link pe site', 'Status', 'Recomandare', 'Data', 'Zi', 'Ora start', 'Ora sfârșit', 'Nume eveniment', 'Organizator',
+    'Locație', 'Descriere', 'Vârstă de la', 'Vârstă până la', 'Categorie', 'Adresă', 'Bilet', 'Preț (lei)', 'Link bilete', 'Link sursă (doar pentru noi)',
+    'Contact organizator', 'Alte detalii / note interne', 'Adăugat de', 'Data adăugării', 'Ordine (pt sortare)']]);
+  // 5. Recomandare: Da / Nu
+  if (n > 0) {
+    const rec = sh.getRange(3, 3, n, 1).getValues(), dat = sh.getRange(3, 4, n, 1).getValues();
+    sh.getRange(3, 3, n, 1).setValues(rec.map(function (x, i) { return [String(x[0] || '').trim() || (String(dat[i][0] || '').trim() ? 'Nu' : '')]; }));
+  }
+  SpreadsheetApp.getActiveSpreadsheet().toast('Gata: coloanele din Evenimente sunt în ordinea nouă.');
 }
 
 function ca_data(x, tz) {
