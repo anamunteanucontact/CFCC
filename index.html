@@ -1142,7 +1142,7 @@ function buildCom(t){
   ART_BY=Object.fromEntries(ARTS.map(a=>[a.id,a]));
   const acts=rows("activitati"),gal=rows("galerie");
   ORG_ALL=rows("parteneri").filter(g=>g(1)).map(g=>{const id=slug(g(0)||g(1));
-    return {slug:id,n:g(1),tip:g(2),pro:/^partener/i.test(g(3)),desc:g(5),age:g(6),ad:g(7),tel:g(8),mail:g(9),ig:cleanUrl(g(10)),fb:cleanUrl(g(11)),web:cleanUrl(g(12)),
+    return {slug:id,n:g(1),tip:g(2),pro:/^partener/i.test(g(3)),full:/^partener|complet/i.test(norm(g(3))),desc:g(5),age:g(6),ad:g(7),tel:g(8),mail:g(9),ig:cleanUrl(g(10)),fb:cleanUrl(g(11)),web:cleanUrl(g(12)),
       logo:imgUrl(g(13)),cover:imgUrl(g(14)),keys:[g(1),...g(15).split(/\n+/)].map(norm).filter(Boolean),
       svc:acts.filter(a=>slug(a(0))===id&&a(1)).map(a=>({t:a(1),d:a(2)})),
       foto:gal.filter(a=>slug(a(0))===id).map(a=>({u:imgUrl(a(1)),alt:a(2)})).filter(x=>x.u),
@@ -1190,7 +1190,7 @@ async function renderPrev(cod){
   try{const r=await fetch(SCRIPT_URL+"?previzualizare="+encodeURIComponent(cod));const d=await r.json();
     if(!d.ok||!d.pagina)throw 0;const x=d.pagina;
     while(orgState==="loading")await new Promise(ok=>setTimeout(ok,200));
-    ORG_BY.__prev={slug:x.id,n:x.n,tip:x.tip,pro:x.pro!==false,desc:x.desc,age:x.age,ad:x.ad,tel:x.tel,mail:x.mail,ig:cleanUrl(x.ig),fb:cleanUrl(x.fb),web:cleanUrl(x.web),
+    ORG_BY.__prev={slug:x.id,n:x.n,tip:x.tip,pro:!!x.pro,full:x.full!==undefined?!!x.full:!!x.pro,desc:x.desc,age:x.age,ad:x.ad,tel:x.tel,mail:x.mail,ig:cleanUrl(x.ig),fb:cleanUrl(x.fb),web:cleanUrl(x.web),
       logo:imgUrl(x.logo),cover:imgUrl(x.cover),keys:x.nume.map(norm).filter(Boolean),svc:x.act.map(a=>({t:a[0],d:a[1]})),foto:x.foto.map(u=>({u:imgUrl(u),alt:""})).filter(f=>f.u),
       art:[],live:false,prev:true};
     if(location.hash.slice(1)==="previzualizare/"+cod)renderOrg("__prev");
@@ -1210,11 +1210,11 @@ function renderOrg(sl){
   el.innerHTML=`${back}${draft}
     <div class="org-head">${mono(o,true)}<div><span class="eyebrow">${esc(o.tip)}</span><h2>${esc(o.n)}</h2>
       <div class="tags">${o.age?`<span class="tag age">${esc(o.age)}</span>`:""}${o.pro?'<span class="tag saved">Partener</span>':""}</div></div></div>
-    ${o.pro&&o.cover?`<img class="org-photo" src="${esc(o.cover)}" alt="" loading="lazy">`:""}
+    ${o.full&&o.cover?`<img class="org-photo" src="${esc(o.cover)}" alt="" loading="lazy">`:""}
     ${o.desc?o.desc.split(/\n+/).map(p=>p.trim()).filter(Boolean).map(p=>`<p class="org-desc">${esc(p)}</p>`).join(""):""}
     <div class="org-acts">
       ${btn(o.ad?mapUrl(o):"","Hartă",true,"Organizator: hartă")}
-      ${o.pro?btn(o.web,"Site",false,"Organizator: site"):""}
+      ${o.full?btn(o.web,"Site",false,"Organizator: site"):""}
       ${btn(o.ig,"Instagram",false,"Organizator: Instagram")}
       ${btn(o.fb,"Facebook",false,"Organizator: Facebook")}
     </div>
@@ -1224,15 +1224,15 @@ function renderOrg(sl){
       :'<div class="empty">Deocamdată nu au evenimente pentru copii programate în calendar. Când apare ceva nou o să găsești aici.</div>'}
     </div>
     ${past.length?`<div class="org-sec"><h3>Au fost recent în calendar</h3><ul class="past">${past.map(e=>{const d=dt(e.d);return `<li><b>${esc(e.n)}</b><span>${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></li>`}).join("")}</ul></div>`:""}
-    ${o.pro&&o.svc.length?`<div class="org-sec"><h3>Activități</h3><div class="acts">${o.svc.map(x=>`<div class="acts-i"><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:""}</div>`).join("")}</div></div>`:""}
-    ${o.pro&&o.foto.length?`<div class="org-sec"><div class="gal">${o.foto.map(f=>`<img src="${esc(f.u)}" alt="${esc(f.alt)}" loading="lazy">`).join("")}</div></div>`:""}
-    ${o.pro&&o.art.length?`<div class="org-sec"><h3>Am scris despre ei</h3><div class="arts">${o.art.map(artCard).join("")}</div></div>`:""}
+    ${o.full&&o.svc.length?`<div class="org-sec"><h3>Activități</h3><div class="acts">${o.svc.map(x=>`<div class="acts-i"><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:""}</div>`).join("")}</div></div>`:""}
+    ${o.full&&o.foto.length?`<div class="org-sec"><div class="gal">${o.foto.map(f=>`<img src="${esc(f.u)}" alt="${esc(f.alt)}" loading="lazy">`).join("")}</div></div>`:""}
+    ${o.full&&o.art.length?`<div class="org-sec"><h3>Am scris despre ei</h3><div class="arts">${o.art.map(artCard).join("")}</div></div>`:""}
     <div class="org-sec"><h3>Date de contact</h3><dl class="org-info">
       ${o.ad?`<dt>Adresa</dt><dd>${esc(o.ad)}</dd>`:""}
       ${o.tel?`<dt>Telefon</dt><dd><a href="tel:${esc(o.tel.replace(/[^\d+]/g,""))}">${esc(o.tel)}</a></dd>`:""}
       ${o.mail?`<dt>E-mail</dt><dd><a href="mailto:${esc(o.mail)}">${esc(o.mail)}</a></dd>`:""}
-      ${o.pro&&o.web?`<dt>Site</dt><dd><a href="${esc(o.web)}" target="_blank" rel="noopener">${esc(o.web.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,""))}</a></dd>`:""}
-    </dl>${o.pro?"":`<p class="note">Informațiile sunt adunate din surse publice.</p>`}</div>`;
+      ${o.full&&o.web?`<dt>Site</dt><dd><a href="${esc(o.web)}" target="_blank" rel="noopener">${esc(o.web.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,""))}</a></dd>`:""}
+    </dl>${o.full?"":`<p class="note">Informațiile sunt adunate din surse publice.</p>`}</div>`;
   track("Pagina organizator",null,{organizator:o.n});
 }
 function renderArt(id){

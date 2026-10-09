@@ -489,7 +489,7 @@ function date_previzualizare(cod) {
     }
     const act = p['Activități'].split(/\n+/).filter(function (l) { return l.replace(/\|/g, '').trim(); }).map(function (l) { const x = l.split('|'); return [x[0].trim(), (x.slice(1).join('|') || '').trim()]; });
     return { ok: true, pagina: {
-      id: r[0], n: r[1], tip: r[2], pro: /^partener/i.test(r[3]), inlocuieste: existent ? r[0] : '', desc: r[5], age: r[6], ad: r[7],
+      id: r[0], n: r[1], tip: r[2], pro: /^partener/i.test(r[3]), full: /^partener|complet/i.test(norm_nume(r[3])), inlocuieste: existent ? r[0] : '', desc: r[5], age: r[6], ad: r[7],
       tel: String(r[8]).replace(/^'/, ''), mail: r[9], ig: r[10], fb: r[11], web: r[12], logo: r[13], cover: r[14],
       foto: p['Alte poze'] ? poze('Alte poze') : vechi_foto, nume: r[15].split('\n'), act: act.length ? act : vechi_act
     } };
