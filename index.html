@@ -1208,7 +1208,7 @@ function renderOrg(sl){
     <div class="org-sec"><h3>În calendar acum</h3>
       ${loadState==="loading"?'<div class="empty">Se încarcă evenimentele...</div>':ev.length?`<div class="mini">${ev.map(e=>{const d=dt(e.d);
         return `<a class="mini-ev" href="#${e.id}" style="text-decoration:none;color:inherit"><div><b>${esc(e.n)}</b><span>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></div><span class="x">Detalii</span></a>`}).join("")}</div>`
-      :'<div class="empty">Deocamdată nu au nimic programat în calendar. Când apare ceva nou de la ei, îl găsești aici.</div>'}
+      :'<div class="empty">Deocamdată nu au evenimente pentru copii programate în calendar. Când apare ceva nou de la ei, îl găsești aici.</div>'}
     </div>
     ${past.length?`<div class="org-sec"><h3>Au fost recent în calendar</h3><ul class="past">${past.map(e=>{const d=dt(e.d);return `<li><b>${esc(e.n)}</b><span>${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></li>`}).join("")}</ul></div>`:""}
     ${o.pro&&o.svc.length?`<div class="org-sec"><h3>Activități</h3><div class="acts">${o.svc.map(x=>`<div class="acts-i"><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:""}</div>`).join("")}</div></div>`:""}
