@@ -224,12 +224,13 @@ textarea{min-height:90px;resize:vertical}
 .x.on{background:var(--ok);color:#fff}
 .kid{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border-radius:12px}
 .inline{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
-@media (max-width:520px){.inline{grid-template-columns:1fr 1fr}.inline .btn{grid-column:1/-1}}
+form>.btn[type=submit]{align-self:center;justify-content:center;min-width:260px;padding:13px 28px;font-size:1rem}
+@media (max-width:520px){form>.btn[type=submit]{align-self:stretch;min-width:0}.inline{grid-template-columns:1fr 1fr}.inline .btn{grid-column:1/-1}}
 
 .check{flex-direction:row;align-items:center;gap:8px;font-weight:500}
 .check input{width:18px;height:18px;flex:none}
 .nl-cta{margin:28px auto 12px}
-.nl-bar{display:flex;flex-direction:row;border-radius:0;align-items:center;gap:10px 16px;flex-wrap:wrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;background:transparent}
+.nl-bar{display:flex;flex-direction:row;align-items:center;gap:10px 16px;flex-wrap:wrap;border-left:4px solid var(--galben);border-radius:12px;padding:12px 16px;background:rgba(244,185,66,.16)}
 .nl-bar p{margin:0;flex:1 1 280px;font-size:.88rem;line-height:1.4}
 .nl-bar p span{color:var(--muted)}
 .nl-in{display:flex;gap:6px;flex:1 1 260px;max-width:360px}
@@ -543,7 +544,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <p>Alege ce ai nevoie și completează formularul. Revenim noi cu răspuns.</p>
     </div>
     <div class="rules" id="f-type" role="group" aria-label="Ce vrei să ne trimiți">
-      <button class="rule" type="button" data-v="ev" aria-pressed="false"><span class="who">Evenimente cu dată</span><h3>Adaug un eveniment în calendar</h3><span class="note">Spectacole, ateliere, lansări, sesiuni demo. Listarea în calendar este și rămâne gratuită.</span><span class="pick">Completează formularul</span></button>
+      <button class="rule" type="button" data-v="ev" aria-pressed="false"><span class="who">Evenimente cu dată</span><h3>Adaug un eveniment în calendar</h3><span class="note">Spectacole, ateliere, lansări, ieșiri, concerte, lecturi. Listarea în calendar este și rămâne gratuită.</span><span class="pick">Completează formularul</span></button>
       <button class="rule" type="button" data-v="pr" aria-pressed="false"><span class="who">Cursuri, cluburi, abonamente, branduri</span><h3>Vreau să colaborăm</h3><span class="note">Înainte de orice trebuie să ne cunoaștem, apoi alegem împreună varianta cea mai faină de colaborare în funcție de nevoile brandului tău.</span><span class="pick">Completează formularul</span></button>
     </div>
 
@@ -680,34 +681,35 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     <div class="sec-h">
       <span class="eyebrow">Confidențialitate</span>
       <h2>Politica de confidențialitate</h2>
-      <p>Ultima actualizare: 7 octombrie 2026</p>
+      <p>Ultima actualizare: 9 octombrie 2026</p>
     </div>
     <h3>Cine suntem</h3>
-    <p>Site-ul cefacemcucopiii.ro și conturile „Ce facem cu copiii?” sunt administrate de DOING GOOD S.R.L., cu sediul în Timișoara, str. Deliblata nr. 21, bl. T1, parter, ap. 1, cam. 1, jud. Timiș, înregistrată la Registrul Comerțului sub nr. J35/776/2023, CUI 47675624. Noi suntem operatorul datelor tale.</p>
+    <p>Site-ul cefacemcucopiii.ro și conturile „Ce facem cu copiii?” sunt administrate de DOING GOOD S.R.L., cu sediul în Timișoara, str. Deliblata nr. 21, bl. T1, parter, ap. 1, cam. 1, jud. Timiș, înregistrată la Registrul Comerțului sub nr. J35/776/2023, CUI 47675624. Noi suntem operatorul datelor tale. Ne poți scrie oricând la <a href="mailto:hello@cefacemcucopiii.ro">hello@cefacemcucopiii.ro</a>.</p>
     <h3>Ce date strângem și de ce</h3>
     <p><strong>Formularul de eveniment:</strong> numele evenimentului, organizatorul, detaliile evenimentului, e-mailul și, opțional, telefonul. Le folosim ca să verificăm evenimentul, să-l publicăm în calendar și să te contactăm dacă avem întrebări.</p>
     <p><strong>Formularul de colaborare:</strong> numele afacerii, persoana de contact, e-mailul, telefonul, conturile de social media și ce ne scrii despre voi. Le folosim ca să te contactăm și să-ți trimitem o ofertă.</p>
+    <p><strong>Formularul pentru pagina partenerului:</strong> numele organizației, persoana de contact, e-mailul, telefonul, descrierea, activitățile, logoul și pozele trimise. Le folosim ca să pregătim pagina voastră din Comunitatea CFCC și o publicăm doar după ce o aprobați.</p>
     <p><strong>Abonarea pe e-mail:</strong> adresa de e-mail, ca să-ți trimitem programul săptămânal. Reduceri și oferte speciale de la organizatorii și brandurile cu care colaborăm îți trimitem doar dacă ai bifat separat că vrei asta. Nu le dăm adresa ta, ofertele vin de la noi.</p>
     <p><strong>Agenda mea fără cont:</strong> evenimentele salvate, istoricul și copiii adăugați rămân doar în browserul de pe telefonul tău. Nu ajung la noi.</p>
-    <p><strong>Agenda mea cu cont:</strong> dacă intri în cont (cu Google sau cu e-mail și parolă), păstrăm adresa ta de e-mail, evenimentele salvate, istoricul și, dacă le adaugi, prenumele și data nașterii copiilor, ca să-ți arătăm evenimentele potrivite vârstei lor. Le adaugi tu, ca părinte, și le poți șterge oricând. Datele stau în Google Firebase, pe servere din Uniunea Europeană, și le vezi doar tu. Din Agenda mea poți șterge oricând contul, împreună cu toate datele lui.</p>
+    <p><strong>Agenda mea cu cont:</strong> dacă intri în cont (cu Google sau cu e-mail și parolă), păstrăm adresa ta de e-mail, evenimentele salvate, istoricul și, dacă le adaugi, prenumele și data nașterii copiilor, ca să-ți arătăm evenimentele potrivite vârstei lor. Le adaugi tu, ca părinte, și le poți șterge oricând. Datele stau în Google Firebase și le vezi doar tu. Din Agenda mea poți șterge oricând contul, împreună cu toate datele lui.</p>
     <h3>Temeiul legal</h3>
     <p>Pentru formulare, temeiul este cererea ta de a fi contactat. Pentru contul din Agenda mea, temeiul este contractul de utilizare a serviciului, pe care îl închei când îți faci cont. Pentru e-mailuri, temeiul este consimțământul tău, pe care îl poți retrage oricând.</p>
     <h3>Unde stau datele și cât timp</h3>
-    <p>Datele trimise prin formulare sunt păstrate în Google Workspace (Google Sheets), un serviciu al Google, pe care îl folosim ca furnizor. Nu vindem și nu dăm datele tale altor firme. Păstrăm datele de contact cât timp colaborăm sau ești abonat, iar după aceea cel mult un an.</p>
+    <p>Datele trimise prin formulare sunt păstrate în Google Workspace (Google Sheets și Google Drive), un serviciu al Google, pe care îl folosim ca furnizor. E-mailurile automate (confirmări și newsletter) le trimitem prin Brevo, un furnizor din Uniunea Europeană. Unii furnizori (Google, Meta) pot prelucra date și în afara Uniunii Europene, cu garanțiile cerute de lege (clauze contractuale standard). Nu vindem și nu dăm datele tale altor firme. Păstrăm datele de contact cât timp colaborăm sau ești abonat, iar după aceea cel mult un an.</p>
     <h3>Cookie-uri</h3>
     <p>Dacă accepți cookie-urile pentru reclame, folosim Meta Pixel, de la Meta Platforms (Facebook, Instagram). El ne arată câți oameni au venit pe site din reclamele noastre și dacă s-au abonat sau și-au făcut cont, ca să plătim doar pentru reclamele care ajung la părinți interesați. Meta primește date despre vizita ta și le poate lega de contul tău Meta, conform politicii proprii. Dacă refuzi, pixelul nu pornește. Îți poți schimba alegerea oricând, din linkul „Cookie-uri” din josul paginii.</p>
-    <p>Site-ul nu folosește cookie-uri de reclamă sau de urmărire. Salvăm în browserul tău doar ce adaugi în Agenda mea.</p>
+    <p>Fără acordul tău, site-ul nu folosește cookie-uri de reclamă sau de urmărire. Salvăm în browserul tău doar ce adaugi în Agenda mea și alegerea ta despre cookie-uri.</p>
     <p>Pentru statistici folosim Umami, un serviciu care nu folosește cookie-uri și nu te identifică. Vedem doar cifre generale, de exemplu câte vizite are site-ul sau de câte ori a fost apăsat butonul de bilete al unui eveniment, ca să le putem arăta organizatorilor cât interes au evenimentele lor.</p>
     <h3>Drepturile tale</h3>
-    <p>Ai dreptul să ceri acces la datele tale, corectarea sau ștergerea lor, să restrângi sau să te opui prelucrării și să-ți retragi consimțământul. Ne poți scrie pe Instagram, la @cefacemcucopiii. Dacă nu ești mulțumit de răspuns, te poți plânge la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (www.dataprotection.ro).</p>
+    <p>Ai dreptul să ceri acces la datele tale, corectarea sau ștergerea lor, să restrângi sau să te opui prelucrării și să-ți retragi consimțământul. Ne poți scrie la <a href="mailto:hello@cefacemcucopiii.ro">hello@cefacemcucopiii.ro</a> sau pe Instagram, la @cefacemcucopiii. Dacă nu ești mulțumit de răspuns, te poți plânge la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (www.dataprotection.ro).</p>
   </div>
 </section>
 
 <!-- ABONARE: cutia de la finalul paginilor (ascunsă pe Agenda mea, formulare, Colaborări, Confidențialitate și pentru cine e deja abonat) -->
 <section id="nl-cta" class="wrap nl-cta" hidden>
   <form id="nl2-form" class="nl-bar" novalidate>
-    <p><b>Toate evenimentele pentru copii din oraș, pe e-mail.</b> <span>Un mail pe săptămână, te poți dezabona oricând.</span></p>
-    <div class="nl-in"><input id="nl2-mail" type="email" placeholder="adresa ta de e-mail" aria-label="E-mail"><button class="btn btn-soft" type="submit">Mă abonez</button></div>
+    <p><b>💌 Toate evenimentele pentru copii din oraș, pe e-mail.</b> <span>Un mail pe săptămână, te poți dezabona oricând.</span></p>
+    <div class="nl-in"><input id="nl2-mail" type="email" placeholder="adresa ta de e-mail" aria-label="E-mail"><button class="btn btn-main" type="submit">Mă abonez</button></div>
   </form>
 </section>
 </main>
@@ -1176,7 +1178,7 @@ function renderOrgs(){
   if(orgState!=="ok"){el.innerHTML=`<div class="empty">${orgState==="loading"?"Se încarcă...":"Lista nu s-a putut încărca. Reîncarcă pagina."}</div>`;return}
   const by=(a,b)=>a.n.localeCompare(b.n,"ro"),pro=ORGS.filter(o=>o.pro).sort(by),inst=ORGS.filter(o=>!o.pro).sort(by);
   el.innerHTML=(pro.length?`<h3 class="grp">Parteneri</h3><div class="org-grid">${pro.map(orgCard).join("")}</div>`:"")
-    +(inst.length?`<h3 class="grp">Instituții și locuri din oraș</h3><div class="org-grid">${inst.map(orgCard).join("")}</div>`:"");
+    +(inst.length?`<h3 class="grp">Instituții și locuri faine din oraș</h3><div class="org-grid">${inst.map(orgCard).join("")}</div>`:"");
 }
 function mapUrl(o){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(o.ad.replace(/^Intrarea publică:\s*/i,"")+", Timișoara")}
 const artCard=a=>`<a class="art" href="#articol/${a.id}">${a.poza?`<img src="${esc(a.poza)}" alt="" loading="lazy">`:""}<span class="eyebrow">${esc(a.rub||"Recomandările noastre")}</span><b>${esc(a.t)}</b>${a.rez?`<span class="art-rez">${esc(a.rez)}</span>`:""}</a>`;
@@ -1205,7 +1207,7 @@ function renderOrg(sl){
     <div class="org-sec"><h3>În calendar acum</h3>
       ${loadState==="loading"?'<div class="empty">Se încarcă evenimentele...</div>':ev.length?`<div class="mini">${ev.map(e=>{const d=dt(e.d);
         return `<a class="mini-ev" href="#${e.id}" style="text-decoration:none;color:inherit"><div><b>${esc(e.n)}</b><span>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></div><span class="x">Detalii</span></a>`}).join("")}</div>`
-      :'<div class="empty">Deocamdată nu au evenimente pentru copii programate în calendar. Ce apare nou de la ei găsești aici.</div>'}
+      :'<div class="empty">Deocamdată nu au evenimente pentru copii programate în calendar. Când apare ceva nou o să găsești aici.</div>'}
     </div>
     ${past.length?`<div class="org-sec"><h3>Au fost recent în calendar</h3><ul class="past">${past.map(e=>{const d=dt(e.d);return `<li><b>${esc(e.n)}</b><span>${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></li>`}).join("")}</ul></div>`:""}
     ${o.pro&&o.svc.length?`<div class="org-sec"><h3>Activități</h3><div class="acts">${o.svc.map(x=>`<div class="acts-i"><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:""}</div>`).join("")}</div></div>`:""}
