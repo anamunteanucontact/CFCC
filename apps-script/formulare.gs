@@ -4,6 +4,7 @@
  * 1. Primește formularele de pe site:
  *    - propunerile de evenimente -> fila „Propuneri evenimente” din acest sheet
  *    - abonările și colaborările -> sheet-ul separat „Contacte”
+ *    - la fiecare formular, o notificare pentru echipă (fila „Notificări” din sheet-ul cu texte)
  *    - formularul pentru parteneri (cefacemcucopiii.ro/#formular-partener) -> fila „Pagini parteneri - de verificat”
  *      din sheet-ul separat „CFCC - Onboarding parteneri”, cu roșu, ca să le verifice un om; pozele lor se salvează în Drive, în folderul „CFCC - poze parteneri”
  *    și trimite un e-mail de confirmare celui care a completat.
@@ -76,6 +77,7 @@ function doPost(e) {
     }
 
     try { trimite_confirmare(date.tip, campuri); } catch (errMail) { /* rândul e salvat oricum */ }
+    try { notifica_echipa(date.tip, campuri); } catch (errNotif) { console.warn('Notificare: ' + errNotif); }
     return raspuns({ ok: true });
   } catch (err) {
     return raspuns({ ok: false, eroare: String(err) });
@@ -139,6 +141,7 @@ const TEXTE_REZERVA = {
   'abonare - oferte': ['', 'Ai ales să primești și reduceri și oferte speciale pentru familii, de la organizatorii și brandurile cu care colaborăm. Le trimitem doar când merită.'],
   'eveniment': ['Am primit evenimentul tău: {eveniment}', 'Bună!\n\nMulțumim că ne-ai trimis {eveniment}. Îl verificăm și îl adăugăm în calendarul de pe {site}.\n\nDacă ai întrebări sau vrei să schimbi ceva, răspunde la acest e-mail.\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
   'colaborare': ['Am primit mesajul tău - Ce facem cu copiii?', 'Bună, {persoana}!\n\nMulțumim pentru interesul de a colabora cu Ce facem cu copiii?. Am primit detaliile despre {brand} și revenim în curând, ca să ne cunoaștem și să-ți propunem variante potrivite.\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
+  'pagina live': ['Pagina {pagina} e live pe Ce facem cu copiii?', 'Bună, {persoana}!\n\nVești bune: pagina {pagina} e acum live în Comunitatea CFCC. O găsiți aici: {linkpagina}\n\nDe acum numărăm, în fiecare lună, cum interacționează părinții cu voi pe site: vizitele pe pagina voastră din Comunitate și ce fac pe evenimentele voastre din calendar (deschid detaliile, apasă pe bilete sau înscriere, le salvează, le pun în calendar, le trimit mai departe). Sunt cifre totale și anonime, nu urmărim persoane. La final de lună primiți raportul, așa cum am stabilit.\n\nVreți să schimbați ceva pe pagina de prezentare? Scrieți-ne la hello@cefacemcucopiii.ro sau răspundeți la acest e-mail și facem modificarea în cel mult 48 de ore.\n\nEvenimentele noi le puteți adăuga singuri, oricând, din meniul Colaborări → Adaugă un eveniment: {linkeveniment}. Le verificăm și apar în calendar.\n\nMulțumim că sunteți parte din Comunitatea CFCC!\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
   'pagina': ['Am primit informațiile pentru pagina voastră - Ce facem cu copiii?', 'Bună, {persoana}!\n\nMulțumim! Am primit informațiile pentru pagina {pagina} din Comunitatea CFCC. Un om din echipa noastră le verifică și vă contactează dacă mai avem nevoie de ceva. Când pagina e gata, v-o trimitem spre aprobare și o publicăm doar după ce ne dați ok.\n\nDacă vreți să schimbați ceva între timp, răspundeți la acest e-mail.\n\nCu drag,\nAna, de la Ce facem cu copiii?']
 };
 const CAND_PLEACA = {
@@ -146,7 +149,8 @@ const CAND_PLEACA = {
   'abonare - oferte': 'Paragraf pus în mailul de abonare doar dacă a bifat ofertele (înlocuiește {oferte}); subiectul nu contează',
   'eveniment': 'Cineva trimite un eveniment (Colaborări → Adaugă eveniment)',
   'colaborare': 'Cineva completează „Vreau să colaborăm”',
-  'pagina': 'Un partener completează formularul pentru pagina lui (#formular-partener)'
+  'pagina': 'Un partener completează formularul pentru pagina lui (#formular-partener)',
+  'pagina live': 'În Onboarding, statusul partenerului devine „Publicat” (pagina apare pe site). Pleacă o singură dată, la e-mailul persoanei de contact'
 };
 
 function texte_mailuri() {
@@ -183,17 +187,76 @@ function trimite_confirmare(tip, c) {
     persoana: c['Persoană de contact'] || '', brand: c['Afacere / brand'] || '',
     eveniment: c['Nume eveniment'] || '', pagina: c['Nume'] || ''
   };
+  const link_pagina = SITE + '/#comunitate/' + (c._id || '');
+  const link_eveniment = SITE + '/#adauga-eveniment';
   const subiect = ia(tip)[0].replace(/\{(\w+)\}/g, function (m, k) { return k in val ? val[k] : m; });
   let text = ia(tip)[1];
   text = text.replace('{oferte}', tip === 'abonare' && c['Vrea oferte de la parteneri'] === 'Da' ? ia('abonare - oferte')[1] : '');
   const continut = text.split(/\n\s*\n/).map(function (p) { return p.trim(); }).filter(String).map(function (p) {
     let h = esc(p).replace(/\n/g, '<br>');
-    h = h.replace(/\{site\}/g, '<a href="' + SITE + '">cefacemcucopiii.ro</a>')
+    h = h.replace(/\{linkpagina\}/g, '<a href="' + link_pagina + '">' + esc(link_pagina.replace(/^https:\/\//, '')) + '</a>')
+      .replace(/\{linkeveniment\}/g, '<a href="' + link_eveniment + '">' + esc(link_eveniment.replace(/^https:\/\//, '')) + '</a>')
+      .replace(/\{site\}/g, '<a href="' + SITE + '">cefacemcucopiii.ro</a>')
       .replace(/\{instagram\}/g, '<a href="' + INSTAGRAM + '">Instagram</a>')
       .replace(/\{(persoana|brand|eveniment|pagina)\}/g, function (m, k) { return k === 'persoana' ? esc(val[k]) : '<strong>' + esc(val[k]) + '</strong>'; });
     return '<p>' + h + '</p>';
   }).join('');
   trimite_email(catre, subiect, continut);
+}
+
+/* ---------- notificări pentru echipă ---------- */
+
+/* Fila „Notificări” din sheet-ul cu texte: Formular | Trimite (Da/Nu) | Către (una sau mai multe adrese, cu virgulă).
+   Dacă fila lipsește, se creează singură, cu notificările pornite spre cefacemcucopiii@gmail.com. */
+const FILA_NOTIFICARI = 'Notificări';
+const NOTIF = {
+  'abonare': ['Abonat nou', function (c) { return c['E-mail'] || ''; }, ['E-mail', 'Vrea oferte de la parteneri'], 'Contacte → Abonați', CONTACTE_ID],
+  'eveniment': ['Eveniment propus', function (c) { return (c['Nume eveniment'] || '') + (c['Organizator'] ? ' (' + c['Organizator'] + ')' : ''); },
+    ['Nume eveniment', 'Organizator', 'Data', 'Ora', 'Locație', 'Vârstă minimă', 'Vârstă maximă', 'Acces', 'E-mail', 'Telefon'], 'centralizator → Propuneri evenimente', ''],
+  'colaborare': ['Cerere de colaborare', function (c) { return c['Afacere / brand'] || ''; },
+    ['Afacere / brand', 'Persoană de contact', 'E-mail', 'Telefon', 'Instagram', 'Despre ei', 'Ce au nevoie'], 'Contacte → Colaborări', CONTACTE_ID],
+  'pagina': ['Pagină de partener de verificat', function (c) { return c['Nume'] || ''; },
+    ['Nume', 'Cum se descriu', 'Persoană de contact', 'Telefon contact', 'E-mail', 'Denumire legală'], 'CFCC - Onboarding parteneri', ONBOARDING_ID]
+};
+
+function setari_notificari() {
+  const ss = SpreadsheetApp.openById(TEXTE_ID);
+  let f = ss.getSheetByName(FILA_NOTIFICARI);
+  if (!f) {
+    f = ss.insertSheet(FILA_NOTIFICARI);
+    const rows = [['Formular', 'Trimite notificare (Da/Nu)', 'Către', 'Ce primești']].concat([
+      ['abonare', 'Da', 'cefacemcucopiii@gmail.com', 'Un mail „[CFCC] Abonat nou” la fiecare abonare la newsletter'],
+      ['eveniment', 'Da', 'cefacemcucopiii@gmail.com', 'Un mail „[CFCC] Eveniment propus” când cineva trimite un eveniment'],
+      ['colaborare', 'Da', 'cefacemcucopiii@gmail.com', 'Un mail „[CFCC] Cerere de colaborare” la fiecare cerere'],
+      ['pagina', 'Da', 'cefacemcucopiii@gmail.com', 'Un mail „[CFCC] Pagină de partener de verificat” când un partener trimite formularul']
+    ]);
+    f.getRange(1, 1, rows.length, 4).setValues(rows);
+    f.setFrozenRows(1);
+    f.getRange(1, 1, 1, 4).setFontWeight('bold').setBackground('#1F4E5F').setFontColor('#ffffff');
+    f.setColumnWidth(1, 120); f.setColumnWidth(2, 190); f.setColumnWidth(3, 300); f.setColumnWidth(4, 520);
+    f.getRange(2, 2, rows.length - 1, 1).setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(['Da', 'Nu'], true).build());
+  }
+  const s = {};
+  f.getRange(2, 1, Math.max(f.getLastRow() - 1, 1), 3).getValues().forEach(function (r) {
+    if (r[0]) s[String(r[0]).trim()] = { da: /^da/i.test(String(r[1])), catre: String(r[2] || '').trim() };
+  });
+  return s;
+}
+
+function notifica_echipa(tip, c) {
+  const n = NOTIF[tip];
+  if (!n) return;
+  const s = setari_notificari()[tip];
+  if (!s || !s.da || !s.catre) return;
+  const subiect = '[CFCC] ' + n[0] + (n[1](c) ? ': ' + n[1](c) : '');
+  const rows = n[2].filter(function (k) { return c[k]; }).map(function (k) {
+    return '<tr><td style="padding:4px 12px 4px 0;color:#5b7079;vertical-align:top">' + esc(k) + '</td><td style="padding:4px 0">' + esc(c[k]).replace(/\n/g, '<br>') + '</td></tr>';
+  }).join('');
+  const link = n[4] ? 'https://docs.google.com/spreadsheets/d/' + n[4] + '/edit' : SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  const html = '<p><strong>' + esc(n[0]) + '</strong>, primit acum pe cefacemcucopiii.ro.</p><table>' + rows + '</table>' +
+    '<p>Toate detaliile sunt în <a href="' + link + '">' + esc(n[3]) + '</a>.</p>' +
+    '<p style="color:#888;font-size:12px">Notificare automată. O oprești din sheet-ul „Ce facem cu copiii? - Texte e-mailuri automate”, fila Notificări.</p>';
+  s.catre.split(/[,;\s]+/).filter(function (a) { return /^\S+@\S+\.\S+$/.test(a); }).forEach(function (a) { trimite_email(a, subiect, html); });
 }
 
 /* Trimite prin Brevo, de pe hello@cefacemcucopiii.ro.
@@ -352,7 +415,9 @@ function la_editare_onboarding(e) {
       const i = ids.indexOf(id);
       if (i < 1) { e.source.toast('Nu am găsit pagina „' + id + '” în Comunitatea CFCC.', 'Ce facem cu copiii?', 10); return; }
       par.getRange(i + 1, 5).setValue(pe);
-      e.source.toast('În Comunitatea CFCC, „' + id + '” are acum Pe site = ' + pe + (pe === 'Da' ? ' (apare pe site în câteva minute).' : '.'), 'Ce facem cu copiii?', 10);
+      let mesaj = 'În Comunitatea CFCC, „' + id + '” are acum Pe site = ' + pe + (pe === 'Da' ? ' (apare pe site în câteva minute).' : '.');
+      if (pe === 'Da') mesaj += ' ' + mail_pagina_live(fila, e.range.getRow(), id);
+      e.source.toast(mesaj, 'Ce facem cu copiii?', 12);
     } catch (err) { e.source.toast('Nu am putut actualiza Comunitatea CFCC: ' + err.message, 'Ce facem cu copiii?', 15); }
     return;
   }
@@ -366,6 +431,21 @@ function la_editare_onboarding(e) {
     e.range.setValue('De verificat');
     e.source.toast('Nu am putut crea pagina: ' + err.message, 'Ce facem cu copiii?', 15);
   }
+}
+
+/** Trimite partenerului mailul „pagina e live”, o singură dată (se notează în coloana Note). */
+function mail_pagina_live(fila, rand, id) {
+  const nr = FILE.pagina.coloane.length;
+  const v = fila.getRange(rand, 1, 1, nr).getDisplayValues()[0];
+  const p = {};
+  FILE.pagina.coloane.forEach(function (c, i) { p[c[0]] = String(v[i] || '').trim(); });
+  const colNote = FILE.pagina.coloane.map(function (c) { return c[0]; }).indexOf('Note') + 1;
+  if (/mail „pagina e live” trimis/i.test(p['Note'])) return 'Mailul „pagina e live” fusese deja trimis, nu l-am trimis din nou.';
+  if (!/^\S+@\S+\.\S+$/.test(p['E-mail'])) return 'Nu am trimis mailul „pagina e live”: lipsește e-mailul persoanei de contact.';
+  trimite_confirmare('pagina live', { 'E-mail': p['E-mail'], 'Persoană de contact': p['Persoană de contact'], 'Nume': p['Nume'], _id: id });
+  const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
+  fila.getRange(rand, colNote).setValue((p['Note'] ? p['Note'] + '\n' : '') + azi + ' - mail „pagina e live” trimis la ' + p['E-mail']);
+  return 'Am trimis mailul „pagina e live” la ' + p['E-mail'] + '.';
 }
 
 function creeaza_pagina(fila, rand) {
