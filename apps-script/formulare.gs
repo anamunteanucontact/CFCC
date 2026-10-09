@@ -27,7 +27,7 @@ const FILE = {
   eveniment: {
     nume: 'Propuneri evenimente', fisier: 'principal',
     coloane: [['Primit la'], ['Nume eveniment'], ['Organizator'], ['Data'], ['Ora'], ['Locație'], ['Adresă'],
-      ['Vârstă minimă'], ['Vârstă maximă'], ['Acces'], ['Link bilete / înscriere'], ['Descriere'], ['E-mail'], ['Telefon'], ['Status']]
+      ['Vârstă minimă'], ['Vârstă maximă'], ['Acces'], ['Link bilete / înscriere'], ['Descriere'], ['E-mail'], ['Telefon'], ['Categorie'], ['Status']]
   },
   colaborare: {
     nume: 'Colaborări', fisier: 'contacte',
@@ -368,6 +368,12 @@ function onEdit(e) {
     const val = String(e.value || '');
     if (val !== STATUS_IN_CALENDAR && val !== STATUS_PUBLICAT) return;
     const celula = e.range;
+    const colCat = FILE.eveniment.coloane.map(function (c) { return c[0]; }).indexOf('Categorie') + 1;
+    if (val === STATUS_PUBLICAT && !String(fila.getRange(e.range.getRow(), colCat).getValue() || '').trim()) {
+      celula.setValue(e.oldValue || 'Nou');
+      e.source.toast('Alege întâi categoria (coloana Categorie), apoi pune „Publicat”.', 'Ce facem cu copiii?', 8);
+      return;
+    }
     if (String(celula.getNote() || '').indexOf(NOTA_MUTAT) === 0) {
       // e deja în Evenimente: doar sincronizăm statusul acolo
       seteaza_status_in_evenimente(fila, e.range.getRow(), val === STATUS_PUBLICAT ? 'Publicat' : 'De verificat');
@@ -398,11 +404,11 @@ function muta_in_calendar(filaProp, rand, publica) {
   const primit = p['Primit la'] instanceof Date ? Utilities.formatDate(p['Primit la'], tz, 'dd.MM.yyyy HH:mm') : String(p['Primit la'] || '');
 
   // rândul nou: coloanele B-V din „Evenimente” (coloana A e formula cu linkul de pe site)
-  const notaProp = 'Din propunerea primită pe ' + primit + '. De completat: categoria.';
+  const notaProp = 'Din propunerea primită pe ' + primit + '.' + (p['Categorie'] ? '' : ' De completat: categoria.');
   const nou = [
     publica ? 'Publicat' : 'De verificat', 'Nu', "'" + dataTxt, ZILE[data.getDay()], ora ? "'" + ora : '', '',
     p['Nume eveniment'], p['Organizator'], p['Locație'], p['Descriere'],
-    p['Vârstă minimă'], p['Vârstă maximă'], '', p['Adresă'] || adresa_cunoscuta(ev, p['Locație']),
+    p['Vârstă minimă'], p['Vârstă maximă'], p['Categorie'] || '', p['Adresă'] || adresa_cunoscuta(ev, p['Locație']),
     bilet, p['Link bilete / înscriere'], '', contact, notaProp,
     'Organizator', Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy')
   ];
