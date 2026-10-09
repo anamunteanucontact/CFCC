@@ -273,8 +273,6 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .org-acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-bottom:22px}
 .org-acts .btn{padding:10px 14px}
 .org-acts .btn svg{width:18px;height:18px}
-.org-sharebox{justify-content:flex-end;margin:-12px 0 22px}
-.org-sharebox .story{background:var(--coral);color:#fff;border-color:var(--coral)}
 .org-sec{margin-top:26px}
 .org-sec>h3{font-size:1.35rem;font-weight:800;margin-bottom:10px}
 .svc{display:grid;gap:10px}
@@ -830,7 +828,7 @@ const store={get(k,f){try{const v=localStorage.getItem("cfcc_"+k);return v?JSON.
 let saved=store.get("saved",[]), went=store.get("went",[]), kids=store.get("kids",[]), sub=store.get("sub",null), curView="calendar";
 const _set=store.set.bind(store);store.set=(k,v)=>{_set(k,v);if(pushHook&&["saved","went","kids","sub"].includes(k))pushHook()};
 
-function toast(t,ms){const el=document.getElementById("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>el.hidden=true,ms||2200)}
+function toast(t){const el=document.getElementById("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>el.hidden=true,2200)}
 
 /* vârste */
 function years(s){if(!s)return null;const m=String(s).toLowerCase().match(/(\d+)\s*(luni)?/);if(!m)return null;return m[2]?(+m[1])/12:+m[1]}
@@ -1185,65 +1183,6 @@ function renderOrgs(){
 }
 function mapUrl(o){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(o.ad.replace(/^Intrarea publică:\s*/i,"")+", Timișoara")}
 const artCard=a=>`<a class="art" href="#articol/${a.id}">${a.poza?`<img src="${esc(a.poza)}" alt="" loading="lazy">`:""}<span class="eyebrow">${esc(a.rub||"Recomandările noastre")}</span><b>${esc(a.t)}</b>${a.rez?`<span class="art-rez">${esc(a.rez)}</span>`:""}</a>`;
-const orgUrl=o=>"https://cefacemcucopiii.ro/#comunitate/"+o.slug;
-function shareOrg(sl){
-  const o=ORG_BY[sl];if(!o)return;const sb=document.getElementById("osb");if(!sb)return;
-  sb.hidden=!sb.hidden;if(!sb.hidden)track("Organizator: distribuie",null,{organizator:o.n});
-}
-async function nativeShareOrg(sl){const o=ORG_BY[sl];if(!o||!navigator.share)return;
-  track("Organizator: distribuie alte aplicații",null,{organizator:o.n});
-  try{await navigator.share({title:o.n,text:o.n+" pe Ce facem cu copiii?",url:orgUrl(o)})}catch(_){}}
-/* imagine de story (1080x1920) pentru Instagram/Facebook */
-const loadImg=src=>new Promise(ok=>{if(!src)return ok(null);const i=new Image();i.crossOrigin="anonymous";i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src=src;setTimeout(()=>ok(null),6000)});
-function rr(x,X,Y,W,H,R){x.beginPath();x.moveTo(X+R,Y);x.arcTo(X+W,Y,X+W,Y+H,R);x.arcTo(X+W,Y+H,X,Y+H,R);x.arcTo(X,Y+H,X,Y,R);x.arcTo(X,Y,X+W,Y,R);x.closePath()}
-function wrapLines(x,t,max,n){const w=t.split(/\s+/),L=[];let l="";for(const k of w){const z=l?l+" "+k:k;if(x.measureText(z).width>max&&l){L.push(l);l=k}else l=z}if(l)L.push(l);
-  if(L.length>n){L.length=n;L[n-1]=L[n-1].replace(/\s*\S*$/,"")+"…"}return L}
-async function storyBlob(o){
-  try{await Promise.all([document.fonts.load('800 100px "Baloo 2"'),document.fonts.load('600 40px Figtree'),document.fonts.load('700 40px Figtree')])}catch(_){}
-  const [cov,logo]=await Promise.all([loadImg(o.pro?o.cover:""),loadImg(o.logo)]);
-  const make=(useImg)=>{const c=document.createElement("canvas");c.width=1080;c.height=1920;const x=c.getContext("2d");
-    x.fillStyle="#FFF8F0";x.fillRect(0,0,1080,1920);
-    x.fillStyle="#F4B942";x.beginPath();x.arc(1010,90,170,0,7);x.fill();x.fillStyle="#EE6C4D";x.beginPath();x.arc(60,1860,140,0,7);x.fill();
-    x.textAlign="center";x.fillStyle="#1F4E5F";x.font='800 54px "Baloo 2", sans-serif';x.fillText("Ce facem cu copiii?",540,170);
-    x.font='600 34px Figtree, sans-serif';x.fillStyle="#5b7079";x.fillText("Comunitatea CFCC · Timișoara",540,222);
-    let y=300;
-    if(useImg&&cov){const W=920,H=700,X=80;x.save();rr(x,X,y,W,H,48);x.clip();const k=Math.max(W/cov.naturalWidth,H/cov.naturalHeight);
-      const w=cov.naturalWidth*k,h=cov.naturalHeight*k;x.drawImage(cov,X+(W-w)/2,y+(H-h)*.3,w,h);x.restore();y+=H-90}
-    else y+=230;
-    const R=120;x.save();x.beginPath();x.arc(540,y+R,R+12,0,7);x.fillStyle="#FFF8F0";x.fill();x.beginPath();x.arc(540,y+R,R,0,7);
-    if(useImg&&logo){x.fillStyle="#fff";x.fill();x.clip();const k=Math.min(2*R*.8/logo.naturalWidth,2*R*.8/logo.naturalHeight);x.drawImage(logo,540-logo.naturalWidth*k/2,y+R-logo.naturalHeight*k/2,logo.naturalWidth*k,logo.naturalHeight*k)}
-    else{const h=[...o.slug].reduce((a,ch)=>a+ch.charCodeAt(0),0);x.fillStyle=MONO_C[h%MONO_C.length];x.fill();x.fillStyle="#fff";x.font='800 130px "Baloo 2", sans-serif';x.textBaseline="middle";x.fillText(o.n.replace(/^((teatrul|muzeul|casa|pentru|copii|și|si|tineret|de|stat|a|al)\s+)+/i,"").charAt(0).toUpperCase(),540,y+R+8);x.textBaseline="alphabetic"}
-    x.restore();y+=2*R+60;
-    if(o.tip){x.font='700 36px Figtree, sans-serif';x.fillStyle="#EE6C4D";x.fillText(o.tip.toUpperCase(),540,y);y+=30}
-    x.fillStyle="#1d3640";let fs=96;x.font=`800 ${fs}px "Baloo 2", sans-serif`;let L=wrapLines(x,o.n,900,3);
-    if(L.length>2){fs=76;x.font=`800 ${fs}px "Baloo 2", sans-serif`;L=wrapLines(x,o.n,900,3)}
-    for(const l of L){y+=fs*1.05;x.fillText(l,540,y)}
-    y+=70;x.font='500 40px Figtree, sans-serif';x.fillStyle="#1d3640";
-    for(const l of ["Ne găsești în calendarul cu","evenimente pentru copii din Timișoara"]){x.fillText(l,540,y);y+=54}
-    const by=Math.max(y+40,1560);x.setLineDash([18,14]);x.lineWidth=5;x.strokeStyle="#1F4E5F";rr(x,190,by,700,150,40);x.stroke();x.setLineDash([]);
-    x.fillStyle="#1F4E5F";x.font='700 40px Figtree, sans-serif';x.fillText("Pune aici sticker-ul cu link",540,by+68);
-    x.font='500 32px Figtree, sans-serif';x.fillStyle="#5b7079";x.fillText("cefacemcucopiii.ro",540,by+116);
-    return new Promise(ok=>{try{c.toBlob(b=>ok(b),"image/png")}catch(_){ok(null)}})};
-  return (await make(true))||(await make(false));
-}
-async function storyOrg(sl){
-  const o=ORG_BY[sl];if(!o)return;track("Organizator: story",null,{organizator:o.n});
-  toast("Pregătim imaginea...");
-  try{await navigator.clipboard.writeText(orgUrl(o))}catch(_){}
-  const b=await storyBlob(o);if(!b){toast("Nu am putut crea imaginea");return}
-  const f=new File([b],"story-"+o.slug+".png",{type:"image/png"});
-  const tip="Linkul paginii e copiat: în story adaugă un sticker Link și lipește-l.";
-  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f]});toast(tip,7000)}catch(_){}return}
-  const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);
-  toast("Imaginea s-a descărcat. "+tip,7000);
-}
-document.addEventListener("click",ev=>{
-  const a=ev.target.closest("[data-org-share]");if(a){shareOrg(a.dataset.orgShare);return}
-  const st=ev.target.closest("[data-org-story]");if(st){storyOrg(st.dataset.orgStory);return}
-  const nv=ev.target.closest("[data-org-native]");if(nv){nativeShareOrg(nv.dataset.orgNative);return}
-  const c=ev.target.closest("[data-org-copy]");if(c){const o=ORG_BY[c.dataset.orgCopy];if(!o)return;track("Organizator: copiază linkul",null,{organizator:o.n});
-    navigator.clipboard.writeText(orgUrl(o)).then(()=>toast("Link copiat"),()=>toast(orgUrl(o)))}
-});
 function renderOrg(sl){
   const el=document.getElementById("org-page");
   const back='<a class="back" href="#comunitate">← Comunitatea CFCC</a>';
@@ -1265,14 +1204,6 @@ function renderOrg(sl){
       ${o.pro?btn(o.web,"Site",false,"Organizator: site"):""}
       ${btn(o.ig,"Instagram",false,"Organizator: Instagram")}
       ${btn(o.fb,"Facebook",false,"Organizator: Facebook")}
-      <button class="btn btn-soft" type="button" data-org-share="${esc(o.slug)}">${I.share}Distribuie</button>
-    </div>
-    <div class="sharebox org-sharebox" id="osb" hidden>
-      <button type="button" class="story" data-org-story="${esc(o.slug)}">Pune în story (Instagram, Facebook)</button>
-      <a href="https://wa.me/?text=${encodeURIComponent(o.n+" pe Ce facem cu copiii? "+orgUrl(o))}" target="_blank" rel="noopener" data-trk="Organizator: distribuie WhatsApp" data-trk-org="${esc(o.n)}">WhatsApp</a>
-      <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(orgUrl(o))}" target="_blank" rel="noopener" data-trk="Organizator: distribuie Facebook" data-trk-org="${esc(o.n)}">Facebook</a>
-      <button type="button" data-org-copy="${esc(o.slug)}">Copiază linkul</button>
-      ${navigator.share?`<button type="button" data-org-native="${esc(o.slug)}">Alte aplicații</button>`:""}
     </div>
     <div class="org-sec"><h3>În calendar acum</h3>
       ${loadState==="loading"?'<div class="empty">Se încarcă evenimentele...</div>':ev.length?`<div class="mini">${ev.map(e=>{const d=dt(e.d);
