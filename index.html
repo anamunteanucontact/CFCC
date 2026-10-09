@@ -1214,7 +1214,6 @@ function renderOrg(sl){
     ${o.desc?o.desc.split(/\n+/).map(p=>p.trim()).filter(Boolean).map(p=>`<p class="org-desc">${esc(p)}</p>`).join(""):""}
     <div class="org-acts">
       ${btn(o.ad?mapUrl(o):"","Hartă",true,"Organizator: hartă")}
-      ${o.full?btn(o.web,"Site",false,"Organizator: site"):""}
       ${btn(o.ig,"Instagram",false,"Organizator: Instagram")}
       ${btn(o.fb,"Facebook",false,"Organizator: Facebook")}
     </div>
