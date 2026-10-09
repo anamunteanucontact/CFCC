@@ -254,14 +254,14 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .org-card h3{font-family:var(--body);font-size:1rem;font-weight:700;line-height:1.25}
 .org-card div>span{font-size:.82rem;color:var(--muted)}
 .mono{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font:800 1.35rem var(--display);color:#fff;flex:none;overflow:hidden}
-.mono img{width:100%;height:100%;object-fit:cover}
+.mono img{width:100%;height:100%;object-fit:contain;padding:5px;box-sizing:border-box}
 .mono.lg{width:72px;height:72px;font-size:1.9rem;border-radius:20px}
 .back{display:inline-block;margin-bottom:14px;font-weight:600;font-size:.9rem;color:var(--muted);text-decoration:none}
 .org-head{display:grid;grid-template-columns:72px 1fr;gap:16px;align-items:center;margin-bottom:16px}
 .org-head h2{font-size:clamp(1.6rem,5vw,2.2rem);font-weight:800}
 .org-head .tags{margin-top:8px}
-.org-photo{width:100%;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:18px;margin-bottom:16px;display:block}
-.org-desc{margin:0 0 16px;max-width:62ch;font-size:1rem}
+.org-photo{width:100%;max-width:100%;aspect-ratio:4/3;max-height:520px;object-fit:cover;object-position:center 30%;border-radius:18px;margin-bottom:16px;display:block}
+.org-desc{margin:0 0 12px;max-width:62ch;font-size:1rem}
 .org-acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-bottom:22px}
 .org-acts .btn{padding:10px 14px}
 .org-sec{margin-top:26px}
@@ -1112,7 +1112,7 @@ const COM_TABS={parteneri:0,activitati:1001,galerie:1002,articole:1003};
 let ORGS=[],ORG_ALL=[],ORG_BY={},ARTS=[],ART_BY={},orgState="loading";
 const norm=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
 /* imagini: link https sau fișier din site (ex. assets/logos/merlin.png) */
-const imgUrl=u=>{u=(u||"").trim();return /^[\w\-./]+\.(png|jpe?g|webp|svg)$/i.test(u)&&!u.includes("..")?u:cleanUrl(u)};
+const imgUrl=u=>{u=(u||"").trim();return /^[\w\-./]+\.(png|jpe?g|webp|svg)$/i.test(u)&&!u.includes("..")?"/"+u.replace(/^\/+/,""):cleanUrl(u)};
 const da=v=>/^da/i.test((v||"").trim());
 function buildCom(t){
   const rows=k=>(t[k]||[]).slice(1).map(r=>{const g=i=>(r[i]||"").trim();return g});
@@ -1146,7 +1146,7 @@ const orgLink=(v)=>{const g=orgByName(v);return g?`<a href="#comunitate/${g.slug
 const orgEvents=o=>EV.filter(e=>e.d>=iso(TODAY)&&(orgByName(e.o)===o||orgByName(e.l)===o)).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
 const MONO_C=["#1F4E5F","#EE6C4D","#2f7d5b","#7a5c9e","#c2851b","#3b6ea5"];
 function mono(o,lg){
-  if(o.logo)return `<span class="mono${lg?" lg":""}" style="background:#fff"><img src="${esc(o.logo)}" alt="" loading="lazy"></span>`;
+  if(o.logo)return `<span class="mono${lg?" lg":""}" style="background:#fff"><img src="${esc(o.logo)}" alt="" loading="lazy" onerror="this.remove()"></span>`;
   const h=[...o.slug].reduce((a,c)=>a+c.charCodeAt(0),0);
   const w=o.n.replace(/^((teatrul|muzeul|casa|pentru|copii|și|si|tineret|de|stat|a|al)\s+)+/i,"");
   return `<span class="mono${lg?" lg":""}" style="background:${MONO_C[h%MONO_C.length]}" aria-hidden="true">${esc(w.charAt(0).toUpperCase())}</span>`;
@@ -1177,7 +1177,7 @@ function renderOrg(sl){
     <div class="org-head">${mono(o,true)}<div><span class="eyebrow">${esc(o.tip)}</span><h2>${esc(o.n)}</h2>
       <div class="tags">${o.age?`<span class="tag age">${esc(o.age)}</span>`:""}${o.pro?'<span class="tag saved">Partener</span>':""}</div></div></div>
     ${o.pro&&o.cover?`<img class="org-photo" src="${esc(o.cover)}" alt="" loading="lazy">`:""}
-    ${o.desc?`<p class="org-desc">${esc(o.desc)}</p>`:""}
+    ${o.desc?o.desc.split(/\n+/).map(p=>p.trim()).filter(Boolean).map(p=>`<p class="org-desc">${esc(p)}</p>`).join(""):""}
     <div class="org-acts">
       ${btn(o.ad?mapUrl(o):"","Hartă",true,"Organizator: hartă")}
       ${o.pro?btn(o.web,"Site",false,"Organizator: site"):""}
