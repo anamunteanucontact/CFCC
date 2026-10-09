@@ -27,7 +27,7 @@ const FILE = {
   eveniment: {
     nume: 'Propuneri evenimente', fisier: 'principal',
     coloane: [['Primit la'], ['Nume eveniment'], ['Organizator'], ['Data'], ['Ora'], ['Locație'], ['Adresă'],
-      ['Vârstă minimă'], ['Vârstă maximă'], ['Acces'], ['Link bilete / înscriere'], ['Descriere'], ['E-mail'], ['Telefon'], ['Categorie'], ['Status']]
+      ['Vârstă minimă'], ['Vârstă maximă'], ['Acces'], ['Link bilete / înscriere'], ['Descriere'], ['E-mail'], ['Telefon'], ['Categorie'], ['Status'], ['Note']]
   },
   colaborare: {
     nume: 'Colaborări', fisier: 'contacte',
@@ -225,7 +225,7 @@ function trimite_confirmare(tip, c) {
 }
 
 /* Ce mail de confirmare pleacă după fiecare formular (numele care apare în coloana Note). */
-const ETICHETE_CONFIRMARE = { 'abonare': 'bine ai venit', 'colaborare': 'confirmare colaborare', 'pagina': 'confirmare formular' };
+const ETICHETE_CONFIRMARE = { 'eveniment': 'am primit evenimentul', 'abonare': 'bine ai venit', 'colaborare': 'confirmare colaborare', 'pagina': 'confirmare formular' };
 
 /** Notează în coloana Note a rândului nou dacă mailul de confirmare a plecat (cu data, ora și adresa). */
 function noteaza_mail_confirmare(fila, nrRand, tip, cheieTip, c, rezultat) {
@@ -363,7 +363,7 @@ function onEdit(e) {
     const fila = e.range.getSheet();
     if (fila.getName() === 'Evenimente') { la_editare_evenimente(e); return; }
     if (fila.getName() !== FILE.eveniment.nume) return;
-    const colStatus = FILE.eveniment.coloane.length; // ultima coloană
+    const colStatus = prop_col('Status');
     if (e.range.getColumn() !== colStatus || e.range.getRow() < 2) return;
     const val = String(e.value || '');
     if (val !== STATUS_IN_CALENDAR && val !== STATUS_PUBLICAT) return;
@@ -383,6 +383,30 @@ function onEdit(e) {
   } catch (err) {
     e.source.toast('Nu am putut muta evenimentul: ' + err, 'Ce facem cu copiii?', 10);
   }
+}
+
+/** Coloana (1, 2, ...) dintr-un titlu din „Propuneri evenimente”. */
+function prop_col(titlu) { return FILE.eveniment.coloane.map(function (c) { return c[0]; }).indexOf(titlu) + 1; }
+
+/** Adaugă un rând în coloana Note a propunerii (cu data și ora). */
+function noteaza_propunere(filaProp, rand, text) {
+  const c = filaProp.getRange(rand, prop_col('Note'));
+  const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
+  const vechi = c.getDisplayValue();
+  c.setValue((vechi ? vechi.replace(/\s+$/, '') + '\n\n' : '') + azi + ' - ' + text);
+}
+
+/** Găsește rândul propunerii după nume și dată (pentru notele venite din Evenimente). */
+function rand_propunere(ss, nume, data) {
+  const prop = ss.getSheetByName(FILE.eveniment.nume);
+  if (!prop || prop.getLastRow() < 2) return 0;
+  const tz = ss.getSpreadsheetTimeZone(), n = String(nume || '').trim().toLowerCase(), d = ca_data(data, tz);
+  const rows = prop.getRange(2, 1, prop.getLastRow() - 1, 4).getValues();
+  for (let i = 0; i < rows.length; i++) {
+    const dd = ca_data(rows[i][3], tz);
+    if (String(rows[i][1] || '').trim().toLowerCase() === n && d && dd && dd.toDateString() === d.toDateString()) return i + 2;
+  }
+  return 0;
 }
 
 function muta_in_calendar(filaProp, rand, publica) {
@@ -430,7 +454,8 @@ function muta_in_calendar(filaProp, rand, publica) {
   const f = ev.getRange(vecin, EV_COL.ordine).getFormulaR1C1();
   if (f) ev.getRange(tinta, EV_COL.ordine).setFormulaR1C1(f);
 
-  filaProp.getRange(rand, nr).setNote(NOTA_MUTAT + ' pe ' + Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy HH:mm'));
+  filaProp.getRange(rand, prop_col('Status')).setNote(NOTA_MUTAT + ' pe ' + Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy HH:mm'));
+  noteaza_propunere(filaProp, rand, 'mutat în Evenimente, rândul ' + tinta + (publica ? ', publicat pe site' : ', nepublicat încă'));
   ss.toast('Am mutat „' + p['Nume eveniment'] + '” în Evenimente, rândul ' + tinta + ', cu status „' + (publica ? 'Publicat' : 'De verificat') + '”.', 'Ce facem cu copiii?', 8);
 }
 
@@ -461,15 +486,18 @@ function sincronizeaza_propunerea(ev, rand) {
   const st = String(r[EV_COL.status - 1] || '').trim();
   const prop = ss.getSheetByName(FILE.eveniment.nume);
   if (!prop || prop.getLastRow() < 2 || !nume) return;
-  const nr = FILE.eveniment.coloane.length;
+  const nr = FILE.eveniment.coloane.length, cs = prop_col('Status');
   const rows = prop.getRange(2, 1, prop.getLastRow() - 1, nr).getValues();
-  const note = prop.getRange(2, nr, prop.getLastRow() - 1, 1).getNotes();
+  const note = prop.getRange(2, cs, prop.getLastRow() - 1, 1).getNotes();
   for (let i = 0; i < rows.length; i++) {
     if (String(note[i][0] || '').indexOf(NOTA_MUTAT) !== 0) continue;
     const dd = ca_data(rows[i][3], tz);
     if (String(rows[i][1] || '').trim().toLowerCase() === nume && d && dd && dd.toDateString() === d.toDateString()) {
       const nou = st === 'Publicat' ? STATUS_PUBLICAT : st === 'Anulat' ? 'Respins' : STATUS_IN_CALENDAR;
-      prop.getRange(i + 2, nr).setValue(nou);
+      if (String(rows[i][cs - 1] || '') !== nou) {
+        prop.getRange(i + 2, cs).setValue(nou);
+        noteaza_propunere(prop, i + 2, 'status schimbat din Evenimente: ' + nou);
+      }
       return;
     }
   }
@@ -585,6 +613,10 @@ function mail_evenimente_publicate() {
       : azi + ' - mail „eveniment pe site” NU a plecat la ' + m[0] + (rez ? ' (' + String(rez).slice(0, 150) + ')' : '') + '. Încercăm din nou peste 15 minute.';
     if (rez === 'Brevo' || rez === 'Gmail') fila.getRange(i + 3, EV_COL_NOTE).setValue((note.trim() ? note.trim() + ' | ' : '') + nota);
     else nouAsteapta[link] = asteapta[link];
+    try {
+      const rp = rand_propunere(fila.getParent(), r[EV_COL.nume - 1], r[EV_COL.data - 1]);
+      if (rp) noteaza_propunere(fila.getParent().getSheetByName(FILE.eveniment.nume), rp, nota.replace(/^\S+ \S+ - /, ''));
+    } catch (errP) { console.warn(errP); }
   });
   props.setProperty('EV_LIVE_ASTEAPTA', JSON.stringify(nouAsteapta));
 }
