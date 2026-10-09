@@ -374,6 +374,10 @@ function creeaza_pagina(fila, rand) {
     text(p['Telefon public']), p['E-mail public'], link_social(p['Instagram'], 'instagram'), link_social(p['Facebook'], 'facebook'),
     p['Website'], logo, cover, nume_calendar]);
 
+  // dacă pagina a mai existat și a fost ștearsă, scoatem activitățile și pozele vechi rămase cu același ID
+  sterge_ramase(com.getSheetByName('Activități'), id);
+  sterge_ramase(com.getSheetByName('Galerie'), id);
+
   const act = p['Activități'].split(/\n+/).filter(String).map(function (l) {
     const parti = l.split('|');
     return [id, parti[0].trim(), (parti.slice(1).join('|') || '').trim()];
@@ -387,6 +391,13 @@ function creeaza_pagina(fila, rand) {
     fg.getRange(fg.getLastRow() + 1, 1, alte.length, 3).setValues(alte.map(function (u) { return [id, u, '']; }));
   }
   return id;
+}
+
+/** Șterge rândurile care au în coloana A ID-ul dat (resturi de la o pagină ștearsă). Articolele nu se ating. */
+function sterge_ramase(fila, id) {
+  if (!fila || fila.getLastRow() < 2) return;
+  const ids = fila.getRange(2, 1, fila.getLastRow() - 1, 1).getDisplayValues();
+  for (let i = ids.length - 1; i >= 0; i--) if (String(ids[i][0]).trim() === id) fila.deleteRow(i + 2);
 }
 
 /** Face pozele din Drive vizibile pentru oricine are linkul și întoarce linkuri care se pot afișa pe site. */
