@@ -272,6 +272,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .org-desc{margin:0 0 12px;max-width:62ch;font-size:1rem}
 .org-acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-bottom:22px}
 .org-acts .btn{padding:10px 14px}
+.org-acts .btn svg{width:18px;height:18px}
+.org-sharebox{justify-content:flex-end;margin:-12px 0 22px}
 .org-sec{margin-top:26px}
 .org-sec>h3{font-size:1.35rem;font-weight:800;margin-bottom:10px}
 .svc{display:grid;gap:10px}
@@ -1182,6 +1184,17 @@ function renderOrgs(){
 }
 function mapUrl(o){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(o.ad.replace(/^Intrarea publică:\s*/i,"")+", Timișoara")}
 const artCard=a=>`<a class="art" href="#articol/${a.id}">${a.poza?`<img src="${esc(a.poza)}" alt="" loading="lazy">`:""}<span class="eyebrow">${esc(a.rub||"Recomandările noastre")}</span><b>${esc(a.t)}</b>${a.rez?`<span class="art-rez">${esc(a.rez)}</span>`:""}</a>`;
+const orgUrl=o=>"https://cefacemcucopiii.ro/#comunitate/"+o.slug;
+async function shareOrg(sl){
+  const o=ORG_BY[sl];if(!o)return;track("Organizator: distribuie",null,{organizator:o.n});
+  if(navigator.share){try{await navigator.share({title:o.n,text:o.n+" pe Ce facem cu copiii?",url:orgUrl(o)});return}catch(err){if(err&&err.name==="AbortError")return}}
+  const sb=document.getElementById("osb");if(sb)sb.hidden=!sb.hidden;
+}
+document.addEventListener("click",ev=>{
+  const a=ev.target.closest("[data-org-share]");if(a){shareOrg(a.dataset.orgShare);return}
+  const c=ev.target.closest("[data-org-copy]");if(c){const o=ORG_BY[c.dataset.orgCopy];if(!o)return;track("Organizator: copiază linkul",null,{organizator:o.n});
+    navigator.clipboard.writeText(orgUrl(o)).then(()=>toast("Link copiat"),()=>toast(orgUrl(o)))}
+});
 function renderOrg(sl){
   const el=document.getElementById("org-page");
   const back='<a class="back" href="#comunitate">← Comunitatea CFCC</a>';
@@ -1203,6 +1216,12 @@ function renderOrg(sl){
       ${o.pro?btn(o.web,"Site",false,"Organizator: site"):""}
       ${btn(o.ig,"Instagram",false,"Organizator: Instagram")}
       ${btn(o.fb,"Facebook",false,"Organizator: Facebook")}
+      <button class="btn btn-soft" type="button" data-org-share="${esc(o.slug)}">${I.share}Distribuie</button>
+    </div>
+    <div class="sharebox org-sharebox" id="osb" hidden>
+      <a href="https://wa.me/?text=${encodeURIComponent(o.n+" pe Ce facem cu copiii? "+orgUrl(o))}" target="_blank" rel="noopener" data-trk="Organizator: distribuie WhatsApp" data-trk-org="${esc(o.n)}">WhatsApp</a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(orgUrl(o))}" target="_blank" rel="noopener" data-trk="Organizator: distribuie Facebook" data-trk-org="${esc(o.n)}">Facebook</a>
+      <button type="button" data-org-copy="${esc(o.slug)}">Copiază linkul</button>
     </div>
     <div class="org-sec"><h3>În calendar acum</h3>
       ${loadState==="loading"?'<div class="empty">Se încarcă evenimentele...</div>':ev.length?`<div class="mini">${ev.map(e=>{const d=dt(e.d);
