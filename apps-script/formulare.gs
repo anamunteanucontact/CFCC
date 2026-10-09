@@ -341,7 +341,22 @@ function la_editare_onboarding(e) {
   const fila = e.range.getSheet();
   if (fila.getName() !== FILE.pagina.nume) return;
   if (e.range.getColumn() !== 2 || e.range.getRow() < 2) return; // coloana Status
-  if (String(e.value || '') !== STATUS_CREEAZA) return;
+  const val = String(e.value || '');
+  // Trimis spre aprobare / Publicat în Onboarding -> „Pe site” în Comunitatea CFCC (În aprobare / Da)
+  if (/aprobare/i.test(val) || /^publicat/i.test(val)) {
+    try {
+      const pe = /aprobare/i.test(val) ? 'În aprobare' : 'Da';
+      const id = slug_id(fila.getRange(e.range.getRow(), 3).getDisplayValue());
+      const par = SpreadsheetApp.openById(COMUNITATE_ID).getSheetByName('Parteneri');
+      const ids = par.getRange(1, 1, par.getLastRow(), 1).getDisplayValues().map(function (r) { return r[0]; });
+      const i = ids.indexOf(id);
+      if (i < 1) { e.source.toast('Nu am găsit pagina „' + id + '” în Comunitatea CFCC.', 'Ce facem cu copiii?', 10); return; }
+      par.getRange(i + 1, 5).setValue(pe);
+      e.source.toast('În Comunitatea CFCC, „' + id + '” are acum Pe site = ' + pe + (pe === 'Da' ? ' (apare pe site în câteva minute).' : '.'), 'Ce facem cu copiii?', 10);
+    } catch (err) { e.source.toast('Nu am putut actualiza Comunitatea CFCC: ' + err.message, 'Ce facem cu copiii?', 15); }
+    return;
+  }
+  if (val !== STATUS_CREEAZA) return;
   try {
     const id = creeaza_pagina(fila, e.range.getRow());
     e.range.setValue(STATUS_CREATA);
