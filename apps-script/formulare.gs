@@ -225,6 +225,15 @@ function esc(s) {
   });
 }
 
+/** Trimite pe adresa ta câte un mail de probă din fiecare tip (cu date de test). */
+function testToateMailurile() {
+  const eu = Session.getActiveUser().getEmail();
+  trimite_confirmare('abonare', { 'E-mail': eu, 'Vrea oferte de la parteneri': 'Da' });
+  trimite_confirmare('eveniment', { 'E-mail': eu, 'Nume eveniment': 'Atelier de test pentru copii' });
+  trimite_confirmare('colaborare', { 'E-mail': eu, 'Persoană de contact': 'Ana', 'Afacere / brand': 'Brand de test' });
+  trimite_confirmare('pagina', { 'E-mail': eu, 'Persoană de contact': 'Ana', 'Nume': 'Partener de test' });
+}
+
 /** Rulează o dată din editor: aprobi permisiunile și primești un mail de probă. */
 function testMail() {
   trimite_confirmare('abonare', { 'E-mail': Session.getActiveUser().getEmail(), 'Vrea oferte de la parteneri': 'Da' });
