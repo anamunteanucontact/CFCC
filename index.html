@@ -670,6 +670,11 @@ function parseCSV(t){
   return rows;
 }
 const slug=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40);
+// linkuri curate: doar titlul (max ~60 caractere, tăiat la cuvânt întreg); la titluri repetate se adaugă data, ex. detectivii-beta-18-octombrie
+const LUNI_SLUG=["ianuarie","februarie","martie","aprilie","mai","iunie","iulie","august","septembrie","octombrie","noiembrie","decembrie"];
+const RESERVED_IDS=new Set(["calendar","despre","recomandari","colaborari","profil","confidentialitate","formular","formular-partener","adauga-eveniment","colaborare-promovare"]);
+function titleSlug(n){let x=n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");if(x.length>60){x=x.slice(0,61);x=x.includes("-")?x.slice(0,x.lastIndexOf("-")):x.slice(0,60)}return x||"eveniment"}
+const dateSlug=d=>{const p=d.split("-");return (+p[2])+"-"+LUNI_SLUG[+p[1]-1]};
 function cleanUrl(u){u=(u||"").trim();if(!/^https?:\/\//i.test(u))return"";try{const x=new URL(u);["stkn","fbclid","igsh","mibextid","utm_source","utm_medium","utm_campaign"].forEach(k=>x.searchParams.delete(k));return x.toString()}catch(_){return""}}
 function accFrom(b){b=(b||"").toLowerCase();if(b.includes("donați")||b.includes("donati"))return"D";if(b.includes("înscriere")||b.includes("inscriere"))return"I";if(b.includes("bilet"))return"B";if(b.includes("gratuit"))return"G";return"-"}
 function isoFrom(ordine,data){
@@ -682,15 +687,20 @@ function toEvents(rows){
     const g=i=>(r[i]||"").trim();
     const n=g(5).replace(/\s+/g," ");const d=isoFrom(g(0),g(1));if(!n||!d)return;
     let t=g(2).replace(/\?/g,"").trim(),te=g(3).replace(/\?/g,"").trim();
-    let id="e"+d.replace(/-/g,"")+"-"+slug(n);if(seen[id])id+="-"+(++seen[id]);else seen[id]=1;
-    out.push({id,d,t,te,o:g(4),n,c:g(6)||"Altele",a1:g(7),a2:g(8),l:g(9),ad:g(10),acc:accFrom(g(11)),link:cleanUrl(g(12))||cleanUrl(g(13)),desc:g(14)});
+    let oid="e"+d.replace(/-/g,"")+"-"+slug(n);if(seen[oid])oid+="-"+(++seen[oid]);else seen[oid]=1;
+    let id=titleSlug(n);if(RESERVED_IDS.has(id))id="eveniment-"+id;
+    if(seen[id]){id+="-"+dateSlug(d);if(seen[id])id+="-"+(++seen[id]);else seen[id]=1}else seen[id]=1;
+    out.push({id,oid,d,t,te,o:g(4),n,c:g(6)||"Altele",a1:g(7),a2:g(8),l:g(9),ad:g(10),acc:accFrom(g(11)),link:cleanUrl(g(12))||cleanUrl(g(13)),desc:g(14)});
   });
   return out;
 }
+// linkurile vechi (#e20261009-...) și agendele salvate cu id-uri vechi trec pe id-ul nou
+function normIds(){if(typeof saved==="undefined")return;const m=id=>BYID[id]?BYID[id].id:id;const a=uniqIds(saved.map(m)),b=uniqIds(went.map(m));if(a.join()!==saved.join()||b.join()!==went.join()){saved=a;went=b;store.set("saved",saved);store.set("went",went)}}
+const uniqIds=a=>[...new Set(a)];
 async function loadEvents(){
   try{
     const r=await fetch(CSV_URL+"&t="+Math.floor(Date.now()/60000),{cache:"no-store"});if(!r.ok)throw new Error(r.status);
-    EV=toEvents(parseCSV(await r.text()));BYID=Object.fromEntries(EV.map(e=>[e.id,e]));loadState="ok";
+    EV=toEvents(parseCSV(await r.text()));BYID=Object.fromEntries([...EV.map(e=>[e.oid,e]),...EV.map(e=>[e.id,e])]);loadState="ok";normIds();
   }catch(err){loadState="error"}
 }
 const ACC_LBL={G:"Gratuit",I:"Cu înscriere",B:"Cu bilet",D:"Donație"};
@@ -1029,7 +1039,8 @@ function go(v,scroll){
   if(scroll)window.scrollTo(0,0);
 }
 function route(){
-  const h=location.hash.slice(1);
+  let h=location.hash.slice(1);
+  if(BYID[h]&&BYID[h].id!==h){h=BYID[h].id;history.replaceState(null,"","#"+h)}
   if(h==="formular-partener"){go("formular",true);return}
   if(BYID[h]){state.per="all";document.querySelectorAll("#f-per .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v==="all"?"true":"false"));state.open=h;state.day=BYID[h].d;go("calendar");render();setTimeout(()=>document.getElementById(h)?.scrollIntoView({block:"center"}),50);return}
   if(h==="adauga-eveniment"||h==="colaborare-promovare"){go("colaborari",true);openForm(h==="adauga-eveniment"?"ev":"pr",true);return}
@@ -1055,7 +1066,7 @@ async function pushNow(){if(!fbUser||!db)return;try{await db.collection("users")
 pushHook=()=>{clearTimeout(pushTimer);pushTimer=setTimeout(pushNow,600)};
 async function pullAndMerge(){
   try{const snap=await db.collection("users").doc(fbUser.uid).get();const d=snap.exists?snap.data():{};
-    saved=uniq([...(d.saved||[]),...saved]);went=uniq([...(d.went||[]),...went]);kids=mergeKids(d.kids||[],kids);sub=sub||d.sub||null;
+    saved=uniq([...(d.saved||[]),...saved]);went=uniq([...(d.went||[]),...went]);if(EV.length)normIds();kids=mergeKids(d.kids||[],kids);sub=sub||d.sub||null;
     _set("saved",saved);_set("went",went);_set("kids",kids);_set("sub",sub);render();renderProfile();await pushNow();
   }catch(_){toast("Nu am putut încărca agenda din cont.")}
 }
