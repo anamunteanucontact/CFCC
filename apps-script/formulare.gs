@@ -236,7 +236,7 @@ function testToateMailurile() {
 
 /** Rulează o dată din editor: aprobi permisiunile și primești un mail de probă. */
 function testMail() {
-  trimite_confirmare('abonare', { 'E-mail': Session.getActiveUser().getEmail(), 'Vrea oferte de la parteneri': 'Da' });
+  testToateMailurile();
 }
 
 /* ---------- 2. din „Propuneri evenimente” în „Evenimente” ---------- */
