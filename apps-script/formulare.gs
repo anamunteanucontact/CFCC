@@ -438,8 +438,8 @@ function la_editare_onboarding(e) {
       const link = link_previzualizare(fila, rand, true);
       e.source.toast(mail_spre_aprobare(fila, rand, id, link), titlu, 12);
     } else if (/^publicat/i.test(val)) {
-      const r = publica_pagina(fila, rand);
-      e.source.toast(r + ' ' + mail_pagina_live(fila, rand, id), titlu, 12);
+      const idPub = publica_pagina(fila, rand);
+      e.source.toast('Pagina e în Comunitatea CFCC (cefacemcucopiii.ro/#comunitate/' + idPub + '), cu Pe site = Da. Apare pe site în câteva minute. ' + mail_pagina_live(fila, rand, idPub), titlu, 15);
     }
   } catch (err) {
     e.source.toast('Nu am putut termina pasul: ' + err.message, titlu, 15);
@@ -477,16 +477,21 @@ function date_previzualizare(cod) {
     cols.forEach(function (k, j) { p[k] = String(rows[i][j] || '').trim(); });
     if (p['Note'].indexOf('#previzualizare/' + cod) < 0) continue;
     if (/respins/i.test(p['Status'])) return { ok: false };
-    const poze = function (k) { return String(p[k] || '').split(/\s+/).filter(String).map(function (u) {
-      const m = u.match(/\/d\/([\w-]{20,})/) || u.match(/[?&]id=([\w-]{20,})/);
-      return m ? 'https://lh3.googleusercontent.com/d/' + m[1] : u;
-    }); };
+    const poze = function (k) { return linkuri_poze(p[k]); };
+    const par = SpreadsheetApp.openById(COMUNITATE_ID).getSheetByName('Parteneri');
+    const existent = pagina_existenta(par, p);
+    const r = rand_comunitate(p, existent, true);
+    const vechi_act = [], vechi_foto = [];
+    if (existent && (!p['Activități'].replace(/[\s|]/g, '') || !p['Alte poze'])) {
+      const com = SpreadsheetApp.openById(COMUNITATE_ID);
+      if (!p['Activități'].replace(/[\s|]/g, '')) { const fa = com.getSheetByName('Activități'); if (fa.getLastRow() > 1) fa.getRange(2, 1, fa.getLastRow() - 1, 3).getDisplayValues().forEach(function (x) { if (x[0] === r[0] && x[1]) vechi_act.push([x[1], x[2]]); }); }
+      if (!p['Alte poze']) { const fg = com.getSheetByName('Galerie'); if (fg.getLastRow() > 1) fg.getRange(2, 1, fg.getLastRow() - 1, 2).getDisplayValues().forEach(function (x) { if (x[0] === r[0] && x[1]) vechi_foto.push(x[1]); }); }
+    }
+    const act = p['Activități'].split(/\n+/).filter(function (l) { return l.replace(/\|/g, '').trim(); }).map(function (l) { const x = l.split('|'); return [x[0].trim(), (x.slice(1).join('|') || '').trim()]; });
     return { ok: true, pagina: {
-      id: slug_id(p['Nume']), n: p['Nume'], tip: p['Cum se descriu'], desc: p['Descriere'], age: p['Vârste'], ad: p['Adresă'],
-      tel: p['Telefon public'], mail: p['E-mail public'], ig: link_social(p['Instagram'], 'instagram'), fb: link_social(p['Facebook'], 'facebook'),
-      web: p['Website'], logo: poze('Logo')[0] || '', cover: poze('Poza principală')[0] || '', foto: poze('Alte poze'),
-      nume: [p['Nume']].concat(p['Nume în calendar'].split(/\n+/)).map(function (x) { return x.trim(); }).filter(String),
-      act: p['Activități'].split(/\n+/).filter(String).map(function (l) { const x = l.split('|'); return [x[0].trim(), (x.slice(1).join('|') || '').trim()]; })
+      id: r[0], n: r[1], tip: r[2], pro: /^partener/i.test(r[3]), inlocuieste: existent ? r[0] : '', desc: r[5], age: r[6], ad: r[7],
+      tel: String(r[8]).replace(/^'/, ''), mail: r[9], ig: r[10], fb: r[11], web: r[12], logo: r[13], cover: r[14],
+      foto: p['Alte poze'] ? poze('Alte poze') : vechi_foto, nume: r[15].split('\n'), act: act.length ? act : vechi_act
     } };
   }
   return { ok: false };
@@ -498,18 +503,76 @@ function doGet(e) {
   return raspuns({ ok: true });
 }
 
-/** La „Publicat”: copiază pagina în Comunitatea CFCC cu Pe site = Da. Dacă există deja (ex. după o pauză), doar pune Pe site = Da. */
+/* ---- legătura dintre un rând de onboarding și Comunitatea CFCC ---- */
+
+function norm_nume(x) { return String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+
+/** Câmpurile publice din rândul de onboarding. */
+function campuri_onboarding(fila, rand) {
+  const v = fila.getRange(rand, 1, 1, FILE.pagina.coloane.length).getDisplayValues()[0];
+  const p = {};
+  FILE.pagina.coloane.forEach(function (c, i) { p[c[0]] = String(v[i] || '').trim(); });
+  return p;
+}
+
+/** Caută în Comunitatea CFCC o pagină care există deja pentru același loc (după ID, nume sau „Nume în calendar”).
+    Întoarce { rand, valori } sau null. Așa, un partener care avea deja pagină (ex. o instituție) o primește pe cea nouă în loc, cu același link. */
+function pagina_existenta(par, p) {
+  if (par.getLastRow() < 2) return null;
+  const rows = par.getRange(2, 1, par.getLastRow() - 1, 16).getDisplayValues();
+  const id = slug_id(p['Nume']);
+  const v = norm_nume(p['Nume']);
+  const noi = [v].concat(String(p['Nume în calendar'] || '').split(/\n+/).map(norm_nume)).filter(String);
+  let best = null, scor = 0;
+  rows.forEach(function (r, i) {
+    if (r[0] === id) { best = { rand: i + 2, valori: r }; scor = 1e9; return; }
+    const chei = [r[1]].concat(String(r[15] || '').split(/\n+/)).map(norm_nume).filter(String);
+    chei.forEach(function (k) {
+      noi.forEach(function (n) {
+        const ok = n === k || (k.length >= 8 && (' ' + n + ' ').indexOf(' ' + k + ' ') >= 0) || (n.length >= 8 && (' ' + k + ' ').indexOf(' ' + n + ' ') >= 0);
+        if (ok && Math.min(k.length, n.length) > scor) { scor = Math.min(k.length, n.length); best = { rand: i + 2, valori: r }; }
+      });
+    });
+  });
+  return best;
+}
+
+/** Rândul pentru „Parteneri” din Comunitatea CFCC, din datele de onboarding. Ce lipsește din formular rămâne ca în pagina veche. */
+function rand_comunitate(p, existent, doar_citire) {
+  const vechi = existent ? existent.valori : [];
+  const ia = function (nou, i) { return nou ? nou : (vechi[i] || ''); };
+  const poze = doar_citire ? linkuri_poze : poze_publice; // la previzualizare nu schimbăm permisiunile din Drive
+  const logo = poze(p['Logo'])[0] || '';
+  const cover = poze(p['Poza principală'])[0] || '';
+  const chei = [];
+  [p['Nume']].concat(String(p['Nume în calendar'] || '').split(/\n+/), String(vechi[15] || '').split(/\n+/)).forEach(function (x) {
+    x = String(x).trim(); if (x && chei.map(norm_nume).indexOf(norm_nume(x)) < 0) chei.push(x);
+  });
+  return [existent ? vechi[0] : slug_id(p['Nume']), p['Nume'], ia(p['Cum se descriu'], 2), existent ? (vechi[3] || 'Partener') : 'Partener', 'Da',
+    ia(p['Descriere'], 5), ia(p['Vârste'], 6), ia(p['Adresă'], 7), p['Telefon public'] ? text(p['Telefon public']) : (vechi[8] ? text(vechi[8]) : ''),
+    ia(p['E-mail public'], 9), ia(link_social(p['Instagram'], 'instagram'), 10), ia(link_social(p['Facebook'], 'facebook'), 11),
+    ia(p['Website'], 12), ia(logo, 13), ia(cover, 14), chei.join('\n')];
+}
+
+/** La „Publicat”: pune pagina în Comunitatea CFCC cu Pe site = Da. Dacă locul avea deja pagină, o înlocuiește (același ID, același link). Întoarce ID-ul. */
 function publica_pagina(fila, rand) {
-  const id = slug_id(fila.getRange(rand, 3).getDisplayValue());
-  const par = SpreadsheetApp.openById(COMUNITATE_ID).getSheetByName('Parteneri');
-  const ids = par.getRange(1, 1, Math.max(par.getLastRow(), 1), 1).getDisplayValues().map(function (r) { return r[0]; });
-  const i = ids.indexOf(id);
-  if (i >= 1) {
-    par.getRange(i + 1, 5).setValue('Da');
-    return 'Pagina „' + id + '” exista deja în Comunitatea CFCC: am pus Pe site = Da.';
-  }
-  creeaza_pagina(fila, rand);
-  return 'Am copiat pagina „' + id + '” în Comunitatea CFCC, cu Pe site = Da (apare pe site în câteva minute).';
+  const p = campuri_onboarding(fila, rand);
+  if (!p['Nume']) throw new Error('lipsește numele');
+  const com = SpreadsheetApp.openById(COMUNITATE_ID);
+  const par = com.getSheetByName('Parteneri');
+  const existent = pagina_existenta(par, p);
+  const r = rand_comunitate(p, existent);
+  const id = r[0];
+  if (existent) par.getRange(existent.rand, 1, 1, r.length).setValues([r]);
+  else par.appendRow(r);
+  const act = String(p['Activități'] || '').split(/\n+/).filter(function (l) { return l.replace(/\|/g, '').trim(); }).map(function (l) {
+    const x = l.split('|'); return [id, x[0].trim(), (x.slice(1).join('|') || '').trim()];
+  });
+  const alte = poze_publice(p['Alte poze']);
+  // activitățile și pozele vechi se înlocuiesc doar dacă au venit altele noi
+  if (act.length) { const fa = com.getSheetByName('Activități'); sterge_ramase(fa, id); fa.getRange(fa.getLastRow() + 1, 1, act.length, 3).setValues(act); }
+  if (alte.length) { const fg = com.getSheetByName('Galerie'); sterge_ramase(fg, id); fg.getRange(fg.getLastRow() + 1, 1, alte.length, 3).setValues(alte.map(function (u) { return [id, u, '']; })); }
+  return id;
 }
 
 /** Trimite partenerului un mail o singură dată și îl notează în coloana Note. */
@@ -570,46 +633,6 @@ function mailuri_programate() {
   });
 }
 
-function creeaza_pagina(fila, rand) {
-  const v = fila.getRange(rand, 1, 1, FILE.pagina.coloane.length).getDisplayValues()[0];
-  const p = {};
-  FILE.pagina.coloane.forEach(function (c, i) { p[c[0]] = String(v[i] || '').trim(); });
-  if (!p['Nume']) throw new Error('lipsește numele');
-
-  const com = SpreadsheetApp.openById(COMUNITATE_ID);
-  const parteneri = com.getSheetByName('Parteneri');
-  const id = slug_id(p['Nume']);
-  const existente = parteneri.getRange(1, 1, Math.max(parteneri.getLastRow(), 1), 1).getDisplayValues().map(function (r) { return r[0]; });
-  if (existente.indexOf(id) >= 0) throw new Error('există deja o pagină cu ID-ul „' + id + '”');
-
-  const logo = poze_publice(p['Logo'])[0] || '';
-  const cover = poze_publice(p['Poza principală'])[0] || '';
-  const alte = poze_publice(p['Alte poze']);
-  const nume_calendar = [p['Nume']].concat(p['Nume în calendar'].split(/\n+/)).map(function (x) { return x.trim(); }).filter(String).join('\n');
-
-  parteneri.appendRow([id, p['Nume'], p['Cum se descriu'], 'Partener', 'Da', p['Descriere'], p['Vârste'], p['Adresă'],
-    text(p['Telefon public']), p['E-mail public'], link_social(p['Instagram'], 'instagram'), link_social(p['Facebook'], 'facebook'),
-    p['Website'], logo, cover, nume_calendar]);
-
-  // dacă pagina a mai existat și a fost ștearsă, scoatem activitățile și pozele vechi rămase cu același ID
-  sterge_ramase(com.getSheetByName('Activități'), id);
-  sterge_ramase(com.getSheetByName('Galerie'), id);
-
-  const act = p['Activități'].split(/\n+/).filter(String).map(function (l) {
-    const parti = l.split('|');
-    return [id, parti[0].trim(), (parti.slice(1).join('|') || '').trim()];
-  });
-  if (act.length) {
-    const fa = com.getSheetByName('Activități');
-    fa.getRange(fa.getLastRow() + 1, 1, act.length, 3).setValues(act);
-  }
-  if (alte.length) {
-    const fg = com.getSheetByName('Galerie');
-    fg.getRange(fg.getLastRow() + 1, 1, alte.length, 3).setValues(alte.map(function (u) { return [id, u, '']; }));
-  }
-  return id;
-}
-
 /** Șterge rândurile care au în coloana A ID-ul dat (resturi de la o pagină ștearsă). Articolele nu se ating. */
 function sterge_ramase(fila, id) {
   if (!fila || fila.getLastRow() < 2) return;
@@ -624,6 +647,14 @@ function poze_publice(celula) {
     if (!m) return u;
     DriveApp.getFileById(m[1]).setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
     return 'https://lh3.googleusercontent.com/d/' + m[1];
+  });
+}
+
+/** Ca poze_publice, dar doar transformă linkurile din Drive, fără să schimbe permisiunile. */
+function linkuri_poze(celula) {
+  return String(celula || '').split(/\s+/).filter(String).map(function (u) {
+    const m = u.match(/\/d\/([\w-]{20,})/) || u.match(/[?&]id=([\w-]{20,})/);
+    return m ? 'https://lh3.googleusercontent.com/d/' + m[1] : u;
   });
 }
 

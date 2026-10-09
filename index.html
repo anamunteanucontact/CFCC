@@ -1190,7 +1190,7 @@ async function renderPrev(cod){
   try{const r=await fetch(SCRIPT_URL+"?previzualizare="+encodeURIComponent(cod));const d=await r.json();
     if(!d.ok||!d.pagina)throw 0;const x=d.pagina;
     while(orgState==="loading")await new Promise(ok=>setTimeout(ok,200));
-    ORG_BY.__prev={slug:x.id,n:x.n,tip:x.tip,pro:true,desc:x.desc,age:x.age,ad:x.ad,tel:x.tel,mail:x.mail,ig:cleanUrl(x.ig),fb:cleanUrl(x.fb),web:cleanUrl(x.web),
+    ORG_BY.__prev={slug:x.id,n:x.n,tip:x.tip,pro:x.pro!==false,desc:x.desc,age:x.age,ad:x.ad,tel:x.tel,mail:x.mail,ig:cleanUrl(x.ig),fb:cleanUrl(x.fb),web:cleanUrl(x.web),
       logo:imgUrl(x.logo),cover:imgUrl(x.cover),keys:x.nume.map(norm).filter(Boolean),svc:x.act.map(a=>({t:a[0],d:a[1]})),foto:x.foto.map(u=>({u:imgUrl(u),alt:""})).filter(f=>f.u),
       art:[],live:false,prev:true};
     if(location.hash.slice(1)==="previzualizare/"+cod)renderOrg("__prev");
