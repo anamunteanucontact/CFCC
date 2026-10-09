@@ -299,6 +299,14 @@ function testToateMailurile() {
   trimite_confirmare('pagina', { 'E-mail': eu, 'Persoană de contact': 'Ana', 'Nume': 'Partener de test' });
 }
 
+/** Trimite pe adresa ta mailurile de după onboarding („pagina live” și „recomandări”), cu textele din sheet, pe exemplul ABCD Creativity. */
+function testMailuriParteneri() {
+  const eu = Session.getActiveUser().getEmail();
+  const c = { 'E-mail': eu, 'Persoană de contact': 'Ana', 'Nume': 'ABCD Creativity', _id: 'abcd-creativity' };
+  trimite_confirmare('pagina live', c);
+  trimite_confirmare('pagina live - recomandări', c);
+}
+
 /** Rulează o dată din editor: aprobi permisiunile și primești un mail de probă. */
 function testMail() {
   testToateMailurile();
