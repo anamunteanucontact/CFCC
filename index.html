@@ -228,6 +228,10 @@ textarea{min-height:90px;resize:vertical}
 
 .check{flex-direction:row;align-items:center;gap:8px;font-weight:500}
 .check input{width:18px;height:18px;flex:none}
+.nl-cta{margin:28px auto 8px}
+.nl-card{background:var(--surface);border:2px dashed var(--galben);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:12px}
+.nl-card h3{font-size:1.25rem;font-weight:800;color:var(--head)}
+.nl-card p{margin:0}
 .follow-box{margin-top:24px;background:var(--surface);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px}
 .follow-box h3{font-size:1.25rem;font-weight:800}
 .follow{display:flex;flex-wrap:wrap;gap:10px}
@@ -695,6 +699,20 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     <p>Ai dreptul să ceri acces la datele tale, corectarea sau ștergerea lor, să restrângi sau să te opui prelucrării și să-ți retragi consimțământul. Ne poți scrie pe Instagram, la @cefacemcucopiii. Dacă nu ești mulțumit de răspuns, te poți plânge la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (www.dataprotection.ro).</p>
   </div>
 </section>
+
+<!-- ABONARE: cutia de la finalul paginilor (ascunsă pe Agenda mea, formulare, Colaborări, Confidențialitate și pentru cine e deja abonat) -->
+<section id="nl-cta" class="wrap nl-cta" hidden>
+  <div class="nl-card">
+    <h3>💌 Toate evenimentele pentru copii din oraș, pe e-mail</h3>
+    <p>Lasă-ne adresa ta de e-mail și îți trimitem în fiecare săptămână tot ce e de făcut cu cei mici în Timișoara.</p>
+    <form id="nl2-form" class="inline" novalidate style="padding:0;background:transparent;grid-template-columns:1fr auto">
+      <label for="nl2-mail">E-mail<input id="nl2-mail" type="email"></label>
+      <button class="btn btn-main" type="submit">Vreau programul</button>
+      <label for="nl2-offers" class="check" style="grid-column:1/-1"><input id="nl2-offers" type="checkbox"> Vreau să primesc și reduceri și oferte speciale pentru familii, de la organizatorii și brandurile cu care colaborați</label>
+    </form>
+    <p class="note">Te poți dezabona oricând. Detalii în <a href="#confidentialitate">Politica de confidențialitate</a>.</p>
+  </div>
+</section>
 </main>
 
 <footer>
@@ -807,7 +825,7 @@ const mem={};
 let pushHook=null;
 const store={get(k,f){try{const v=localStorage.getItem("cfcc_"+k);return v?JSON.parse(v):(mem[k]??f)}catch(_){return mem[k]??f}},
              set(k,v){mem[k]=v;try{localStorage.setItem("cfcc_"+k,JSON.stringify(v))}catch(_){}}};
-let saved=store.get("saved",[]), went=store.get("went",[]), kids=store.get("kids",[]), sub=store.get("sub",null);
+let saved=store.get("saved",[]), went=store.get("went",[]), kids=store.get("kids",[]), sub=store.get("sub",null), curView="calendar";
 const _set=store.set.bind(store);store.set=(k,v)=>{_set(k,v);if(pushHook&&["saved","went","kids","sub"].includes(k))pushHook()};
 
 function toast(t){const el=document.getElementById("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>el.hidden=true,2200)}
@@ -1031,7 +1049,7 @@ function miniEv(e,mode){
 function kidYears(b){const d=dt(b);return (TODAY-d)/(365.25*864e5)}
 function age(b){const d=dt(b);let y=TODAY.getFullYear()-d.getFullYear(),m=TODAY.getMonth()-d.getMonth();if(TODAY.getDate()<d.getDate())m--;if(m<0){y--;m+=12}return y>=2?y+" ani":(y*12+m)+" luni"}
 function syncKidsChip(){const c=document.getElementById("age-kids");c.hidden=!kids.length;if(!kids.length&&state.age==="kids"){state.age="";document.querySelectorAll("#f-age .chip").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===""?"true":"false"));render()}}
-function renderSub(){const on=!!(sub&&sub.email);document.getElementById("nl-box").hidden=on;const d=document.getElementById("nl-done");d.hidden=!on;
+function renderSub(){nlCta();const on=!!(sub&&sub.email);document.getElementById("nl-box").hidden=on;const d=document.getElementById("nl-done");d.hidden=!on;
   document.getElementById("nl-title").textContent=on?"Ești abonat":"Abonează-te";
   if(on)d.textContent=`Primești programul în fiecare săptămână pe ${sub.email}${sub.offers?", plus reduceri și oferte speciale":""}.`}
 function renderProfile(){
@@ -1043,10 +1061,13 @@ function renderProfile(){
   document.getElementById("kids-list").innerHTML=kids.map((k,i)=>`<div class="kid"><span><b>${esc(k.n)}</b> · ${esc(age(k.b))}</span><button class="x" type="button" data-kid="${i}">Șterge</button></div>`).join("");
 }
 document.getElementById("kid-form").addEventListener("submit",ev=>{ev.preventDefault();const n=document.getElementById("kid-name").value.trim(),b=document.getElementById("kid-bday").value;if(!n||!b){toast("Completează prenumele și data nașterii");return}kids.push({n,b});store.set("kids",kids);ev.target.reset();renderProfile()});
-document.getElementById("nl-form").addEventListener("submit",async ev=>{ev.preventDefault();const m=val("nl-mail");const ok=document.getElementById("nl-ok");if(!/^\S+@\S+\.\S+$/.test(m)){toast("Verifică adresa de e-mail");return}
-  const btn=ev.target.querySelector("button[type=submit]");btn.disabled=true;
-  try{await sendForm("abonare",{"E-mail":m,"Vrea oferte de la parteneri":document.getElementById("nl-offers").checked?"Da":"Nu"});const offers=document.getElementById("nl-offers").checked;sub={email:m,offers};store.set("sub",sub);track("Abonare newsletter",null,{oferte:offers?"da":"nu"});pixel("Lead",{content_name:"Abonare newsletter"});ok.textContent="Gata, te-am notat!";ok.hidden=false;ev.target.reset();renderSub()}
-  catch(_){toast("Nu s-a putut trimite. Încearcă din nou.")}finally{btn.disabled=false}});
+async function subscribe(form,mailId,offId,onOk){const m=val(mailId);if(!/^\S+@\S+\.\S+$/.test(m)){toast("Verifică adresa de e-mail");return}
+  const btn=form.querySelector("button[type=submit]");btn.disabled=true;
+  try{const offers=document.getElementById(offId).checked;await sendForm("abonare",{"E-mail":m,"Vrea oferte de la parteneri":offers?"Da":"Nu"});sub={email:m,offers};store.set("sub",sub);track("Abonare newsletter",null,{oferte:offers?"da":"nu",loc:form.id});pixel("Lead",{content_name:"Abonare newsletter"});form.reset();onOk();renderSub()}
+  catch(_){toast("Nu s-a putut trimite. Încearcă din nou.")}finally{btn.disabled=false}}
+document.getElementById("nl-form").addEventListener("submit",ev=>{ev.preventDefault();subscribe(ev.target,"nl-mail","nl-offers",()=>{const ok=document.getElementById("nl-ok");ok.textContent="Gata, te-am notat!";ok.hidden=false})});
+document.getElementById("nl2-form").addEventListener("submit",ev=>{ev.preventDefault();subscribe(ev.target,"nl2-mail","nl2-offers",()=>{toast("Gata, te-am notat! Primești programul pe e-mail.");nlCta()})});
+function nlCta(){const c=document.getElementById("nl-cta");if(c)c.hidden=!!(sub&&sub.email)||["profil","formular","colaborari","confidentialitate"].includes(curView)}
 
 /* formular partener: pagina ascunsă #formular-partener. Trimite totul în fila „Pagini parteneri - de verificat” din centralizator. */
 (()=>{
@@ -1187,7 +1208,7 @@ function renderOrg(sl){
     <div class="org-sec"><h3>În calendar acum</h3>
       ${loadState==="loading"?'<div class="empty">Se încarcă evenimentele...</div>':ev.length?`<div class="mini">${ev.map(e=>{const d=dt(e.d);
         return `<a class="mini-ev" href="#${e.id}" style="text-decoration:none;color:inherit"><div><b>${esc(e.n)}</b><span>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></div><span class="x">Detalii</span></a>`}).join("")}</div>`
-      :'<div class="empty">Momentan nu avem evenimente de aici în calendar. Revino curând.</div>'}
+      :'<div class="empty">Deocamdată nu au nimic programat în calendar. Când apare ceva nou de la ei, îl găsești aici.</div>'}
     </div>
     ${past.length?`<div class="org-sec"><h3>Au fost recent în calendar</h3><ul class="past">${past.map(e=>{const d=dt(e.d);return `<li><b>${esc(e.n)}</b><span>${d.getDate()} ${LUNI_LUNG[d.getMonth()]}${ageLabel(e)?" · "+esc(ageLabel(e)):""}</span></li>`}).join("")}</ul></div>`:""}
     ${o.pro&&o.svc.length?`<div class="org-sec"><h3>Activități</h3><div class="acts">${o.svc.map(x=>`<div class="acts-i"><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:""}</div>`).join("")}</div></div>`:""}
@@ -1230,6 +1251,7 @@ function go(v,scroll){
   VIEWS.forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
   const nv=v==="articol"?"recomandari":v==="org"?"comunitate":v;
   document.querySelectorAll(".nav ul a,.tabbar a").forEach(a=>{if(a.dataset.view===nv)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  curView=v;nlCta();
   if(scroll)window.scrollTo(0,0);
 }
 const BASE_TITLE=document.title;
