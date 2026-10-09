@@ -8,9 +8,8 @@
  *    - formularul pentru parteneri (cefacemcucopiii.ro/#formular-partener) -> fila „Pagini parteneri - de verificat”
  *      din sheet-ul separat „CFCC - Onboarding parteneri”, cu roșu, ca să le verifice un om; pozele lor se salvează în Drive, în folderul „CFCC - poze parteneri”
  *    și trimite un e-mail de confirmare celui care a completat.
- * 2. Când schimbi statusul unei propuneri în „Pregătit pentru calendar”,
- *    o mută singur în fila „Evenimente”, la ziua și ora ei, cu status „De verificat”.
- *    După ce o treci pe „Publicat”, apare pe site.
+ * 2. Propuneri: Nou (roșu) → „În calendar - nepublicat” (portocaliu) o mută singur în „Evenimente”, la ziua și ora ei,
+ *    cu status „De verificat”; „Publicat” (verde) o mută direct publicată. Statusul se sincronizează în ambele sensuri.
  * 3. În „CFCC - Onboarding parteneri”, când un rând primește statusul „Verificat - creează pagina”,
  *    face link de previzualizare, trimite mailul spre aprobare și, la „Publicat”, copiază pagina în „Comunitatea CFCC”. Pornește o dată cu porneste_onboarding().
  */
@@ -353,8 +352,10 @@ function testMail() {
 
 /* ---------- 2. din „Propuneri evenimente” în „Evenimente” ---------- */
 
-const STATUS_MUTA = 'Pregătit pentru calendar';
-const STATUS_MUTAT = 'Mutat în calendar';
+// Statusurile din „Propuneri evenimente”: Nou (roșu) → În calendar - nepublicat (portocaliu) → Publicat (verde); Respins (gri).
+const STATUS_IN_CALENDAR = 'În calendar - nepublicat';
+const STATUS_PUBLICAT = 'Publicat';
+const NOTA_MUTAT = 'Mutat în Evenimente';
 const ZILE = ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'];
 
 function onEdit(e) {
@@ -364,14 +365,21 @@ function onEdit(e) {
     if (fila.getName() !== FILE.eveniment.nume) return;
     const colStatus = FILE.eveniment.coloane.length; // ultima coloană
     if (e.range.getColumn() !== colStatus || e.range.getRow() < 2) return;
-    if (String(e.value || '') !== STATUS_MUTA) return;
-    muta_in_calendar(fila, e.range.getRow());
+    const val = String(e.value || '');
+    if (val !== STATUS_IN_CALENDAR && val !== STATUS_PUBLICAT) return;
+    const celula = e.range;
+    if (String(celula.getNote() || '').indexOf(NOTA_MUTAT) === 0) {
+      // e deja în Evenimente: doar sincronizăm statusul acolo
+      seteaza_status_in_evenimente(fila, e.range.getRow(), val === STATUS_PUBLICAT ? 'Publicat' : 'De verificat');
+      return;
+    }
+    muta_in_calendar(fila, e.range.getRow(), val === STATUS_PUBLICAT);
   } catch (err) {
     e.source.toast('Nu am putut muta evenimentul: ' + err, 'Ce facem cu copiii?', 10);
   }
 }
 
-function muta_in_calendar(filaProp, rand) {
+function muta_in_calendar(filaProp, rand, publica) {
   const ss = filaProp.getParent();
   const tz = ss.getSpreadsheetTimeZone();
   const nr = FILE.eveniment.coloane.length;
@@ -392,7 +400,7 @@ function muta_in_calendar(filaProp, rand) {
   // rândul nou: coloanele B-V din „Evenimente” (coloana A e formula cu linkul de pe site)
   const notaProp = 'Din propunerea primită pe ' + primit + '. De completat: categoria.';
   const nou = [
-    'De verificat', 'Nu', "'" + dataTxt, ZILE[data.getDay()], ora ? "'" + ora : '', '',
+    publica ? 'Publicat' : 'De verificat', 'Nu', "'" + dataTxt, ZILE[data.getDay()], ora ? "'" + ora : '', '',
     p['Nume eveniment'], p['Organizator'], p['Locație'], p['Descriere'],
     p['Vârstă minimă'], p['Vârstă maximă'], '', p['Adresă'] || adresa_cunoscuta(ev, p['Locație']),
     bilet, p['Link bilete / înscriere'], '', contact, notaProp,
@@ -416,8 +424,49 @@ function muta_in_calendar(filaProp, rand) {
   const f = ev.getRange(vecin, EV_COL.ordine).getFormulaR1C1();
   if (f) ev.getRange(tinta, EV_COL.ordine).setFormulaR1C1(f);
 
-  filaProp.getRange(rand, nr).setValue(STATUS_MUTAT);
-  ss.toast('Am mutat „' + p['Nume eveniment'] + '” în Evenimente, rândul ' + tinta + ', cu status „De verificat”.', 'Ce facem cu copiii?', 8);
+  filaProp.getRange(rand, nr).setNote(NOTA_MUTAT + ' pe ' + Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy HH:mm'));
+  ss.toast('Am mutat „' + p['Nume eveniment'] + '” în Evenimente, rândul ' + tinta + ', cu status „' + (publica ? 'Publicat' : 'De verificat') + '”.', 'Ce facem cu copiii?', 8);
+}
+
+/** Găsește în Evenimente rândul venit dintr-o propunere (același nume și aceeași dată) și îi pune statusul dat. */
+function seteaza_status_in_evenimente(filaProp, rand, status) {
+  const ss = filaProp.getParent(), tz = ss.getSpreadsheetTimeZone();
+  const nr = FILE.eveniment.coloane.length;
+  const v = filaProp.getRange(rand, 1, 1, nr).getValues()[0];
+  const nume = String(v[1] || '').trim().toLowerCase(), d = ca_data(v[3], tz);
+  const ev = ss.getSheetByName('Evenimente');
+  if (ev.getLastRow() < 3 || !nume) return;
+  const rows = ev.getRange(3, 1, ev.getLastRow() - 2, EV_COL.nume).getValues();
+  for (let i = 0; i < rows.length; i++) {
+    const dd = ca_data(rows[i][EV_COL.data - 1], tz);
+    if (String(rows[i][EV_COL.nume - 1] || '').trim().toLowerCase() === nume && d && dd && dd.toDateString() === d.toDateString()) {
+      ev.getRange(i + 3, EV_COL.status).setValue(status);
+      ss.toast('Am pus „' + status + '” și în Evenimente, rândul ' + (i + 3) + '.', 'Ce facem cu copiii?', 6);
+      return;
+    }
+  }
+}
+
+/** Invers: când schimbi Status-ul în Evenimente, propunerea din care a venit devine Publicat (verde) sau În calendar - nepublicat (portocaliu). */
+function sincronizeaza_propunerea(ev, rand) {
+  const ss = ev.getParent(), tz = ss.getSpreadsheetTimeZone();
+  const r = ev.getRange(rand, 1, 1, EV_COL.nume).getValues()[0];
+  const nume = String(r[EV_COL.nume - 1] || '').trim().toLowerCase(), d = ca_data(r[EV_COL.data - 1], tz);
+  const st = String(r[EV_COL.status - 1] || '').trim();
+  const prop = ss.getSheetByName(FILE.eveniment.nume);
+  if (!prop || prop.getLastRow() < 2 || !nume) return;
+  const nr = FILE.eveniment.coloane.length;
+  const rows = prop.getRange(2, 1, prop.getLastRow() - 1, nr).getValues();
+  const note = prop.getRange(2, nr, prop.getLastRow() - 1, 1).getNotes();
+  for (let i = 0; i < rows.length; i++) {
+    if (String(note[i][0] || '').indexOf(NOTA_MUTAT) !== 0) continue;
+    const dd = ca_data(rows[i][3], tz);
+    if (String(rows[i][1] || '').trim().toLowerCase() === nume && d && dd && dd.toDateString() === d.toDateString()) {
+      const nou = st === 'Publicat' ? STATUS_PUBLICAT : st === 'Anulat' ? 'Respins' : STATUS_IN_CALENDAR;
+      prop.getRange(i + 2, nr).setValue(nou);
+      return;
+    }
+  }
 }
 
 /* ---------- „Evenimente” (The Sheet): coloanele, după reorganizarea din 9 oct ---------- */
@@ -434,6 +483,8 @@ function la_editare_evenimente(e) {
   if (r0 + nr - 1 < 3) return;
   const tz = e.source.getSpreadsheetTimeZone();
   for (let r = Math.max(r0, 3); r < r0 + nr; r++) {
+    // statusul s-a schimbat -> propunerea din care a venit își schimbă culoarea
+    if (c0 <= EV_COL.status && EV_COL.status < c0 + nc) { try { sincronizeaza_propunerea(fila, r); } catch (errS) { console.warn(errS); } }
     // locația s-a schimbat și adresa e goală -> o luăm din intrările de dinainte sau din Organizatori
     if (c0 <= EV_COL.locatie && EV_COL.locatie < c0 + nc) {
       const loc = String(fila.getRange(r, EV_COL.locatie).getValue() || '').trim();
