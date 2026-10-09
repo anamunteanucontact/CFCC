@@ -49,6 +49,9 @@ const FILE = {
 };
 
 const FOLDER_POZE = 'CFCC - poze parteneri';
+// Folderul fix pentru poze (în folderul principal CFCC). Nu se mai creează altul nou.
+const FOLDER_POZE_ID = '1us3oNdxAI03kIt-6M3R6exsmeCBcBPRc';
+const FOLDER_CFCC_ID = '1N3rD9icm9kMZJIVBwIw16FJyUPdDyxk9';
 
 /* ---------- 1. formularele de pe site ---------- */
 
@@ -105,7 +108,7 @@ function salveaza_poze(c) {
   delete c._poze;
   const toate = [].concat(poze.logo || [], poze.cover || [], poze.gal || []);
   if (!toate.length) return;
-  const radacina = folder_sau_nou(DriveApp.getRootFolder(), FOLDER_POZE);
+  const radacina = folder_poze();
   const nume = String(c['Nume'] || 'Partener').replace(/[\\/:*?"<>|]/g, ' ').slice(0, 80);
   const folder = radacina.createFolder(nume + ' - ' + Utilities.formatDate(new Date(), 'Europe/Bucharest', 'yyyy-MM-dd HH:mm'));
   const salveaza = function (lista, prefix) {
@@ -119,6 +122,12 @@ function salveaza_poze(c) {
   c['Poza principală'] = salveaza(poze.cover, 'principala-');
   c['Alte poze'] = salveaza(poze.gal, 'poza-');
   c['Folder poze'] = folder.getUrl();
+}
+
+/** Folderul de poze: cel fix, după ID. Doar dacă a fost șters, îl caută / creează în folderul principal CFCC. */
+function folder_poze() {
+  try { return DriveApp.getFolderById(FOLDER_POZE_ID); } catch (e) {}
+  return folder_sau_nou(DriveApp.getFolderById(FOLDER_CFCC_ID), FOLDER_POZE);
 }
 
 function folder_sau_nou(parinte, nume) {
