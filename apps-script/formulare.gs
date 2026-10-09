@@ -427,12 +427,12 @@ function la_editare_onboarding(e) {
   const nume = fila.getRange(rand, 3).getDisplayValue().trim();
   const id = slug_id(nume);
   const titlu = 'Ce facem cu copiii?';
+  coloreaza_rand(fila, rand, val === STATUS_CREEAZA ? STATUS_CREATA : val);
   try {
     if (val === STATUS_CREEAZA || val === STATUS_CREATA) {
       if (!nume) throw new Error('lipsește numele');
       const link = link_previzualizare(fila, rand, true);
       if (val === STATUS_CREEAZA) e.range.setValue(STATUS_CREATA);
-      fila.getRange(rand, 1, 1, FILE.pagina.coloane.length).setBackground('#d9ead3').setFontColor('#274e13');
       e.source.toast('Pagina „' + nume + '” e gata de verificat. Linkul de previzualizare e în coloana Note: ' + link, titlu, 15);
     } else if (/aprobare/i.test(val)) {
       const link = link_previzualizare(fila, rand, true);
@@ -444,6 +444,15 @@ function la_editare_onboarding(e) {
   } catch (err) {
     e.source.toast('Nu am putut termina pasul: ' + err.message, titlu, 15);
   }
+}
+
+/** Culoarea rândului după status: roșu = la noi, în verificare; portocaliu = trimis spre aprobare; verde = publicat; gri = respins. */
+function coloreaza_rand(fila, rand, status) {
+  const c = /^publicat/i.test(status) ? ['#d9ead3', '#274e13']
+    : /aprobare/i.test(status) ? ['#fce5cd', '#7f4f00']
+    : /respins/i.test(status) ? ['#efefef', '#666666']
+    : ['#f4c7c3', '#9c0006'];
+  fila.getRange(rand, 1, 1, FILE.pagina.coloane.length).setBackground(c[0]).setFontColor(c[1]);
 }
 
 /** Linkul de previzualizare (cu un cod greu de ghicit), notat în coloana Note. Dacă există deja, îl refolosește. */
