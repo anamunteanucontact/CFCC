@@ -152,7 +152,7 @@ const CAND_PLEACA = {
   'colaborare': 'Cineva completează „Vreau să colaborăm”',
   'pagina': 'Un partener completează formularul pentru pagina lui (#formular-partener)',
   'pagina live': 'În Onboarding, statusul partenerului devine „Publicat” (pagina apare pe site). Pleacă o singură dată, la e-mailul persoanei de contact',
-  'pagina live - recomandări': 'La 1-2 zile după mailul „pagina live” (verificare zilnică la 10:00). Pleacă o singură dată, doar dacă statusul e tot „Publicat”. După 7 zile, echipa primește un reminder pentru pachetul de imagini promo'
+  'pagina live - recomandări': 'La 1-2 zile după mailul „pagina live” (verificare zilnică la 10:00). Pleacă o singură dată, doar dacă statusul e tot „Publicat”.'
 };
 
 function texte_mailuri() {
@@ -218,10 +218,7 @@ const NOTIF = {
   'colaborare': ['Cerere de colaborare', function (c) { return c['Afacere / brand'] || ''; },
     ['Afacere / brand', 'Persoană de contact', 'E-mail', 'Telefon', 'Instagram', 'Despre ei', 'Ce au nevoie'], 'Contacte → Colaborări', CONTACTE_ID],
   'pagina': ['Pagină de partener de verificat', function (c) { return c['Nume'] || ''; },
-    ['Nume', 'Cum se descriu', 'Persoană de contact', 'Telefon contact', 'E-mail', 'Denumire legală'], 'CFCC - Onboarding parteneri', ONBOARDING_ID],
-  'promo': ['Pachet promo de pregătit', function (c) { return c['Nume'] || ''; },
-    ['Nume', 'Persoană de contact', 'E-mail', 'Pagina', 'Live din'], 'CFCC - Onboarding parteneri', ONBOARDING_ID,
-    'Pagina partenerului e live de o săptămână: e momentul să pregătim pachetul de imagini și materiale pentru promo. După ce îl trimiți, notează în coloana Note.']
+    ['Nume', 'Cum se descriu', 'Persoană de contact', 'Telefon contact', 'E-mail', 'Denumire legală'], 'CFCC - Onboarding parteneri', ONBOARDING_ID]
 };
 
 function setari_notificari() {
@@ -519,13 +516,6 @@ function mailuri_programate() {
     if (ore >= 20 && !/mail „recomandări” trimis/i.test(p['Note']) && /^\S+@\S+\.\S+$/.test(p['E-mail'])) {
       trimite_confirmare('pagina live - recomandări', { 'E-mail': p['E-mail'], 'Persoană de contact': p['Persoană de contact'], 'Nume': p['Nume'], _id: slug_id(p['Nume']) });
       p['Note'] += (p['Note'] ? '\n' : '') + azi + ' - mail „recomandări” trimis la ' + p['E-mail'];
-      fila.getRange(i + 2, colNote).setValue(p['Note']);
-    }
-    // pasul 3 (după ~7 zile): îți amintește să pregătești pachetul de imagini promo
-    if (ore >= 7 * 24 - 6 && !/reminder „pachet promo”/i.test(p['Note'])) {
-      notifica_echipa('promo', { 'Nume': p['Nume'], 'Persoană de contact': p['Persoană de contact'], 'E-mail': p['E-mail'],
-        'Pagina': SITE + '/#comunitate/' + slug_id(p['Nume']), 'Live din': m[1] + '.' + m[2] + '.' + m[3] });
-      p['Note'] += (p['Note'] ? '\n' : '') + azi + ' - reminder „pachet promo” trimis echipei';
       fila.getRange(i + 2, colNote).setValue(p['Note']);
     }
   });
