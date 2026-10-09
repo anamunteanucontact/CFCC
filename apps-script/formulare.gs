@@ -560,7 +560,8 @@ function rand_comunitate(p, existent, doar_citire) {
   return [existent ? vechi[0] : slug_id(p['Nume']), p['Nume'], ia(p['Cum se descriu'], 2), existent ? (vechi[3] || 'Partener') : 'Partener', 'Da',
     ia(p['Descriere'], 5), ia(p['Vârste'], 6), ia(p['Adresă'], 7), p['Telefon public'] ? text(p['Telefon public']) : (vechi[8] ? text(vechi[8]) : ''),
     ia(p['E-mail public'], 9), ia(link_social(p['Instagram'], 'instagram'), 10), ia(link_social(p['Facebook'], 'facebook'), 11),
-    ia(p['Website'], 12), ia(logo, 13), ia(cover, 14), chei.join('\n')];
+    ia(p['Website'], 12), ia(logo, 13), ia(cover, 14), chei.join('\n'),
+    SITE + '/#comunitate/' + (existent ? vechi[0] : slug_id(p['Nume']))];
 }
 
 /** La „Publicat”: pune pagina în Comunitatea CFCC cu Pe site = Da. Dacă locul avea deja pagină, o înlocuiește (același ID, același link). Întoarce ID-ul. */
