@@ -141,9 +141,10 @@ const TEXTE_REZERVA = {
   'abonare - oferte': ['', 'Ai ales să primești și reduceri și oferte speciale pentru familii, de la organizatorii și brandurile cu care colaborăm. Le trimitem doar când merită.'],
   'eveniment': ['Am primit evenimentul tău: {eveniment}', 'Bună!\n\nMulțumim că ne-ai trimis {eveniment}. Îl verificăm și îl adăugăm în calendarul de pe {site}.\n\nDacă ai întrebări sau vrei să schimbi ceva, răspunde la acest e-mail.\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
   'colaborare': ['Am primit mesajul tău - Ce facem cu copiii?', 'Bună, {persoana}!\n\nMulțumim pentru interesul de a colabora cu Ce facem cu copiii?. Am primit detaliile despre {brand} și revenim în curând, ca să ne cunoaștem și să-ți propunem variante potrivite.\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
-  'pagina live': ['Pagina {pagina} e live pe Ce facem cu copiii?', 'Bună, {persoana}!\n\nVești bune: pagina {pagina} e acum live în Comunitatea CFCC. O găsiți aici: {linkpagina}\n\nDe acum numărăm, în fiecare lună, cum interacționează părinții cu voi pe site: vizitele pe pagina voastră din Comunitate și ce fac pe evenimentele voastre din calendar (deschid detaliile, apasă pe bilete sau înscriere, le salvează, le pun în calendar, le trimit mai departe). Sunt cifre totale și anonime, nu urmărim persoane. La final de lună primiți raportul, așa cum am stabilit.\n\nVreți să schimbați ceva pe pagina de prezentare? Scrieți-ne la hello@cefacemcucopiii.ro sau răspundeți la acest e-mail și facem modificarea în cel mult 48 de ore.\n\nEvenimentele noi le puteți adăuga singuri, oricând, din meniul Colaborări → Adaugă un eveniment: {linkeveniment}. Le verificăm și apar în calendar.\n\nMulțumim că sunteți parte din Comunitatea CFCC!\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
-  'pagina live - recomandări': ['Câteva sfaturi ca pagina {pagina} să fie văzută de cât mai mulți părinți', 'Bună, {persoana}!\n\nPrima zi a voastră pe platformă s-a încheiat și am început deja să strângem datele pentru raportul de la final de lună.\n\nCa pagina voastră să lucreze cât mai mult pentru voi, câteva lucruri simple care ajută mult la vizibilitate:\n\n1. Puneți linkul paginii voastre în bio, pe Instagram și pe Facebook: {linkpagina}\n2. Când vă dăm tag într-o postare sau într-un story, dați share sau repost, și în story, și pe profil.\n3. Când vă trimitem o invitație de colaborare (collab) pe Instagram, acceptați-o: postarea apare și pe profilul vostru și ajunge la ambele comunități.\n4. Urmăriți-ne pe {instagram} și dați-ne tag când postați ceva pentru copii, ca să putem distribui mai departe.\n5. Trimiteți-ne evenimentele noi din timp, din Colaborări → Adaugă un eveniment: {linkeveniment}. Cu cât apar mai devreme în calendar, cu atât le văd mai mulți părinți.\n\nPentru orice întrebare, suntem la hello@cefacemcucopiii.ro.\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
-  'pagina': ['Am primit informațiile pentru pagina voastră - Ce facem cu copiii?', 'Bună, {persoana}!\n\nMulțumim! Am primit informațiile pentru pagina {pagina} din Comunitatea CFCC. Un om din echipa noastră le verifică și vă contactează dacă mai avem nevoie de ceva. Când pagina e gata, v-o trimitem spre aprobare și o publicăm doar după ce ne dați ok.\n\nDacă vreți să schimbați ceva între timp, răspundeți la acest e-mail.\n\nCu drag,\nAna, de la Ce facem cu copiii?']
+  'pagina spre aprobare': ['Pagina {pagina} e gata - te rugăm să o verifici', 'Bună, {persoana}!\n\nPagina {pagina} din Comunitatea CFCC e gata. O poți vedea aici: {linkpagina}\n\nDeocamdată nu e publică: nu apare încă pe site, o vezi doar tu, prin acest link.\n\nTe rugăm să te uiți peste ea (texte, poze, date de contact, activități) și să ne răspunzi la acest e-mail:\n- dacă totul e în regulă, scrie-ne „Confirm” și o publicăm;\n- dacă vrei să schimbi ceva, spune-ne ce anume și o ajustăm înainte de publicare.\n\nPublicăm pagina doar după ce primim confirmarea ta.\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
+  'pagina live': ['Pagina {pagina} e live pe platforma noastră', 'Bună, {persoana}!\n\nVești bune: pagina {pagina} e acum live în Comunitatea CFCC.\nO găsești aici: {linkpagina}\n\nDe acum numărăm, în fiecare lună, cum interacționează părinții cu {pagina} pe site: vizitele pe pagina din Comunitate și ce fac pe evenimentele tale din calendar (deschid detaliile, apasă pe bilete sau înscriere, le salvează, le pun în calendar, le trimit mai departe).\nSunt cifre totale și anonime, nu urmărim persoane. La final de lună primești raportul, așa cum am stabilit.\n\nVrei să schimbi ceva pe pagina de prezentare?\nScrie-ne la hello@cefacemcucopiii.ro sau răspunde la acest e-mail și facem modificarea în cel mult 48 de ore.\n\nEvenimentele noi le poți adăuga tu, oricând, din meniul Colaborări → Adaugă un eveniment: {linkeveniment}.\nLe verificăm și apoi apar în calendar.\n\nMulțumim că ești parte din Comunitatea CFCC!\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
+  'pagina live - recomandări': ['Câteva sfaturi ca pagina {pagina} să fie văzută de cât mai mulți părinți', 'Bună, {persoana}!\n\nPrima zi pe platformă s-a încheiat și am început deja să strângem datele pentru raportul de la final de lună.\n\nCa pagina să lucreze cât mai mult pentru tine, câteva lucruri simple care ajută mult la vizibilitate:\n\n1. Pune linkul paginii în bio, pe Instagram și pe Facebook: {linkpagina}\n2. Când îți dăm tag într-o postare sau într-un story, dă share sau repost, și în story, și pe profil.\n3. Când îți trimitem o invitație de colaborare (collab) pe Instagram, accept-o: postarea apare și pe profilul tău și ajunge la ambele comunități.\n4. Urmărește-ne pe {instagram} și dă-ne tag când postezi ceva pentru copii, ca să putem distribui mai departe.\n5. Trimite-ne evenimentele noi din timp, din Colaborări → Adaugă un eveniment: {linkeveniment}.\nCu cât apar mai devreme în calendar, cu atât le văd mai mulți părinți.\n\nPentru orice întrebare, suntem la hello@cefacemcucopiii.ro.\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
+  'pagina': ['Gata, am primit informațiile pentru pagina ta!', 'Bună, {persoana}!\n\nMulțumim! Am primit informațiile pentru pagina {pagina} din Comunitatea CFCC.\n\nUn om (adevărat) din echipa noastră le verifică chiar acum și te contactăm cât mai repede, dacă mai avem nevoie de ceva.\n\nRămâne cum am stabilit: când pagina e gata, ți-o trimitem spre aprobare și o publicăm doar după ce ne dai ok.\n\nDacă vrei să schimbi ceva între timp, răspunde la acest e-mail.\n\nCu drag,\nAna, de la Ce facem cu copiii?']
 };
 const CAND_PLEACA = {
   'abonare': 'Cineva se abonează la newsletter pe site',
@@ -151,6 +152,7 @@ const CAND_PLEACA = {
   'eveniment': 'Cineva trimite un eveniment (Colaborări → Adaugă eveniment)',
   'colaborare': 'Cineva completează „Vreau să colaborăm”',
   'pagina': 'Un partener completează formularul pentru pagina lui (#formular-partener)',
+  'pagina spre aprobare': 'În Onboarding, statusul devine „Trimis spre aprobare”. Trimite partenerului linkul de previzualizare și îi cere confirmarea prin reply. Pleacă o singură dată',
   'pagina live': 'În Onboarding, statusul partenerului devine „Publicat” (pagina apare pe site). Pleacă o singură dată, la e-mailul persoanei de contact',
   'pagina live - recomandări': 'La 1-2 zile după mailul „pagina live” (verificare zilnică la 10:00). Pleacă o singură dată, doar dacă statusul e tot „Publicat”.'
 };
@@ -436,7 +438,7 @@ function la_editare_comunitate(e) {
     if (rand < 0) { e.source.toast('„' + id + '” nu are rând în Onboarding parteneri, deci nu trimit niciun mail.', 'Ce facem cu copiii?', 10); return; }
     ob.getRange(rand, 2).setValue(status);
     let mesaj = 'În Onboarding, „' + id + '” are acum statusul ' + status + '.';
-    if (status === 'Publicat') mesaj += ' ' + mail_pagina_live(ob, rand, id);
+    mesaj += ' ' + (status === 'Publicat' ? mail_pagina_live(ob, rand, id) : mail_spre_aprobare(ob, rand, id));
     e.source.toast(mesaj, 'Ce facem cu copiii?', 12);
   } catch (err) { e.source.toast('Nu am putut actualiza Onboarding: ' + err.message, 'Ce facem cu copiii?', 15); }
 }
@@ -458,6 +460,7 @@ function la_editare_onboarding(e) {
       par.getRange(i + 1, 5).setValue(pe);
       let mesaj = 'În Comunitatea CFCC, „' + id + '” are acum Pe site = ' + pe + (pe === 'Da' ? ' (apare pe site în câteva minute).' : '.');
       if (pe === 'Da') mesaj += ' ' + mail_pagina_live(fila, e.range.getRow(), id);
+      else mesaj += ' ' + mail_spre_aprobare(fila, e.range.getRow(), id);
       e.source.toast(mesaj, 'Ce facem cu copiii?', 12);
     } catch (err) { e.source.toast('Nu am putut actualiza Comunitatea CFCC: ' + err.message, 'Ce facem cu copiii?', 15); }
     return;
@@ -467,27 +470,43 @@ function la_editare_onboarding(e) {
     const id = creeaza_pagina(fila, e.range.getRow());
     e.range.setValue(STATUS_CREATA);
     fila.getRange(e.range.getRow(), 1, 1, FILE.pagina.coloane.length).setBackground('#d9ead3').setFontColor('#274e13');
-    e.source.toast('Am creat pagina „' + id + '” în Comunitatea CFCC, ca ciornă (Pe site = Nu).', 'Ce facem cu copiii?', 10);
+    const link = SITE + '/#comunitate/' + id;
+    const colNote = FILE.pagina.coloane.map(function (c) { return c[0]; }).indexOf('Note') + 1;
+    const nota = fila.getRange(e.range.getRow(), colNote).getDisplayValue();
+    const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
+    fila.getRange(e.range.getRow(), colNote).setValue((nota ? nota + '\n' : '') + azi + ' - previzualizare (nu e publică): ' + link);
+    e.source.toast('Am creat pagina „' + id + '” ca ciornă. Previzualizarea e în coloana Note: ' + link, 'Ce facem cu copiii?', 15);
   } catch (err) {
     e.range.setValue('De verificat');
     e.source.toast('Nu am putut crea pagina: ' + err.message, 'Ce facem cu copiii?', 15);
   }
 }
 
-/** Trimite partenerului mailul „pagina e live”, o singură dată (se notează în coloana Note). */
-function mail_pagina_live(fila, rand, id) {
+/** Trimite partenerului un mail o singură dată și îl notează în coloana Note. */
+function mail_o_data(fila, rand, id, tip, eticheta) {
   const nr = FILE.pagina.coloane.length;
   const v = fila.getRange(rand, 1, 1, nr).getDisplayValues()[0];
   const p = {};
   FILE.pagina.coloane.forEach(function (c, i) { p[c[0]] = String(v[i] || '').trim(); });
   const colNote = FILE.pagina.coloane.map(function (c) { return c[0]; }).indexOf('Note') + 1;
-  if (/mail „pagina e live” trimis/i.test(p['Note'])) return 'Mailul „pagina e live” fusese deja trimis, nu l-am trimis din nou.';
-  if (!/^\S+@\S+\.\S+$/.test(p['E-mail'])) return 'Nu am trimis mailul „pagina e live”: lipsește e-mailul persoanei de contact.';
-  trimite_confirmare('pagina live', { 'E-mail': p['E-mail'], 'Persoană de contact': p['Persoană de contact'], 'Nume': p['Nume'], _id: id });
+  if (p['Note'].indexOf('mail „' + eticheta + '” trimis') >= 0) return 'Mailul „' + eticheta + '” fusese deja trimis, nu l-am trimis din nou.';
+  if (!/^\S+@\S+\.\S+$/.test(p['E-mail'])) return 'Nu am trimis mailul „' + eticheta + '”: lipsește e-mailul persoanei de contact.';
+  trimite_confirmare(tip, { 'E-mail': p['E-mail'], 'Persoană de contact': p['Persoană de contact'], 'Nume': p['Nume'], _id: id });
   const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
-  fila.getRange(rand, colNote).setValue((p['Note'] ? p['Note'] + '\n' : '') + azi + ' - mail „pagina e live” trimis la ' + p['E-mail']);
+  fila.getRange(rand, colNote).setValue((p['Note'] ? p['Note'] + '\n' : '') + azi + ' - mail „' + eticheta + '” trimis la ' + p['E-mail']);
+  return 'Am trimis mailul „' + eticheta + '” la ' + p['E-mail'] + '.';
+}
+
+/** Mailul „pagina e live”, o singură dată; pornește și verificarea zilnică pentru mailul cu recomandări. */
+function mail_pagina_live(fila, rand, id) {
+  const r = mail_o_data(fila, rand, id, 'pagina live', 'pagina e live');
   try { asigura_verificare_zilnica(); } catch (err) { console.warn('Trigger zilnic: ' + err); }
-  return 'Am trimis mailul „pagina e live” la ' + p['E-mail'] + '.';
+  return r;
+}
+
+/** Mailul cu linkul de previzualizare, trimis spre aprobare, o singură dată. */
+function mail_spre_aprobare(fila, rand, id) {
+  return mail_o_data(fila, rand, id, 'pagina spre aprobare', 'spre aprobare');
 }
 
 /** Pornește (o singură dată) verificarea zilnică de la 10:00 pentru mailurile programate. */
