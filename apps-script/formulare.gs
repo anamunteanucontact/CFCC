@@ -408,6 +408,37 @@ function porneste_onboarding() {
     if (t.getHandlerFunction() === 'la_editare_onboarding') ScriptApp.deleteTrigger(t);
   });
   ScriptApp.newTrigger('la_editare_onboarding').forSpreadsheet(ONBOARDING_ID).onEdit().create();
+  porneste_comunitate();
+}
+
+/** Rulează o singură dată: când schimbi „Pe site” direct în Comunitatea CFCC, se actualizează singur și statusul din Onboarding (și pleacă mailul „pagina e live”). */
+function porneste_comunitate() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'la_editare_comunitate') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('la_editare_comunitate').forSpreadsheet(COMUNITATE_ID).onEdit().create();
+}
+
+/** „Pe site” schimbat în Comunitatea CFCC -> statusul din Onboarding (Da = Publicat + mail, În aprobare = Trimis spre aprobare). */
+function la_editare_comunitate(e) {
+  const fila = e.range.getSheet();
+  if (fila.getName() !== 'Parteneri' || e.range.getColumn() !== 5 || e.range.getRow() < 2 || e.range.getNumRows() > 1) return;
+  const pe = String(e.value || '').trim();
+  const id = fila.getRange(e.range.getRow(), 1).getDisplayValue().trim();
+  const status = pe === 'Da' ? 'Publicat' : /aprobare/i.test(pe) ? 'Trimis spre aprobare' : '';
+  if (!status || !id) return;
+  try {
+    const ob = SpreadsheetApp.openById(ONBOARDING_ID).getSheetByName(FILE.pagina.nume);
+    if (!ob || ob.getLastRow() < 2) return;
+    const v = ob.getRange(2, 1, ob.getLastRow() - 1, 3).getDisplayValues();
+    let rand = -1;
+    v.forEach(function (r, i) { if (slug_id(r[2]) === id) rand = i + 2; });
+    if (rand < 0) { e.source.toast('„' + id + '” nu are rând în Onboarding parteneri, deci nu trimit niciun mail.', 'Ce facem cu copiii?', 10); return; }
+    ob.getRange(rand, 2).setValue(status);
+    let mesaj = 'În Onboarding, „' + id + '” are acum statusul ' + status + '.';
+    if (status === 'Publicat') mesaj += ' ' + mail_pagina_live(ob, rand, id);
+    e.source.toast(mesaj, 'Ce facem cu copiii?', 12);
+  } catch (err) { e.source.toast('Nu am putut actualiza Onboarding: ' + err.message, 'Ce facem cu copiii?', 15); }
 }
 
 function la_editare_onboarding(e) {
