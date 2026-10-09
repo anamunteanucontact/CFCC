@@ -1214,7 +1214,7 @@ function renderOrg(sl){
     ${o.pro&&o.svc.length?`<div class="org-sec"><h3>Activități</h3><div class="acts">${o.svc.map(x=>`<div class="acts-i"><b>${esc(x.t)}</b>${x.d?`<span>${esc(x.d)}</span>`:""}</div>`).join("")}</div></div>`:""}
     ${o.pro&&o.foto.length?`<div class="org-sec"><div class="gal">${o.foto.map(f=>`<img src="${esc(f.u)}" alt="${esc(f.alt)}" loading="lazy">`).join("")}</div></div>`:""}
     ${o.pro&&o.art.length?`<div class="org-sec"><h3>Am scris despre ei</h3><div class="arts">${o.art.map(artCard).join("")}</div></div>`:""}
-    <div class="org-sec"><h3>Informații</h3><dl class="org-info">
+    <div class="org-sec"><dl class="org-info">
       ${o.ad?`<dt>Adresa</dt><dd>${esc(o.ad)}</dd>`:""}
       ${o.tel?`<dt>Telefon</dt><dd><a href="tel:${esc(o.tel.replace(/[^\d+]/g,""))}">${esc(o.tel)}</a></dd>`:""}
       ${o.mail?`<dt>E-mail</dt><dd><a href="mailto:${esc(o.mail)}">${esc(o.mail)}</a></dd>`:""}
