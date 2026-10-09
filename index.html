@@ -1148,7 +1148,7 @@ function buildCom(t){
       foto:gal.filter(a=>slug(a(0))===id).map(a=>({u:imgUrl(a(1)),alt:a(2)})).filter(x=>x.u),
       art:ARTS.filter(a=>a.parts.includes(id)),live:da(g(4))}});
   ORGS=ORG_ALL.filter(o=>o.live);
-  ORG_BY=Object.fromEntries(ORG_ALL.map(o=>[o.slug,o]));ORG_CACHE={};orgState="ok";
+  ORG_BY=Object.fromEntries(ORGS.map(o=>[o.slug,o]));ORG_CACHE={};orgState="ok";
 }
 async function loadCom(){
   if(COM_SHEET){try{const t={},v=Math.floor(Date.now()/60000);
@@ -1164,7 +1164,8 @@ function keyMatch(v,k){return v===k||(k.length>=8&&(" "+v+" ").includes(" "+k+" 
 function orgByName(v){v=norm(v);if(!v)return null;if(v in ORG_CACHE)return ORG_CACHE[v];return ORG_CACHE[v]=ORGS.find(x=>x.keys.some(k=>keyMatch(v,k)))||null}
 const orgFor=e=>orgByName(e.o)||orgByName(e.l);
 const orgLink=(v)=>{const g=orgByName(v);return g?`<a href="#comunitate/${g.slug}">${esc(v)}</a>`:esc(v)};
-const orgEvents=o=>EV.filter(e=>e.d>=iso(TODAY)&&(orgByName(e.o)===o||orgByName(e.l)===o)).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
+const isOrgEv=(e,o)=>o.prev?[e.o,e.l].some(v=>{v=norm(v);return v&&o.keys.some(k=>keyMatch(v,k))}):(orgByName(e.o)===o||orgByName(e.l)===o);
+const orgEvents=o=>EV.filter(e=>e.d>=iso(TODAY)&&isOrgEv(e,o)).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
 const MONO_C=["#1F4E5F","#EE6C4D","#2f7d5b","#7a5c9e","#c2851b","#3b6ea5"];
 function mono(o,lg){
   if(o.logo)return `<span class="mono${lg?" lg":""}" style="background:#fff"><img src="${esc(o.logo)}" alt="" loading="lazy" onerror="this.remove()"></span>`;
@@ -1183,6 +1184,18 @@ function renderOrgs(){
 }
 function mapUrl(o){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(o.ad.replace(/^Intrarea publică:\s*/i,"")+", Timișoara")}
 const artCard=a=>`<a class="art" href="#articol/${a.id}">${a.poza?`<img src="${esc(a.poza)}" alt="" loading="lazy">`:""}<span class="eyebrow">${esc(a.rub||"Recomandările noastre")}</span><b>${esc(a.t)}</b>${a.rez?`<span class="art-rez">${esc(a.rez)}</span>`:""}</a>`;
+/* previzualizare pentru partener: datele vin din scriptul de onboarding, nu din Comunitatea CFCC */
+async function renderPrev(cod){
+  const el=document.getElementById("org-page");el.innerHTML='<div class="empty">Se încarcă previzualizarea...</div>';
+  try{const r=await fetch(SCRIPT_URL+"?previzualizare="+encodeURIComponent(cod));const d=await r.json();
+    if(!d.ok||!d.pagina)throw 0;const x=d.pagina;
+    while(orgState==="loading")await new Promise(ok=>setTimeout(ok,200));
+    ORG_BY.__prev={slug:x.id,n:x.n,tip:x.tip,pro:true,desc:x.desc,age:x.age,ad:x.ad,tel:x.tel,mail:x.mail,ig:cleanUrl(x.ig),fb:cleanUrl(x.fb),web:cleanUrl(x.web),
+      logo:imgUrl(x.logo),cover:imgUrl(x.cover),keys:x.nume.map(norm).filter(Boolean),svc:x.act.map(a=>({t:a[0],d:a[1]})),foto:x.foto.map(u=>({u:imgUrl(u),alt:""})).filter(f=>f.u),
+      art:[],live:false,prev:true};
+    if(location.hash.slice(1)==="previzualizare/"+cod)renderOrg("__prev");
+  }catch(_){el.innerHTML='<div class="empty">Previzualizarea nu e disponibilă. Verifică linkul sau scrie-ne la hello@cefacemcucopiii.ro.</div>'}
+}
 function renderOrg(sl){
   const el=document.getElementById("org-page");
   const back='<a class="back" href="#comunitate">← Comunitatea CFCC</a>';
@@ -1192,7 +1205,7 @@ function renderOrg(sl){
   document.title=o.n+" | Ce facem cu copiii?";
   const draft=o.live?"":`<div class="draft-note">Previzualizare: pagina nu e încă publică. O vede doar cine are linkul.</div>`;
   const ev=loadState==="ok"?orgEvents(o):[];
-  const past=loadState==="ok"?EV.filter(e=>e.d<iso(TODAY)&&(orgByName(e.o)===o||orgByName(e.l)===o)).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,6):[];
+  const past=loadState==="ok"?EV.filter(e=>e.d<iso(TODAY)&&isOrgEv(e,o)).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,6):[];
   const btn=(href,lbl,main,trk)=>href?`<a class="btn ${main?"btn-main":"btn-soft"}" href="${esc(href)}"${/^https?:/.test(href)?' target="_blank" rel="noopener"':""} data-trk="${trk}" data-trk-org="${esc(o.n)}">${lbl}</a>`:"";
   el.innerHTML=`${back}${draft}
     <div class="org-head">${mono(o,true)}<div><span class="eyebrow">${esc(o.tip)}</span><h2>${esc(o.n)}</h2>
@@ -1261,6 +1274,8 @@ function route(){
   document.title=BASE_TITLE;
   const m=h.match(/^(?:comunitate|org)\/(.+)$/);
   if(m){renderOrg(decodeURIComponent(m[1]));go("org",true);return}
+  const pv=h.match(/^previzualizare\/([a-f0-9]{16,})$/);
+  if(pv){renderPrev(pv[1]);go("org",true);return}
   if(h==="comunitate"||h==="organizatori"){renderOrgs();go("comunitate",true);return}
   if(h==="formular-partener"){go("formular",true);return}
   if(h.startsWith("articol/")){renderArt(decodeURIComponent(h.slice(8)));go("articol",true);return}
@@ -1374,7 +1389,7 @@ render();renderProfile();route();
 renderRec();
 const comRoute=h=>/^(comunitate|organizatori|org\/|articol\/)/.test(h);
 loadCom().then(()=>{renderRec();if(comRoute(location.hash.slice(1)))route();if(loadState==="ok")render()});
-loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();const h=location.hash.slice(1);if(BYID[h]||comRoute(h))route()});
+loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();const h=location.hash.slice(1);if(BYID[h]||comRoute(h))route();else if(h.startsWith("previzualizare/")&&ORG_BY.__prev)renderOrg("__prev")});
 </script>
 </body>
 </html>

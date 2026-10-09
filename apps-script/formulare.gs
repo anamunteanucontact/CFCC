@@ -12,7 +12,7 @@
  *    o mută singur în fila „Evenimente”, la ziua și ora ei, cu status „De verificat”.
  *    După ce o treci pe „Confirmat”, apare pe site.
  * 3. În „CFCC - Onboarding parteneri”, când un rând primește statusul „Verificat - creează pagina”,
- *    îl copiază în „Comunitatea CFCC” ca ciornă (Pe site = Nu). Pornește o dată cu porneste_onboarding().
+ *    face link de previzualizare, trimite mailul spre aprobare și, la „Publicat”, copiază pagina în „Comunitatea CFCC”. Pornește o dată cu porneste_onboarding().
  */
 
 const NUME_EXPEDITOR = 'Ce facem cu copiii?';
@@ -191,7 +191,7 @@ function trimite_confirmare(tip, c) {
     persoana: c['Persoană de contact'] || '', brand: c['Afacere / brand'] || '',
     eveniment: c['Nume eveniment'] || '', pagina: c['Nume'] || ''
   };
-  const link_pagina = SITE + '/#comunitate/' + (c._id || '');
+  const link_pagina = c._link || (SITE + '/#comunitate/' + (c._id || ''));
   const link_eveniment = SITE + '/#adauga-eveniment';
   const subiect = ia(tip)[0].replace(/\{(\w+)\}/g, function (m, k) { return k in val ? val[k] : m; });
   let text = ia(tip)[1];
@@ -404,86 +404,116 @@ const COMUNITATE_ID = '19VxFnrcRzF8sMIG0tUiQSexOE1I21g5tXm9CQw2n7hQ'; // „Comu
 const STATUS_CREEAZA = 'Verificat - creează pagina';
 const STATUS_CREATA = 'Pagină creată (Pe site = Nu)';
 
-/** Rulează o singură dată din editor: pornește copierea automată din sheet-ul de onboarding. */
+/** Rulează o singură dată din editor: pornește automatizarea din sheet-ul de onboarding. */
 function porneste_onboarding() {
   ScriptApp.getProjectTriggers().forEach(function (t) {
-    if (t.getHandlerFunction() === 'la_editare_onboarding') ScriptApp.deleteTrigger(t);
+    const h = t.getHandlerFunction();
+    if (h === 'la_editare_onboarding' || h === 'la_editare_comunitate') ScriptApp.deleteTrigger(t);
   });
   ScriptApp.newTrigger('la_editare_onboarding').forSpreadsheet(ONBOARDING_ID).onEdit().create();
-  porneste_comunitate();
 }
 
-/** Rulează o singură dată: când schimbi „Pe site” direct în Comunitatea CFCC, se actualizează singur și statusul din Onboarding (și pleacă mailul „pagina e live”). */
-function porneste_comunitate() {
-  ScriptApp.getProjectTriggers().forEach(function (t) {
-    if (t.getHandlerFunction() === 'la_editare_comunitate') ScriptApp.deleteTrigger(t);
-  });
-  ScriptApp.newTrigger('la_editare_comunitate').forSpreadsheet(COMUNITATE_ID).onEdit().create();
-}
-
-/** „Pe site” schimbat în Comunitatea CFCC -> statusul din Onboarding (Da = Publicat + mail, În aprobare = Trimis spre aprobare). */
-function la_editare_comunitate(e) {
-  const fila = e.range.getSheet();
-  if (fila.getName() !== 'Parteneri' || e.range.getColumn() !== 5 || e.range.getRow() < 2 || e.range.getNumRows() > 1) return;
-  const pe = String(e.value || '').trim();
-  const id = fila.getRange(e.range.getRow(), 1).getDisplayValue().trim();
-  const status = pe === 'Da' ? 'Publicat' : /aprobare/i.test(pe) ? 'Trimis spre aprobare' : '';
-  if (!status || !id) return;
-  try {
-    const ob = SpreadsheetApp.openById(ONBOARDING_ID).getSheetByName(FILE.pagina.nume);
-    if (!ob || ob.getLastRow() < 2) return;
-    const v = ob.getRange(2, 1, ob.getLastRow() - 1, 3).getDisplayValues();
-    let rand = -1;
-    v.forEach(function (r, i) { if (slug_id(r[2]) === id) rand = i + 2; });
-    if (rand < 0) { e.source.toast('„' + id + '” nu are rând în Onboarding parteneri, deci nu trimit niciun mail.', 'Ce facem cu copiii?', 10); return; }
-    ob.getRange(rand, 2).setValue(status);
-    let mesaj = 'În Onboarding, „' + id + '” are acum statusul ' + status + '.';
-    mesaj += ' ' + (status === 'Publicat' ? mail_pagina_live(ob, rand, id) : mail_spre_aprobare(ob, rand, id));
-    e.source.toast(mesaj, 'Ce facem cu copiii?', 12);
-  } catch (err) { e.source.toast('Nu am putut actualiza Onboarding: ' + err.message, 'Ce facem cu copiii?', 15); }
-}
-
+/* Fluxul din Onboarding (totul se face aici; în Comunitatea CFCC ajunge doar ce e publicat):
+   3. Verificat - creează pagina  -> link de previzualizare în Note (pagina NU se copiază în Comunitatea CFCC)
+   4. Pagină creată (Pe site = Nu) -> la fel, dacă linkul nu există încă
+   5. Trimis spre aprobare        -> mail către partener cu linkul de previzualizare
+   6. Publicat                    -> pagina se copiază în Comunitatea CFCC cu Pe site = Da + mail „pagina e live” */
 function la_editare_onboarding(e) {
   const fila = e.range.getSheet();
   if (fila.getName() !== FILE.pagina.nume) return;
-  if (e.range.getColumn() !== 2 || e.range.getRow() < 2) return; // coloana Status
+  if (e.range.getColumn() !== 2 || e.range.getRow() < 2 || e.range.getNumRows() > 1) return; // coloana Status
   const val = String(e.value || '');
-  // Trimis spre aprobare / Publicat în Onboarding -> „Pe site” în Comunitatea CFCC (În aprobare / Da)
-  if (/aprobare/i.test(val) || /^publicat/i.test(val)) {
-    try {
-      const pe = /aprobare/i.test(val) ? 'În aprobare' : 'Da';
-      const id = slug_id(fila.getRange(e.range.getRow(), 3).getDisplayValue());
-      const par = SpreadsheetApp.openById(COMUNITATE_ID).getSheetByName('Parteneri');
-      const ids = par.getRange(1, 1, par.getLastRow(), 1).getDisplayValues().map(function (r) { return r[0]; });
-      const i = ids.indexOf(id);
-      if (i < 1) { e.source.toast('Nu am găsit pagina „' + id + '” în Comunitatea CFCC.', 'Ce facem cu copiii?', 10); return; }
-      par.getRange(i + 1, 5).setValue(pe);
-      let mesaj = 'În Comunitatea CFCC, „' + id + '” are acum Pe site = ' + pe + (pe === 'Da' ? ' (apare pe site în câteva minute).' : '.');
-      if (pe === 'Da') mesaj += ' ' + mail_pagina_live(fila, e.range.getRow(), id);
-      else mesaj += ' ' + mail_spre_aprobare(fila, e.range.getRow(), id);
-      e.source.toast(mesaj, 'Ce facem cu copiii?', 12);
-    } catch (err) { e.source.toast('Nu am putut actualiza Comunitatea CFCC: ' + err.message, 'Ce facem cu copiii?', 15); }
-    return;
-  }
-  if (val !== STATUS_CREEAZA) return;
+  const rand = e.range.getRow();
+  const nume = fila.getRange(rand, 3).getDisplayValue().trim();
+  const id = slug_id(nume);
+  const titlu = 'Ce facem cu copiii?';
   try {
-    const id = creeaza_pagina(fila, e.range.getRow());
-    e.range.setValue(STATUS_CREATA);
-    fila.getRange(e.range.getRow(), 1, 1, FILE.pagina.coloane.length).setBackground('#d9ead3').setFontColor('#274e13');
-    const link = SITE + '/#comunitate/' + id;
-    const colNote = FILE.pagina.coloane.map(function (c) { return c[0]; }).indexOf('Note') + 1;
-    const nota = fila.getRange(e.range.getRow(), colNote).getDisplayValue();
-    const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
-    fila.getRange(e.range.getRow(), colNote).setValue((nota ? nota + '\n' : '') + azi + ' - previzualizare (nu e publică): ' + link);
-    e.source.toast('Am creat pagina „' + id + '” ca ciornă. Previzualizarea e în coloana Note: ' + link, 'Ce facem cu copiii?', 15);
+    if (val === STATUS_CREEAZA || val === STATUS_CREATA) {
+      if (!nume) throw new Error('lipsește numele');
+      const link = link_previzualizare(fila, rand, true);
+      if (val === STATUS_CREEAZA) e.range.setValue(STATUS_CREATA);
+      fila.getRange(rand, 1, 1, FILE.pagina.coloane.length).setBackground('#d9ead3').setFontColor('#274e13');
+      e.source.toast('Pagina „' + nume + '” e gata de verificat. Linkul de previzualizare e în coloana Note: ' + link, titlu, 15);
+    } else if (/aprobare/i.test(val)) {
+      const link = link_previzualizare(fila, rand, true);
+      e.source.toast(mail_spre_aprobare(fila, rand, id, link), titlu, 12);
+    } else if (/^publicat/i.test(val)) {
+      const r = publica_pagina(fila, rand);
+      e.source.toast(r + ' ' + mail_pagina_live(fila, rand, id), titlu, 12);
+    }
   } catch (err) {
-    e.range.setValue('De verificat');
-    e.source.toast('Nu am putut crea pagina: ' + err.message, 'Ce facem cu copiii?', 15);
+    e.source.toast('Nu am putut termina pasul: ' + err.message, titlu, 15);
   }
 }
 
+/** Linkul de previzualizare (cu un cod greu de ghicit), notat în coloana Note. Dacă există deja, îl refolosește. */
+function link_previzualizare(fila, rand, creeaza) {
+  const cols = FILE.pagina.coloane.map(function (c) { return c[0]; });
+  const colNote = cols.indexOf('Note') + 1;
+  const nota = fila.getRange(rand, colNote).getDisplayValue();
+  const m = nota.match(/#previzualizare\/([a-f0-9]{16,})/);
+  if (m) return SITE + '/#previzualizare/' + m[1];
+  if (!creeaza) return '';
+  const cod = Utilities.getUuid().replace(/-/g, '').slice(0, 20);
+  const link = SITE + '/#previzualizare/' + cod;
+  // facem pozele vizibile pentru cine are linkul, ca să apară în previzualizare
+  ['Logo', 'Poza principală', 'Alte poze'].forEach(function (k) {
+    try { poze_publice(fila.getRange(rand, cols.indexOf(k) + 1).getDisplayValue()); } catch (err) { console.warn('Poze: ' + err); }
+  });
+  const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
+  fila.getRange(rand, colNote).setValue((nota ? nota + '\n' : '') + azi + ' - previzualizare (nu e publică): ' + link);
+  return link;
+}
+
+/** Datele publice ale unei pagini în previzualizare (pentru site). Doar câmpurile care apar pe pagină, niciodată datele firmei. */
+function date_previzualizare(cod) {
+  if (!/^[a-f0-9]{16,}$/.test(cod || '')) return { ok: false };
+  const fila = SpreadsheetApp.openById(ONBOARDING_ID).getSheetByName(FILE.pagina.nume);
+  if (!fila || fila.getLastRow() < 2) return { ok: false };
+  const cols = FILE.pagina.coloane.map(function (c) { return c[0]; });
+  const rows = fila.getRange(2, 1, fila.getLastRow() - 1, cols.length).getDisplayValues();
+  for (let i = 0; i < rows.length; i++) {
+    const p = {};
+    cols.forEach(function (k, j) { p[k] = String(rows[i][j] || '').trim(); });
+    if (p['Note'].indexOf('#previzualizare/' + cod) < 0) continue;
+    if (/respins/i.test(p['Status'])) return { ok: false };
+    const poze = function (k) { return String(p[k] || '').split(/\s+/).filter(String).map(function (u) {
+      const m = u.match(/\/d\/([\w-]{20,})/) || u.match(/[?&]id=([\w-]{20,})/);
+      return m ? 'https://lh3.googleusercontent.com/d/' + m[1] : u;
+    }); };
+    return { ok: true, pagina: {
+      id: slug_id(p['Nume']), n: p['Nume'], tip: p['Cum se descriu'], desc: p['Descriere'], age: p['Vârste'], ad: p['Adresă'],
+      tel: p['Telefon public'], mail: p['E-mail public'], ig: link_social(p['Instagram'], 'instagram'), fb: link_social(p['Facebook'], 'facebook'),
+      web: p['Website'], logo: poze('Logo')[0] || '', cover: poze('Poza principală')[0] || '', foto: poze('Alte poze'),
+      nume: [p['Nume']].concat(p['Nume în calendar'].split(/\n+/)).map(function (x) { return x.trim(); }).filter(String),
+      act: p['Activități'].split(/\n+/).filter(String).map(function (l) { const x = l.split('|'); return [x[0].trim(), (x.slice(1).join('|') || '').trim()]; })
+    } };
+  }
+  return { ok: false };
+}
+
+function doGet(e) {
+  const cod = e && e.parameter && e.parameter.previzualizare;
+  if (cod) return raspuns(date_previzualizare(String(cod)));
+  return raspuns({ ok: true });
+}
+
+/** La „Publicat”: copiază pagina în Comunitatea CFCC cu Pe site = Da. Dacă există deja (ex. după o pauză), doar pune Pe site = Da. */
+function publica_pagina(fila, rand) {
+  const id = slug_id(fila.getRange(rand, 3).getDisplayValue());
+  const par = SpreadsheetApp.openById(COMUNITATE_ID).getSheetByName('Parteneri');
+  const ids = par.getRange(1, 1, Math.max(par.getLastRow(), 1), 1).getDisplayValues().map(function (r) { return r[0]; });
+  const i = ids.indexOf(id);
+  if (i >= 1) {
+    par.getRange(i + 1, 5).setValue('Da');
+    return 'Pagina „' + id + '” exista deja în Comunitatea CFCC: am pus Pe site = Da.';
+  }
+  creeaza_pagina(fila, rand);
+  return 'Am copiat pagina „' + id + '” în Comunitatea CFCC, cu Pe site = Da (apare pe site în câteva minute).';
+}
+
 /** Trimite partenerului un mail o singură dată și îl notează în coloana Note. */
-function mail_o_data(fila, rand, id, tip, eticheta) {
+function mail_o_data(fila, rand, id, tip, eticheta, link) {
   const nr = FILE.pagina.coloane.length;
   const v = fila.getRange(rand, 1, 1, nr).getDisplayValues()[0];
   const p = {};
@@ -491,7 +521,7 @@ function mail_o_data(fila, rand, id, tip, eticheta) {
   const colNote = FILE.pagina.coloane.map(function (c) { return c[0]; }).indexOf('Note') + 1;
   if (p['Note'].indexOf('mail „' + eticheta + '” trimis') >= 0) return 'Mailul „' + eticheta + '” fusese deja trimis, nu l-am trimis din nou.';
   if (!/^\S+@\S+\.\S+$/.test(p['E-mail'])) return 'Nu am trimis mailul „' + eticheta + '”: lipsește e-mailul persoanei de contact.';
-  trimite_confirmare(tip, { 'E-mail': p['E-mail'], 'Persoană de contact': p['Persoană de contact'], 'Nume': p['Nume'], _id: id });
+  trimite_confirmare(tip, { 'E-mail': p['E-mail'], 'Persoană de contact': p['Persoană de contact'], 'Nume': p['Nume'], _id: id, _link: link });
   const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
   fila.getRange(rand, colNote).setValue((p['Note'] ? p['Note'] + '\n' : '') + azi + ' - mail „' + eticheta + '” trimis la ' + p['E-mail']);
   return 'Am trimis mailul „' + eticheta + '” la ' + p['E-mail'] + '.';
@@ -505,8 +535,8 @@ function mail_pagina_live(fila, rand, id) {
 }
 
 /** Mailul cu linkul de previzualizare, trimis spre aprobare, o singură dată. */
-function mail_spre_aprobare(fila, rand, id) {
-  return mail_o_data(fila, rand, id, 'pagina spre aprobare', 'spre aprobare');
+function mail_spre_aprobare(fila, rand, id, link) {
+  return mail_o_data(fila, rand, id, 'pagina spre aprobare', 'spre aprobare', link);
 }
 
 /** Pornește (o singură dată) verificarea zilnică de la 10:00 pentru mailurile programate. */
@@ -557,7 +587,7 @@ function creeaza_pagina(fila, rand) {
   const alte = poze_publice(p['Alte poze']);
   const nume_calendar = [p['Nume']].concat(p['Nume în calendar'].split(/\n+/)).map(function (x) { return x.trim(); }).filter(String).join('\n');
 
-  parteneri.appendRow([id, p['Nume'], p['Cum se descriu'], 'Partener', 'Nu', p['Descriere'], p['Vârste'], p['Adresă'],
+  parteneri.appendRow([id, p['Nume'], p['Cum se descriu'], 'Partener', 'Da', p['Descriere'], p['Vârste'], p['Adresă'],
     text(p['Telefon public']), p['E-mail public'], link_social(p['Instagram'], 'instagram'), link_social(p['Facebook'], 'facebook'),
     p['Website'], logo, cover, nume_calendar]);
 
