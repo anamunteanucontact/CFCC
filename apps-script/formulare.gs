@@ -440,7 +440,7 @@ function muta_in_calendar(filaProp, rand, publica) {
   // îl punem la locul lui, după zi și oră
   const cand = new Date(data.getTime());
   if (ora) { const hm = ora.split(':'); cand.setHours(+hm[0], +hm[1]); }
-  const prim = 3, ultim = Math.max(ev.getLastRow(), prim);
+  const prim = 3, ultim = Math.max(ultim_rand_ev(ev), prim);
   const ordini = ev.getRange(prim, EV_COL.ordine, ultim - prim + 1, 1).getValues();
   let tinta = ultim + 1;
   for (let i = 0; i < ordini.length; i++) {
@@ -464,8 +464,8 @@ function seteaza_status_in_evenimente(filaProp, rand, status) {
   const v = filaProp.getRange(rand, 1, 1, nr).getValues()[0];
   const nume = String(v[1] || '').trim().toLowerCase(), d = ca_data(v[3], tz);
   const ev = ss.getSheetByName('Evenimente');
-  if (ev.getLastRow() < 3 || !nume) return;
-  const rows = ev.getRange(3, 1, ev.getLastRow() - 2, EV_COL.nume).getValues();
+  if (ultim_rand_ev(ev) < 3 || !nume) return;
+  const rows = ev.getRange(3, 1, ultim_rand_ev(ev) - 2, EV_COL.nume).getValues();
   for (let i = 0; i < rows.length; i++) {
     const dd = ca_data(rows[i][EV_COL.data - 1], tz);
     if (String(rows[i][EV_COL.nume - 1] || '').trim().toLowerCase() === nume && d && dd && dd.toDateString() === d.toDateString()) {
@@ -542,7 +542,7 @@ function la_editare_evenimente(e) {
 function adresa_cunoscuta(fila, loc, randExclus) {
   const cheie = String(loc || '').trim().toLowerCase();
   if (!cheie) return '';
-  const ultim = fila.getLastRow();
+  const ultim = ultim_rand_ev(fila);
   if (ultim >= 3) {
     const v = fila.getRange(3, EV_COL.locatie, ultim - 2, EV_COL.adresa - EV_COL.locatie + 1).getValues();
     for (let i = v.length - 1; i >= 0; i--) {
@@ -572,7 +572,7 @@ function porneste_mail_evenimente() {
 /** Test: trimite pe adresa ta mailul „eveniment publicat”, cu primul eveniment publicat din calendar. */
 function testMailEvenimentPublicat() {
   const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
-  const v = fila.getRange(3, 1, Math.max(fila.getLastRow() - 2, 1), EV_COL.nume).getValues();
+  const v = fila.getRange(3, 1, Math.max(ultim_rand_ev(fila) - 2, 1), EV_COL.nume).getValues();
   const r = v.filter(function (x) { return String(x[0] || '').trim(); }).pop() || ['https://cefacemcucopiii.ro/#exemplu', '', '', '', '', '', '', 'Eveniment de test'];
   const rez = trimite_confirmare('eveniment publicat', { 'E-mail': Session.getActiveUser().getEmail(), 'Nume eveniment': String(r[EV_COL.nume - 1]), _linkEv: String(r[0]) });
   SpreadsheetApp.getActiveSpreadsheet().toast('Mail de test „eveniment publicat”: ' + (rez || 'nu a plecat'));
@@ -580,8 +580,8 @@ function testMailEvenimentPublicat() {
 
 function mail_evenimente_publicate() {
   const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
-  if (!fila || fila.getLastRow() < 3) return;
-  const n = fila.getLastRow() - 2;
+  if (!fila || ultim_rand_ev(fila) < 3) return;
+  const n = ultim_rand_ev(fila) - 2;
   const v = fila.getRange(3, 1, n, EV_COL.ordine).getValues();
   const props = PropertiesService.getScriptProperties();
   const asteapta = JSON.parse(props.getProperty('EV_LIVE_ASTEAPTA') || '{}');
@@ -972,7 +972,7 @@ function onOpen() {
 function ascunde_trecute() {
   const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
   if (!fila) return;
-  const prim = 3, ultim = fila.getLastRow();
+  const prim = 3, ultim = ultim_rand_ev(fila);
   if (ultim < prim) return;
   const azi = new Date(); azi.setHours(0, 0, 0, 0);
   const ordini = fila.getRange(prim, EV_COL.ordine, ultim - prim + 1, 1).getValues();
@@ -994,8 +994,8 @@ function ascunde_trecute() {
 
 function arata_trecute() {
   const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
-  if (!fila || fila.getLastRow() < 3) return;
-  fila.showRows(3, fila.getLastRow() - 2);
+  if (!fila || fila.getMaxRows() < 3) return;
+  fila.showRows(3, fila.getMaxRows() - 2);
 }
 
 
@@ -1038,7 +1038,7 @@ function actualizeaza_organizatori(ss, randuri) {
   if (!ev || !d) return 0;
   const tz = ss.getSpreadsheetTimeZone();
   const azi = Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy');
-  if (!randuri) { randuri = []; for (let r = 3; r <= ev.getLastRow(); r++) randuri.push(r); }
+  if (!randuri) { randuri = []; for (let r = 3, u = ultim_rand_ev(ev); r <= u; r++) randuri.push(r); }
   let adaugate = 0;
   randuri.forEach(function (r) {
     const v = ev.getRange(r, 1, 1, EV_COL.adresa).getValues()[0];
@@ -1073,4 +1073,17 @@ function actualizeaza_organizatori(ss, randuri) {
 function actualizeaza_organizatori_tot() {
   const n = actualizeaza_organizatori(SpreadsheetApp.getActiveSpreadsheet());
   SpreadsheetApp.getActiveSpreadsheet().toast(n ? 'Am adăugat ' + n + ' rânduri noi în Organizatori.' : 'Organizatori e la zi.', 'Ce facem cu copiii?', 6);
+}
+
+
+/** Ultimul rând cu un eveniment în „Evenimente” (are Data sau Nume). getLastRow() nu e bun aici:
+ *  formulele din capul coloanelor Zi și Ordine umplu toată foaia, deci ar întoarce ultimul rând al foii. */
+function ultim_rand_ev(fila) {
+  const max = fila.getMaxRows();
+  if (max < 3) return 2;
+  const v = fila.getRange(3, EV_COL.data, max - 2, EV_COL.nume - EV_COL.data + 1).getValues();
+  for (let i = v.length - 1; i >= 0; i--) {
+    if (String(v[i][0]).trim() || String(v[i][EV_COL.nume - EV_COL.data]).trim()) return i + 3;
+  }
+  return 2;
 }
