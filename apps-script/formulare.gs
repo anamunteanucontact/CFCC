@@ -430,7 +430,7 @@ function muta_in_calendar(filaProp, rand, publica) {
   // rândul nou: coloanele B-U din „Evenimente” (coloana A e formula cu linkul de pe site)
   const notaProp = 'Din propunerea primită pe ' + primit + '.' + (p['Categorie'] ? '' : ' De completat: categoria.');
   const nou = [
-    publica ? 'Publicat' : 'De verificat', 'Nu', "'" + dataTxt, '', ora ? "'" + ora : '', '',
+    publica ? 'Publicat' : 'De verificat', 'Nu', dataTxt, '', ora ? "'" + ora : '', '',
     p['Nume eveniment'], p['Organizator'], p['Locație'], p['Descriere'],
     p['Vârstă minimă'], p['Vârstă maximă'], p['Categorie'] || '', p['Adresă'] || adresa_cunoscuta(ev, p['Locație']),
     bilet, p['Link bilete / înscriere'], contact, notaProp,
