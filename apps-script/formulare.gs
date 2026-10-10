@@ -430,7 +430,7 @@ function muta_in_calendar(filaProp, rand, publica) {
   // rândul nou: coloanele B-U din „Evenimente” (coloana A e formula cu linkul de pe site)
   const notaProp = 'Din propunerea primită pe ' + primit + '.' + (p['Categorie'] ? '' : ' De completat: categoria.');
   const nou = [
-    publica ? 'Publicat' : 'De verificat', 'Nu', "'" + dataTxt, ZILE[data.getDay()], ora ? "'" + ora : '', '',
+    publica ? 'Publicat' : 'De verificat', 'Nu', "'" + dataTxt, '', ora ? "'" + ora : '', '',
     p['Nume eveniment'], p['Organizator'], p['Locație'], p['Descriere'],
     p['Vârstă minimă'], p['Vârstă maximă'], p['Categorie'] || '', p['Adresă'] || adresa_cunoscuta(ev, p['Locație']),
     bilet, p['Link bilete / înscriere'], contact, notaProp,
@@ -449,10 +449,7 @@ function muta_in_calendar(filaProp, rand, publica) {
   }
   if (tinta <= ultim) ev.insertRowBefore(tinta);
   ev.getRange(tinta, 2, 1, nou.length).setValues([nou]);
-  // formula din coloana „Ordine”, copiată de pe rândul vecin
-  const vecin = tinta > prim ? tinta - 1 : tinta + 1;
-  const f = ev.getRange(vecin, EV_COL.ordine).getFormulaR1C1();
-  if (f) ev.getRange(tinta, EV_COL.ordine).setFormulaR1C1(f);
+  // „Zi” și „Ordine” se calculează singure (ARRAYFORMULA în capul coloanelor, rândul 2), de aceea rămân goale aici.
 
   filaProp.getRange(rand, prop_col('Status')).setNote(NOTA_MUTAT + ' pe ' + Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy HH:mm'));
   noteaza_propunere(filaProp, rand, 'mutat în Evenimente, rândul ' + tinta + (publica ? ', publicat pe site' : ', nepublicat încă'));
