@@ -952,3 +952,47 @@ function link_social(x, retea) {
 }
 
 function text(x) { return x ? "'" + x : ''; }
+
+/* ---------- Evenimentele trecute se ascund în „Evenimente” ----------
+ * La fiecare deschidere a sheet-ului, rândurile cu ziua trecută (coloana Ordine < azi) se ascund,
+ * ca primele rânduri vizibile să fie evenimentele de azi încolo. Datele rămân în sheet (site-ul,
+ * Agenda mea și fila „Arhivă” au nevoie de ele); doar nu se mai văd. Le vezi pe toate în „Arhivă”
+ * sau din meniul „Ce facem cu copiii?” → „Arată și evenimentele trecute”. */
+function onOpen() {
+  try {
+    SpreadsheetApp.getUi().createMenu('Ce facem cu copiii?')
+      .addItem('Ascunde evenimentele trecute', 'ascunde_trecute')
+      .addItem('Arată și evenimentele trecute', 'arata_trecute')
+      .addToUi();
+  } catch (err) { console.warn(err); }
+  try { ascunde_trecute(); } catch (err) { console.warn(err); }
+}
+
+function ascunde_trecute() {
+  const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
+  if (!fila) return;
+  const prim = 3, ultim = fila.getLastRow();
+  if (ultim < prim) return;
+  const azi = new Date(); azi.setHours(0, 0, 0, 0);
+  const ordini = fila.getRange(prim, EV_COL.ordine, ultim - prim + 1, 1).getValues();
+  // grupăm rândurile consecutive cu aceeași stare, ca să ascundem / arătăm în bucăți mari
+  let start = prim, trecut = null;
+  const aplica = function (de, pana, ascunde) {
+    if (ascunde === null) return;
+    const n = pana - de + 1;
+    if (ascunde) fila.hideRows(de, n); else fila.showRows(de, n);
+  };
+  for (let i = 0; i < ordini.length; i++) {
+    const o = ordini[i][0];
+    const t = o instanceof Date && o.getTime() < azi.getTime();
+    if (trecut === null) { trecut = t; start = prim + i; continue; }
+    if (t !== trecut) { aplica(start, prim + i - 1, trecut); start = prim + i; trecut = t; }
+  }
+  aplica(start, ultim, trecut);
+}
+
+function arata_trecute() {
+  const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
+  if (!fila || fila.getLastRow() < 3) return;
+  fila.showRows(3, fila.getLastRow() - 2);
+}
