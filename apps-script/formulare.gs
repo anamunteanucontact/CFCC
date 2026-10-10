@@ -449,6 +449,7 @@ function muta_in_calendar(filaProp, rand, publica) {
   }
   if (tinta <= ultim) ev.insertRowBefore(tinta);
   ev.getRange(tinta, 2, 1, nou.length).setValues([nou]);
+  try { actualizeaza_organizatori(ss, [tinta]); } catch (errO) { console.warn(errO); }
   // „Zi” și „Ordine” se calculează singure (ARRAYFORMULA în capul coloanelor, rândul 2), de aceea rămân goale aici.
 
   filaProp.getRange(rand, prop_col('Status')).setNote(NOTA_MUTAT + ' pe ' + Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy HH:mm'));
@@ -524,6 +525,10 @@ function la_editare_evenimente(e) {
         if (gasita) { adr.setValue(gasita); e.source.toast('Am completat adresa pentru „' + loc + '”.', 'Ce facem cu copiii?', 4); }
       }
     }
+    // organizator / locație / adresă noi -> se adaugă singure în fila „Organizatori”
+    if (c0 <= EV_COL.adresa && Math.min(EV_COL.organizator, EV_COL.locatie) < c0 + nc) {
+      try { actualizeaza_organizatori(e.source, [r]); } catch (errO) { console.warn(errO); }
+    }
     // rând nou (are nume sau dată) -> data adăugării, automat
     const ad = fila.getRange(r, EV_COL.adaugat);
     if (!String(ad.getValue() || '').trim()) {
@@ -546,14 +551,8 @@ function adresa_cunoscuta(fila, loc, randExclus) {
       if (a && String(v[i][0] || '').trim().toLowerCase() === cheie) return a;
     }
   }
-  const org = fila.getParent().getSheetByName('Organizatori');
-  if (org && org.getLastRow() >= 3) {
-    const o = org.getRange(3, 1, org.getLastRow() - 2, 3).getValues();
-    for (let i = 0; i < o.length; i++) {
-      if (String(o[i][0] || '').trim().toLowerCase() === cheie && String(o[i][2] || '').trim()) return String(o[i][2]).trim();
-    }
-  }
-  return '';
+  const g = gaseste_organizator(fila.getParent(), loc);
+  return g && g.adresa ? g.adresa : '';
 }
 
 /* ---------- mail „evenimentul tău e pe site” ---------- */
@@ -963,6 +962,8 @@ function onOpen() {
     SpreadsheetApp.getUi().createMenu('Ce facem cu copiii?')
       .addItem('Ascunde evenimentele trecute', 'ascunde_trecute')
       .addItem('Arată și evenimentele trecute', 'arata_trecute')
+      .addSeparator()
+      .addItem('Actualizează fila Organizatori', 'actualizeaza_organizatori_tot')
       .addToUi();
   } catch (err) { console.warn(err); }
   try { ascunde_trecute(); } catch (err) { console.warn(err); }
@@ -995,4 +996,81 @@ function arata_trecute() {
   const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
   if (!fila || fila.getLastRow() < 3) return;
   fila.showRows(3, fila.getLastRow() - 2);
+}
+
+
+/* ---------- Fila „Organizatori” se completează singură ----------
+ * Când apare în Evenimente un organizator sau o locație care nu e încă în „Organizatori” (nici ca nume, nici în
+ * coloana „Alte nume în Evenimente”), se adaugă un rând nou: numele, adresa (pentru locații), rolul și o notă.
+ * Dacă locul există deja dar n-are adresă, adresa din Evenimente se trece și acolo.
+ * Coloane Organizatori: A Organizator | B Tip | C Adresă | ... | N Note | O Rol | P Alte nume în Evenimente */
+const ORG_COL = { nume: 1, adresa: 3, note: 14, rol: 15, alias: 16 };
+
+function norm_nume(x) {
+  return String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function citeste_organizatori(ss) {
+  const org = ss.getSheetByName('Organizatori');
+  if (!org) return null;
+  const n = Math.max(org.getLastRow() - 2, 0);
+  const v = n ? org.getRange(3, 1, n, ORG_COL.alias).getValues() : [];
+  const lista = v.map(function (r, i) {
+    const chei = [r[ORG_COL.nume - 1]].concat(String(r[ORG_COL.alias - 1] || '').split(';')).map(norm_nume).filter(String);
+    return { rand: i + 3, nume: String(r[ORG_COL.nume - 1] || '').trim(), adresa: String(r[ORG_COL.adresa - 1] || '').trim(), rol: String(r[ORG_COL.rol - 1] || '').trim(), chei: chei };
+  }).filter(function (o) { return o.nume; });
+  return { fila: org, lista: lista };
+}
+
+function gaseste_organizator(ss, nume, date) {
+  const d = date || citeste_organizatori(ss);
+  const k = norm_nume(nume);
+  if (!d || !k) return null;
+  for (let i = 0; i < d.lista.length; i++) if (d.lista[i].chei.indexOf(k) >= 0) return d.lista[i];
+  return null;
+}
+
+/** Verifică rândurile date din Evenimente (sau toate, dacă `randuri` lipsește) și completează fila Organizatori. */
+function actualizeaza_organizatori(ss, randuri) {
+  ss = ss || SpreadsheetApp.getActiveSpreadsheet();
+  const ev = ss.getSheetByName('Evenimente');
+  const d = citeste_organizatori(ss);
+  if (!ev || !d) return 0;
+  const tz = ss.getSpreadsheetTimeZone();
+  const azi = Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy');
+  if (!randuri) { randuri = []; for (let r = 3; r <= ev.getLastRow(); r++) randuri.push(r); }
+  let adaugate = 0;
+  randuri.forEach(function (r) {
+    const v = ev.getRange(r, 1, 1, EV_COL.adresa).getValues()[0];
+    const orgN = String(v[EV_COL.organizator - 1] || '').trim();
+    const locN = String(v[EV_COL.locatie - 1] || '').trim();
+    const adr = String(v[EV_COL.adresa - 1] || '').trim();
+    const nume = String(v[EV_COL.nume - 1] || '').trim();
+    [[orgN, 'Organizator', ''], [locN, 'Locație', adr]].forEach(function (x) {
+      if (!x[0]) return;
+      const g = gaseste_organizator(ss, x[0], d);
+      if (!g) {
+        const rand = d.fila.getLastRow() + 1;
+        const linie = []; for (let c = 0; c < ORG_COL.alias; c++) linie.push('');
+        linie[ORG_COL.nume - 1] = x[0];
+        linie[ORG_COL.adresa - 1] = x[2];
+        linie[ORG_COL.rol - 1] = x[1];
+        linie[ORG_COL.note - 1] = 'Adăugat automat din Evenimente pe ' + azi + (nume ? ' („' + nume + '”)' : '') + '. De completat: tip, contact.';
+        d.fila.getRange(rand, 1, 1, linie.length).setValues([linie]);
+        d.lista.push({ rand: rand, nume: x[0], adresa: x[2], rol: x[1], chei: [norm_nume(x[0])] });
+        adaugate++;
+        return;
+      }
+      if (x[1] === 'Locație' && x[2] && !g.adresa) { d.fila.getRange(g.rand, ORG_COL.adresa).setValue(x[2]); g.adresa = x[2]; }
+      if (g.rol && g.rol !== x[1] && g.rol !== 'Ambele') { d.fila.getRange(g.rand, ORG_COL.rol).setValue('Ambele'); g.rol = 'Ambele'; }
+      if (!g.rol) { d.fila.getRange(g.rand, ORG_COL.rol).setValue(x[1]); g.rol = x[1]; }
+    });
+  });
+  return adaugate;
+}
+
+/** Din meniu: verifică tot sheet-ul Evenimente. */
+function actualizeaza_organizatori_tot() {
+  const n = actualizeaza_organizatori(SpreadsheetApp.getActiveSpreadsheet());
+  SpreadsheetApp.getActiveSpreadsheet().toast(n ? 'Am adăugat ' + n + ' rânduri noi în Organizatori.' : 'Organizatori e la zi.', 'Ce facem cu copiii?', 6);
 }
