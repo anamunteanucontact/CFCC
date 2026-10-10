@@ -894,7 +894,7 @@ function evCard(e){
   return `<article class="ev${open?" open":""}" id="${e.id}">
     <button class="ev-head" type="button" data-open="${e.id}" aria-expanded="${open}">
       <div class="tm">${esc(timeLabel(e))}</div>
-      <div><h3>${esc(e.n)}</h3>${(()=>{const same=e.o&&e.l&&e.l.trim().toLowerCase()===e.o.trim().toLowerCase();return same?`<div class="meta org loc">${I.pin}${esc(e.o)}</div>`:(e.o?`<div class="meta org">${esc(e.o)}</div>`:"")+(e.l?`<div class="meta loc">${I.pin}${esc(e.l)}</div>`:"")})()}
+      <div><h3>${esc(e.n)}</h3>${(()=>{const same=sameOrgLoc(e);return same?`<div class="meta org loc">${I.pin}${esc(e.l)}</div>`:(e.o?`<div class="meta org">${esc(e.o)}</div>`:"")+(e.l?`<div class="meta loc">${I.pin}${esc(e.l)}</div>`:"")})()}
         <div class="tags"><span class="tag">${esc(e.c)}</span>${al?`<span class="tag age">${esc(al)}</span>`:""}${isSaved?'<span class="tag saved">Salvat</span>':""}</div></div>
       <span class="caret">${I.caret}</span>
     </button>
@@ -905,7 +905,7 @@ function evCard(e){
         ${e.ad?`<dt>Adresa</dt><dd>${esc(e.ad)}</dd>`:""}
         ${al?`<dt>Vârsta</dt><dd>${esc(al)}</dd>`:""}
         <dt>Tip</dt><dd>${esc(e.c)}</dd>
-        ${e.o?`<dt>Organizator</dt><dd>${orgLink(e.o)}</dd>`:""}
+        ${e.o&&!sameOrgLoc(e)?`<dt>Organizator</dt><dd>${orgLink(e.o)}</dd>`:""}
       </dl>
       ${e.desc?`<p class="desc">${esc(e.desc)}</p>`:""}
       <div class="actions">
@@ -1167,6 +1167,8 @@ let ORG_CACHE={};
 function keyMatch(v,k){return v===k||(k.length>=8&&(" "+v+" ").includes(" "+k+" "))}
 function orgByName(v){v=norm(v);if(!v)return null;if(v in ORG_CACHE)return ORG_CACHE[v];return ORG_CACHE[v]=ORGS.find(x=>x.keys.some(k=>keyMatch(v,k)))||null}
 const orgFor=e=>orgByName(e.o)||orgByName(e.l);
+/* organizatorul e chiar locul (ex. Teatrul Merlin la Teatrul Merlin): îl arătăm o singură dată, la „Unde” */
+function sameOrgLoc(e){if(!e.o||!e.l)return false;if(norm(e.o)===norm(e.l))return true;const a=orgByName(e.o);return !!a&&a===orgByName(e.l)}
 const orgLink=(v)=>{const g=orgByName(v);return g?`<a href="#comunitate/${g.slug}">${esc(v)}</a>`:esc(v)};
 const isOrgEv=(e,o)=>o.prev?[e.o,e.l].some(v=>{v=norm(v);return v&&o.keys.some(k=>keyMatch(v,k))}):(orgByName(e.o)===o||orgByName(e.l)===o);
 const orgEvents=o=>EV.filter(e=>e.d>=iso(TODAY)&&isOrgEv(e,o)).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
