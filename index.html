@@ -903,8 +903,6 @@ function evCard(e){
         <dt>Când</dt><dd>${esc(dateLong(e))}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}</dd>
         <dt>Unde</dt><dd>${orgLink(e.l)}</dd>
         ${e.ad?`<dt>Adresa</dt><dd>${esc(e.ad)}</dd>`:""}
-        ${al?`<dt>Vârsta</dt><dd>${esc(al)}</dd>`:""}
-        <dt>Tip</dt><dd>${esc(e.c)}</dd>
         ${e.o&&!sameOrgLoc(e)?`<dt>Organizator</dt><dd>${orgLink(e.o)}</dd>`:""}
       </dl>
       ${e.desc?`<p class="desc">${esc(e.desc)}</p>`:""}
