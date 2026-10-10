@@ -20,8 +20,8 @@
 <meta name="apple-mobile-web-app-title" content="Ce facem?">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <!-- Link ascuns pentru echipă: cefacemcucopiii.ro/#nu-ma-numara oprește statisticile Umami pe acest dispozitiv; /#numara-ma le repornește. -->
-<!-- În aplicația instalată (fără bară de adresă): 7 atingeri rapide pe „cefacemcucopiii.ro” din subsolul paginii. -->
-<script>(function(){function off(){localStorage.setItem("umami.disabled","1");alert("Gata! Vizitele de pe acest dispozitiv nu mai intră în statistici.")}function on(){localStorage.removeItem("umami.disabled");alert("Vizitele de pe acest dispozitiv intră din nou în statistici.")}function chk(){try{var h=location.hash;if(h!=="#nu-ma-numara"&&h!=="#numara-ma")return;history.replaceState(null,"",location.pathname+location.search);h==="#nu-ma-numara"?off():on()}catch(e){}}chk();addEventListener("hashchange",chk,true);var n=0,t=0;document.addEventListener("click",function(e){if(!e.target.closest||!e.target.closest("#team-tap"))return;var now=Date.now();n=now-t<600?n+1:1;t=now;if(n>=7){n=0;try{if(localStorage.getItem("umami.disabled")){if(confirm("Ești deja exclus din statistici. Vrei să fii numărat din nou?"))on()}else off()}catch(_){}}})})();</script>
+<!-- În aplicația instalată (fără bară de adresă): 5 atingeri rapide pe „cefacemcucopiii.ro” din subsolul paginii. -->
+<script>(function(){function off(){localStorage.setItem("umami.disabled","1");alert("Gata! Vizitele de pe acest dispozitiv nu mai intră în statistici.")}function on(){localStorage.removeItem("umami.disabled");alert("Vizitele de pe acest dispozitiv intră din nou în statistici.")}function chk(){try{var h=location.hash;if(h!=="#nu-ma-numara"&&h!=="#numara-ma")return;history.replaceState(null,"",location.pathname+location.search);h==="#nu-ma-numara"?off():on()}catch(e){}}chk();addEventListener("hashchange",chk,true);var n=0,t=0;document.addEventListener("click",function(e){if(!e.target.closest||!e.target.closest("#team-tap"))return;var now=Date.now();e.preventDefault();n=now-t<1000?n+1:1;t=now;if(n>=5){n=0;try{if(localStorage.getItem("umami.disabled")){if(confirm("Ești deja exclus din statistici. Vrei să fii numărat din nou?"))on()}else off()}catch(_){}}})})();</script>
 <script defer src="https://cloud.umami.is/script.js" data-website-id="d0494fa3-dbd4-4c4f-8466-9cbd233f4dd0" data-domains="cefacemcucopiii.ro,www.cefacemcucopiii.ro"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -723,7 +723,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 <footer>
   <div class="wrap">
     <span>Ce facem cu copiii? · Timișoara · <a href="#comunitate">Comunitatea CFCC</a> · <a href="#confidentialitate">Confidențialitate</a> · <a href="#" id="cookie-settings">Cookie-uri</a></span>
-    <span><span id="team-tap">cefacemcucopiii.ro</span> · <a href="https://www.instagram.com/cefacemcucopiii/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.facebook.com/share/1Dk1phx9mW/" target="_blank" rel="noopener">Facebook</a></span>
+    <span><span id="team-tap" style="touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;padding:6px 0">cefacemcucopiii.ro</span> · <a href="https://www.instagram.com/cefacemcucopiii/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.facebook.com/share/1Dk1phx9mW/" target="_blank" rel="noopener">Facebook</a></span>
   </div>
 </footer>
 <div class="toast" id="toast" hidden></div>
