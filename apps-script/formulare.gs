@@ -1128,16 +1128,23 @@ function mail_abonati_ziua3() {
   const v = fila.getRange(2, 1, fila.getLastRow() - 1, fila.getLastColumn()).getValues();
   const zi = function (d) { return Utilities.formatDate(d, 'Europe/Bucharest', 'yyyy-MM-dd'); };
   const azi = zi(new Date());
+  let conturi = null; // adresele cu cont pe site, citite o singură dată, doar dacă e nevoie
   v.forEach(function (r, i) {
     const mail = String(r[k.mail - 1] || '').trim();
     const note = String(r[k.note - 1] || '');
     if (!/^\S+@\S+\.\S+$/.test(mail)) return;
     if (k.status && /dezabonat/i.test(String(r[k.status - 1]))) return;
-    if (/mail „ziua 3” (trimis|NU)/.test(note)) return;
+    if (/mail „ziua 3” (trimis|NU|sărit)/.test(note)) return;
     const primit = ca_data_abonare(r[k.primit - 1]);
     if (!primit) return;
     const zile = Math.round((new Date(azi) - new Date(zi(primit))) / 86400000);
     if (zile < 3) return;
+    const acum0 = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
+    if (conturi === null) conturi = adrese_cu_cont();
+    if (conturi && conturi[mail.toLowerCase()]) {
+      fila.getRange(i + 2, k.note).setValue((note.trim() ? note.replace(/\s+$/, '') + '\n\n' : '') + acum0 + ' - mail „ziua 3” sărit: are deja cont pe site');
+      return;
+    }
     const rez = trimite_confirmare('abonare - ziua 3', { 'E-mail': mail, 'Vrea oferte de la parteneri': String(r[k.oferte - 1]).trim() });
     const acum = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
     const nota = rez === 'Brevo' || rez === 'Gmail' ? acum + ' - mail „ziua 3” trimis la ' + mail : acum + ' - mail „ziua 3” NU a plecat la ' + mail;
@@ -1201,4 +1208,33 @@ function dezabonare(c) {
 function testMailZiua3() {
   const eu = Session.getEffectiveUser().getEmail();
   return trimite_confirmare('abonare - ziua 3', { 'E-mail': eu, 'Vrea oferte de la parteneri': 'Da' });
+}
+
+/** Adresele care au cont pe site (Firestore, colecția users: e-mailul contului și adresa de abonare din agendă).
+    Întoarce un obiect { adresa: true } sau false dacă nu s-a putut citi (atunci mailul pleacă oricum). */
+function adrese_cu_cont() {
+  try {
+    const rez = {};
+    let pagina = '';
+    do {
+      const url = 'https://firestore.googleapis.com/v1/projects/cefacemcucopiii/databases/(default)/documents/users?pageSize=300&mask.fieldPaths=email&mask.fieldPaths=sub' + (pagina ? '&pageToken=' + encodeURIComponent(pagina) : '');
+      const r = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() }, muteHttpExceptions: true });
+      if (r.getResponseCode() >= 300) { console.warn('Firestore ' + r.getResponseCode() + ': ' + r.getContentText().slice(0, 300)); return false; }
+      const d = JSON.parse(r.getContentText());
+      (d.documents || []).forEach(function (doc) {
+        const f = doc.fields || {};
+        const a = f.email && f.email.stringValue;
+        const b = f.sub && f.sub.mapValue && f.sub.mapValue.fields && f.sub.mapValue.fields.email && f.sub.mapValue.fields.email.stringValue;
+        [a, b].forEach(function (x) { if (x) rez[String(x).trim().toLowerCase()] = true; });
+      });
+      pagina = d.nextPageToken || '';
+    } while (pagina);
+    return rez;
+  } catch (err) { console.warn('Firestore: ' + err); return false; }
+}
+
+/** Test: câte conturi vede scriptul pe site (verifică accesul la Firestore). */
+function testConturi() {
+  const c = adrese_cu_cont();
+  console.log(c === false ? 'Nu am putut citi conturile (vezi mesajul de mai sus).' : Object.keys(c).length + ' adrese cu cont.');
 }
