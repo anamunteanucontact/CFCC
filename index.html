@@ -792,7 +792,8 @@ function toEvents(rows){
     let oid="e"+d.replace(/-/g,"")+"-"+slug(n);if(seen[oid])oid+="-"+(++seen[oid]);else seen[oid]=1;
     let id=titleSlug(n);if(RESERVED_IDS.has(id))id="eveniment-"+id;
     if(seen[id]){id+="-"+dateSlug(d);if(seen[id])id+="-"+(++seen[id]);else seen[id]=1}else seen[id]=1;
-    out.push({id,oid,d,t,te,o:g(4),n,c:g(6)||"Altele",a1:g(7),a2:g(8),l:g(9),ad:g(10),acc:accFrom(g(11)),link:cleanUrl(g(12))||cleanUrl(g(13)),desc:g(14)});
+    const os=g(4).split(/\s*\n\s*/).map(x=>x.trim()).filter(Boolean);
+    out.push({id,oid,d,t,te,o:os.join(", "),os,n,c:g(6)||"Altele",a1:g(7),a2:g(8),l:g(9),ad:g(10),acc:accFrom(g(11)),link:cleanUrl(g(12))||cleanUrl(g(13)),desc:g(14)});
   });
   return out;
 }
@@ -906,7 +907,7 @@ function evCard(e){
         <dt>Când</dt><dd>${esc(dateLong(e))}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}</dd>
         <dt>Unde</dt><dd>${orgLink(e.l)}</dd>
         ${e.ad?`<dt>Adresa</dt><dd>${esc(e.ad)}</dd>`:""}
-        ${e.o&&!sameOrgLoc(e)?`<dt>Organizator</dt><dd>${orgLink(e.o)}</dd>`:""}
+        ${e.o&&!sameOrgLoc(e)?`<dt>Organizator</dt><dd>${orgsOf(e).map(orgLink).join(", ")}</dd>`:""}
       </dl>
       ${e.desc?`<p class="desc">${esc(e.desc)}</p>`:""}
       <div class="actions">
@@ -1167,11 +1168,13 @@ async function loadCom(){
 let ORG_CACHE={};
 function keyMatch(v,k){return v===k||(k.length>=8&&(" "+v+" ").includes(" "+k+" "))}
 function orgByName(v){v=norm(v);if(!v)return null;if(v in ORG_CACHE)return ORG_CACHE[v];return ORG_CACHE[v]=ORGS.find(x=>x.keys.some(k=>keyMatch(v,k)))||null}
-const orgFor=e=>orgByName(e.o)||orgByName(e.l);
+/* mai mulți organizatori = pe rânduri diferite în aceeași celulă din sheet */
+const orgsOf=e=>e.os&&e.os.length?e.os:(e.o?[e.o]:[]);
+const orgFor=e=>orgsOf(e).map(orgByName).find(Boolean)||orgByName(e.l);
 /* organizatorul e chiar locul (ex. Teatrul Merlin la Teatrul Merlin): îl arătăm o singură dată, la „Unde” */
-function sameOrgLoc(e){if(!e.o||!e.l)return false;if(norm(e.o)===norm(e.l))return true;const a=orgByName(e.o);return !!a&&a===orgByName(e.l)}
+function sameOrgLoc(e){if(!e.o||!e.l||orgsOf(e).length>1)return false;if(norm(e.o)===norm(e.l))return true;const a=orgByName(e.o);return !!a&&a===orgByName(e.l)}
 const orgLink=(v)=>{const g=orgByName(v);return g?`<a href="#comunitate/${g.slug}">${esc(v)}</a>`:esc(v)};
-const isOrgEv=(e,o)=>o.prev?[e.o,e.l].some(v=>{v=norm(v);return v&&o.keys.some(k=>keyMatch(v,k))}):(orgByName(e.o)===o||orgByName(e.l)===o);
+const isOrgEv=(e,o)=>o.prev?[...orgsOf(e),e.l].some(v=>{v=norm(v);return v&&o.keys.some(k=>keyMatch(v,k))}):(orgsOf(e).some(x=>orgByName(x)===o)||orgByName(e.l)===o);
 const orgEvents=o=>EV.filter(e=>e.d>=iso(TODAY)&&isOrgEv(e,o)).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
 const MONO_C=["#1F4E5F","#EE6C4D","#2f7d5b","#7a5c9e","#c2851b","#3b6ea5"];
 function mono(o,lg){

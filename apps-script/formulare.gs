@@ -1054,7 +1054,10 @@ function actualizeaza_organizatori(ss, randuri) {
     const locN = String(v[EV_COL.locatie - 1] || '').trim();
     const adr = String(v[EV_COL.adresa - 1] || '').trim();
     const nume = String(v[EV_COL.nume - 1] || '').trim();
-    [[orgN, 'Organizator', ''], [locN, 'Locație', adr]].forEach(function (x) {
+    // mai mulți organizatori în aceeași celulă, pe rânduri diferite (Alt+Enter) -> fiecare separat în Organizatori
+    const perechi = orgN.split(/\s*\n\s*/).map(function (o) { return [o.trim(), 'Organizator', '']; });
+    perechi.push([locN, 'Locație', adr]);
+    perechi.forEach(function (x) {
       if (!x[0]) return;
       const g = gaseste_organizator(ss, x[0], d);
       if (!g) {
