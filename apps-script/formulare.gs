@@ -427,10 +427,11 @@ function muta_in_calendar(filaProp, rand, publica) {
   const contact = [p['E-mail'], p['Telefon']].filter(String).join(', ');
   const primit = p['Primit la'] instanceof Date ? Utilities.formatDate(p['Primit la'], tz, 'dd.MM.yyyy HH:mm') : String(p['Primit la'] || '');
 
-  // rândul nou: coloanele B-U din „Evenimente” (coloana A e formula cu linkul de pe site)
-  const notaProp = 'Din propunerea primită pe ' + primit + '.' + (p['Categorie'] ? '' : ' De completat: categoria.');
+  // rândul nou: coloanele B-V din „Evenimente” (coloana A e formula cu linkul de pe site)
+  const notaProp = 'Din propunerea primită pe ' + primit + '.';
+  const lipsa = p['Categorie'] ? '' : 'categoria';
   const nou = [
-    publica ? 'Publicat' : 'De verificat', 'Nu', dataTxt, '', ora ? "'" + ora : '', '',
+    publica ? 'Publicat' : 'De verificat', lipsa, 'Nu', dataTxt, '', ora ? "'" + ora : '', '',
     p['Nume eveniment'], p['Organizator'], p['Locație'], p['Descriere'],
     p['Vârstă minimă'], p['Vârstă maximă'], p['Categorie'] || '', p['Adresă'] || adresa_cunoscuta(ev, p['Locație']),
     bilet, p['Link bilete / înscriere'], contact, notaProp,
@@ -501,11 +502,11 @@ function sincronizeaza_propunerea(ev, rand) {
   }
 }
 
-/* ---------- „Evenimente” (The Sheet): coloanele, după reorganizarea din 9 oct ---------- */
-// A ID (link pe site, formulă) | B Status | C Recomandare | D Data | E Zi | F Ora start | G Ora sfârșit | H Nume eveniment
-// I Organizator | J Locație | K Descriere | L Vârstă de la | M Vârstă până la | N Categorie | O Adresă | P Bilet
-// Q Link bilete | R Contact organizator | S Alte detalii / note interne | T Adăugat de | U Data adăugării | V Ordine (formulă)
-const EV_COL = { status: 2, data: 4, nume: 8, organizator: 9, locatie: 10, adresa: 15, adaugat: 21, ordine: 22 };
+/* ---------- „Evenimente” (The Sheet): coloanele (din 12 oct, cu „De verificat - ce lipsește” pe C) ---------- */
+// A ID (link pe site, formulă) | B Status | C De verificat - ce lipsește | D Recomandare | E Data | F Zi | G Ora start | H Ora sfârșit
+// I Nume eveniment | J Organizator | K Locație | L Descriere | M Vârstă de la | N Vârstă până la | O Categorie | P Adresă | Q Bilet
+// R Link bilete | S Contact organizator | T Alte detalii / note interne | U Adăugat de | V Data adăugării | W Ordine (formulă)
+const EV_COL = { status: 2, verificat: 3, data: 5, nume: 9, organizator: 10, locatie: 11, adresa: 16, adaugat: 22, ordine: 23 };
 
 /** La editare în Evenimente: adresa se completează singură după locație, iar data adăugării se pune singură. */
 function la_editare_evenimente(e) {
@@ -515,7 +516,14 @@ function la_editare_evenimente(e) {
   const tz = e.source.getSpreadsheetTimeZone();
   for (let r = Math.max(r0, 3); r < r0 + nr; r++) {
     // statusul s-a schimbat -> propunerea din care a venit își schimbă culoarea
-    if (c0 <= EV_COL.status && EV_COL.status < c0 + nc) { try { sincronizeaza_propunerea(fila, r); } catch (errS) { console.warn(errS); } }
+    if (c0 <= EV_COL.status && EV_COL.status < c0 + nc) {
+      try { sincronizeaza_propunerea(fila, r); } catch (errS) { console.warn(errS); }
+      // publicat, dar în „De verificat - ce lipsește” a rămas ceva scris -> avertisment
+      const lipsa = String(fila.getRange(r, EV_COL.verificat).getValue() || '').trim();
+      if (lipsa && /^publicat/i.test(String(fila.getRange(r, EV_COL.status).getValue() || ''))) {
+        e.source.toast('Rândul ' + r + ' e Publicat, dar la „De verificat” scrie încă: ' + lipsa + '. Dacă e rezolvat, șterge textul.', 'Atenție', 8);
+      }
+    }
     // locația s-a schimbat și adresa e goală -> o luăm din intrările de dinainte sau din Organizatori
     if (c0 <= EV_COL.locatie && EV_COL.locatie < c0 + nc) {
       const loc = String(fila.getRange(r, EV_COL.locatie).getValue() || '').trim();
@@ -560,7 +568,7 @@ function adresa_cunoscuta(fila, loc, randExclus) {
    și n-au primit încă mailul îl primesc o singură dată, la adresa din Contact organizator.
    Ca linkul să meargă sigur, mailul pleacă abia la a doua verificare după publicare (site-ul se actualizează în câteva minute).
    Mailul trimis se notează în „Alte detalii / note interne”. Pornire: rulează o dată porneste_mail_evenimente din editor. */
-const EV_COL_LINK = 1, EV_COL_CONTACT = 18, EV_COL_NOTE = 19, EV_COL_DE_CINE = 20;
+const EV_COL_LINK = 1, EV_COL_CONTACT = 19, EV_COL_NOTE = 20, EV_COL_DE_CINE = 21;
 const MARCA_EV_LIVE = 'mail „eveniment pe site” trimis';
 
 function porneste_mail_evenimente() {
