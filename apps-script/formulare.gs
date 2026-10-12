@@ -40,7 +40,7 @@ const FILE = {
   },
   pagina: {
     nume: 'Pagini parteneri - de verificat', fisier: 'onboarding', status: 'De verificat', rosu: true, lungime: 5000,
-    coloane: [['Primit la'], ['Status'], ['Nume'], ['Cum se descriu', 'Ce sunt'], ['Descriere'], ['Vârste'], ['Adresă'],
+    coloane: [['Link pagină'], ['Primit la'], ['Status'], ['Nume'], ['Cum se descriu', 'Ce sunt'], ['Descriere'], ['Vârste'], ['Adresă'],
       ['Telefon public'], ['E-mail public'], ['Instagram'], ['Facebook'], ['Website'], ['Activități'], ['Nume în calendar'],
       ['Logo'], ['Poza principală'], ['Alte poze'], ['Folder poze'], ['Persoană de contact'], ['Telefon contact'], ['E-mail'],
       ['Denumire legală'], ['CUI'], ['Nr. înregistrare'], ['Sediu social'], ['Observații'], ['Acord publicare'], ['Note']]
@@ -700,10 +700,11 @@ function porneste_onboarding() {
 function la_editare_onboarding(e) {
   const fila = e.range.getSheet();
   if (fila.getName() !== FILE.pagina.nume) return;
-  if (e.range.getColumn() !== 2 || e.range.getRow() < 2 || e.range.getNumRows() > 1) return; // coloana Status
+  const colsP = FILE.pagina.coloane.map(function (c) { return c[0]; });
+  if (e.range.getColumn() !== colsP.indexOf('Status') + 1 || e.range.getRow() < 2 || e.range.getNumRows() > 1) return; // coloana Status
   const val = String(e.value || '');
   const rand = e.range.getRow();
-  const nume = fila.getRange(rand, 3).getDisplayValue().trim();
+  const nume = fila.getRange(rand, colsP.indexOf('Nume') + 1).getDisplayValue().trim();
   const id = slug_id(nume);
   const titlu = 'Ce facem cu copiii?';
   coloreaza_rand(fila, rand, val);
@@ -717,6 +718,7 @@ function la_editare_onboarding(e) {
       e.source.toast(mail_spre_aprobare(fila, rand, id, link), titlu, 12);
     } else if (/^publicat/i.test(val)) {
       const idPub = publica_pagina(fila, rand);
+      fila.getRange(rand, colsP.indexOf('Link pagină') + 1).setValue(SITE + '/#comunitate/' + idPub);
       e.source.toast('Pagina e în Comunitatea CFCC (cefacemcucopiii.ro/#comunitate/' + idPub + '), cu Pe site = Da. Apare pe site în câteva minute. ' + mail_pagina_live(fila, rand, idPub), titlu, 15);
     }
   } catch (err) {
@@ -739,7 +741,12 @@ function link_previzualizare(fila, rand, creeaza) {
   const colNote = cols.indexOf('Note') + 1;
   const nota = fila.getRange(rand, colNote).getDisplayValue();
   const m = nota.match(/#previzualizare\/([a-f0-9]{16,})/);
-  if (m) return SITE + '/#previzualizare/' + m[1];
+  const colLink = cols.indexOf('Link pagină') + 1;
+  if (m) {
+    const l = SITE + '/#previzualizare/' + m[1];
+    if (colLink && !fila.getRange(rand, colLink).getDisplayValue()) fila.getRange(rand, colLink).setValue(l);
+    return l;
+  }
   if (!creeaza) return '';
   const cod = Utilities.getUuid().replace(/-/g, '').slice(0, 20);
   const link = SITE + '/#previzualizare/' + cod;
@@ -749,6 +756,7 @@ function link_previzualizare(fila, rand, creeaza) {
   });
   const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
   fila.getRange(rand, colNote).setValue((nota ? nota.replace(/\s+$/, '') + '\n\n' : '') + azi + ' - previzualizare (nu e publică): ' + link);
+  if (colLink) fila.getRange(rand, colLink).setValue(link);
   return link;
 }
 
