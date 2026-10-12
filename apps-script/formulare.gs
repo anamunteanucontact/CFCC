@@ -35,8 +35,8 @@ const FILE = {
       ['Facebook'], ['Website'], ['Despre ei'], ['Ce au nevoie'], ['Status'], ['Note']]
   },
   abonare: {
-    nume: 'Abonați', fisier: 'contacte',
-    coloane: [['Primit la'], ['E-mail'], ['Vrea oferte speciale', 'Vrea oferte de la parteneri'], ['Note']]
+    nume: 'Abonați', fisier: 'contacte', status: 'Activ',
+    coloane: [['Primit la'], ['E-mail'], ['Vrea oferte speciale', 'Vrea oferte de la parteneri'], ['Note'], ['Status']]
   },
   pagina: {
     nume: 'Pagini parteneri - de verificat', fisier: 'onboarding', status: 'De verificat', rosu: true, lungime: 5000,
@@ -57,6 +57,7 @@ const FOLDER_CFCC_ID = '1N3rD9icm9kMZJIVBwIw16FJyUPdDyxk9';
 function doPost(e) {
   try {
     const date = JSON.parse(e.postData.contents);
+    if (date.tip === 'dezabonare') return raspuns(dezabonare(date.campuri || {}));
     const tip = FILE[date.tip];
     if (!tip) return raspuns({ ok: false, eroare: 'tip necunoscut' });
     const campuri = date.campuri || {};
@@ -85,6 +86,7 @@ function doPost(e) {
     try { rezultatMail = trimite_confirmare(date.tip, campuri); } catch (errMail) { rezultatMail = 'eroare: ' + errMail; /* rândul e salvat oricum */ }
     try { noteaza_mail_confirmare(fila, nrRand, tip, date.tip, campuri, rezultatMail); } catch (errNota) { console.warn('Notă: ' + errNota); }
     try { notifica_echipa(date.tip, campuri); } catch (errNotif) { console.warn('Notificare: ' + errNotif); }
+    if (date.tip === 'abonare') { try { asigura_verificare_zilnica(); } catch (errTr) { console.warn('Trigger zilnic: ' + errTr); } }
     return raspuns({ ok: true });
   } catch (err) {
     return raspuns({ ok: false, eroare: String(err) });
@@ -150,7 +152,8 @@ function raspuns(obj) {
    Un rând gol între paragrafe = paragraf nou. Dacă fila sau rândul lipsește, se folosește textul de rezervă de mai jos. */
 const FILA_TEXTE = 'Texte e-mailuri';
 const TEXTE_REZERVA = {
-  'abonare': ['Bine ai venit la Ce facem cu copiii?', 'Ceau!\n\nMulțumim că te-ai abonat. De acum, în fiecare săptămână îți trimitem programul: spectacole, ateliere, concerte și ieșiri pentru copii din Timișoara.\n\n{oferte}\n\nPână la primul e-mail, tot calendarul e pe {site}, iar noutățile zilnice pe {instagram}.\n\nCu drag,\nAna, de la Ce facem cu copiii?\n\nTe poți dezabona oricând, răspunzând la acest e-mail cu „dezabonare”.'],
+  'abonare': ['Bine ai venit la Ce facem cu copiii?', 'Ceau!\n\nMulțumim că te-ai abonat. De acum, în fiecare miercuri îți trimitem programul: spectacole, ateliere, concerte și ieșiri pentru copii din Timișoara.\n\n{oferte}\n\nPână la primul e-mail, tot calendarul e pe {site}, iar noutățile zilnice pe {instagram}.\n\nCu drag,\nAna, de la Ce facem cu copiii?\n\nTe poți dezabona oricând, cu un clic: {dezabonare}'],
+  'abonare - ziua 3': ['Ai apucat să-ți faci agenda?', 'Ceau!\n\nÎn primul mail ți-am povestit de „Agenda mea”. Dacă n-ai apucat încă să o încerci, îți ia două minute și merită.\n\nÎți faci cont cu Google sau cu e-mailul și apoi:\n- adaugi vârstele copiilor, iar filtrul „Copiii mei” îți arată doar evenimentele potrivite pentru ei;\n- salvezi ce îți place, ca să nu pierzi evenimentele printre story-uri și grupuri de WhatsApp;\n- pui evenimentul direct în calendarul telefonului, cu un clic;\n- agenda te urmează pe orice telefon sau calculator.\n\nÎncepe de aici: {agenda}\n\nȘi ca să nu ratezi nimic: miercuri vine programul săptămânii.\n\nCu drag,\nAna, de la Ce facem cu copiii?\n\nNu mai vrei mailuri de la noi? Te dezabonezi cu un clic: {dezabonare}'],
   'abonare - oferte': ['', 'Ai ales să primești și reduceri și oferte speciale pentru familii, de la organizatorii și brandurile cu care colaborăm. Le trimitem doar când merită.'],
   'eveniment': ['Am primit evenimentul tău: {eveniment}', 'Bună!\n\nMulțumim că ne-ai trimis {eveniment}. Îl verificăm și îl adăugăm în calendarul de pe {site}.\n\nDacă ai întrebări sau vrei să schimbi ceva, răspunde la acest e-mail.\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
   'colaborare': ['Am primit mesajul tău - Ce facem cu copiii?', 'Bună, {persoana}!\n\nMulțumim pentru interesul de a colabora cu Ce facem cu copiii?. Am primit detaliile despre {brand} și revenim în curând, ca să ne cunoaștem și să-ți propunem variante potrivite.\n\nCu drag,\nAna, de la Ce facem cu copiii?'],
@@ -163,6 +166,7 @@ TEXTE_REZERVA['eveniment publicat'] = ['{eveniment} e acum în calendarul Ce fac
 const CAND_PLEACA = {
   'abonare': 'Cineva se abonează la newsletter pe site',
   'abonare - oferte': 'Paragraf pus în mailul de abonare doar dacă a bifat ofertele (înlocuiește {oferte}); subiectul nu contează',
+  'abonare - ziua 3': 'La 3 zile după abonare (verificare zilnică la 10:00). Pleacă o singură dată, doar abonaților cu Status = Activ. {agenda} = linkul spre Agenda mea',
   'eveniment': 'Cineva trimite un eveniment (Colaborări → Adaugă eveniment)',
   'colaborare': 'Cineva completează „Vreau să colaborăm”',
   'pagina': 'Un partener completează formularul pentru pagina lui (#formular-partener)',
@@ -208,20 +212,26 @@ function trimite_confirmare(tip, c) {
   };
   const link_pagina = c._link || (SITE + '/#comunitate/' + (c._id || ''));
   const link_eveniment = SITE + '/#adauga-eveniment';
+  const e_abonat = /^abonare/.test(tip);
+  const link_dez = e_abonat ? link_dezabonare(catre, c['Vrea oferte de la parteneri'] === 'Da') : '';
   const subiect = ia(tip)[0].replace(/\{(\w+)\}/g, function (m, k) { return k in val ? val[k] : m; });
   let text = ia(tip)[1];
+  // mailurile către abonați au mereu link de dezabonare, chiar dacă textul din sheet nu-l mai conține
+  if (e_abonat && text.indexOf('{dezabonare}') < 0) text += '\n\nNu mai vrei mailuri de la noi? Te dezabonezi cu un clic: {dezabonare}';
   text = text.replace('{oferte}', tip === 'abonare' && c['Vrea oferte de la parteneri'] === 'Da' ? ia('abonare - oferte')[1] : '');
   const continut = text.split(/\n\s*\n/).map(function (p) { return p.trim(); }).filter(String).map(function (p) {
     let h = esc(p).replace(/\n/g, '<br>');
     h = h.replace(/\{linkpagina\}/g, '<a href="' + link_pagina + '">' + esc(link_pagina.replace(/^https:\/\//, '')) + '</a>')
       .replace(/\{linkeveniment\}/g, '<a href="' + link_eveniment + '">' + esc(link_eveniment.replace(/^https:\/\//, '')) + '</a>')
       .replace(/\{link\}/g, c._linkEv ? '<a href="' + c._linkEv + '">' + esc(c._linkEv.replace(/^https:\/\//, '')) + '</a>' : '')
+      .replace(/\{dezabonare\}/g, link_dez ? '<a href="' + link_dez + '">dezabonare</a>' : '')
+      .replace(/\{agenda\}/g, '<a href="' + SITE + '/#profil">cefacemcucopiii.ro/#profil</a>')
       .replace(/\{site\}/g, '<a href="' + SITE + '">cefacemcucopiii.ro</a>')
       .replace(/\{instagram\}/g, '<a href="' + INSTAGRAM + '">Instagram</a>')
       .replace(/\{(persoana|brand|eveniment|pagina)\}/g, function (m, k) { return k === 'persoana' ? esc(val[k]) : '<strong>' + esc(val[k]) + '</strong>'; });
     return '<p>' + h + '</p>';
   }).join('');
-  return trimite_email(catre, subiect, continut);
+  return trimite_email(catre, subiect, continut, link_dez ? { 'List-Unsubscribe': '<' + link_dez + '>' } : null);
 }
 
 /* Ce mail de confirmare pleacă după fiecare formular (numele care apare în coloana Note). */
@@ -301,7 +311,7 @@ function notifica_echipa(tip, c) {
 /* Trimite prin Brevo, de pe hello@cefacemcucopiii.ro.
    Cheia stă în Project Settings → Script Properties → BREVO_API_KEY (nu în cod).
    Dacă lipsește cheia sau Brevo dă eroare, trimite ca înainte, din Gmail. */
-function trimite_email(catre, subiect, html) {
+function trimite_email(catre, subiect, html, antet) {
   const cheie = PropertiesService.getScriptProperties().getProperty('BREVO_API_KEY');
   if (cheie) {
     try {
@@ -311,7 +321,7 @@ function trimite_email(catre, subiect, html) {
         payload: JSON.stringify({
           sender: { name: NUME_EXPEDITOR, email: EMAIL_EXPEDITOR },
           replyTo: { name: NUME_EXPEDITOR, email: EMAIL_EXPEDITOR },
-          to: [{ email: catre }], subject: subiect, htmlContent: html
+          to: [{ email: catre }], subject: subiect, htmlContent: html, headers: antet || undefined
         })
       });
       if (r.getResponseCode() < 300) return 'Brevo';
@@ -898,6 +908,7 @@ function asigura_verificare_zilnica() {
 
 /** Rulează zilnic: partenerilor publicați de cel puțin ~20 de ore le trimite mailul cu recomandări (o singură dată). */
 function mailuri_programate() {
+  try { mail_abonati_ziua3(); } catch (err) { console.warn('Abonați ziua 3: ' + err); }
   const fila = SpreadsheetApp.openById(ONBOARDING_ID).getSheetByName(FILE.pagina.nume);
   if (!fila || fila.getLastRow() < 2) return;
   const cols = FILE.pagina.coloane.map(function (c) { return c[0]; });
@@ -1097,4 +1108,97 @@ function ultim_rand_ev(fila) {
     if (String(v[i][0]).trim() || String(v[i][EV_COL.nume - EV_COL.data]).trim()) return i + 3;
   }
   return 2;
+}
+
+
+/* ---------- abonați: mailul de la 3 zile și dezabonarea ---------- */
+
+/** Coloanele din Abonați (după titlu, ca să nu depindem de ordine). */
+function col_abonati(fila) {
+  const cap = fila.getRange(1, 1, 1, fila.getLastColumn()).getValues()[0].map(function (x) { return String(x).trim(); });
+  const c = function (t) { return cap.indexOf(t) + 1; };
+  return { primit: c('Primit la'), mail: c('E-mail'), oferte: c('Vrea oferte speciale'), note: c('Note'), status: c('Status') };
+}
+
+/** Zilnic la 10:00: abonaților activi de cel puțin 3 zile le trimite o singură dată mailul „abonare - ziua 3”. */
+function mail_abonati_ziua3() {
+  const fila = SpreadsheetApp.openById(CONTACTE_ID).getSheetByName(FILE.abonare.nume);
+  if (!fila || fila.getLastRow() < 2) return;
+  const k = col_abonati(fila);
+  const v = fila.getRange(2, 1, fila.getLastRow() - 1, fila.getLastColumn()).getValues();
+  const zi = function (d) { return Utilities.formatDate(d, 'Europe/Bucharest', 'yyyy-MM-dd'); };
+  const azi = zi(new Date());
+  v.forEach(function (r, i) {
+    const mail = String(r[k.mail - 1] || '').trim();
+    const note = String(r[k.note - 1] || '');
+    if (!/^\S+@\S+\.\S+$/.test(mail)) return;
+    if (k.status && /dezabonat/i.test(String(r[k.status - 1]))) return;
+    if (/mail „ziua 3” (trimis|NU)/.test(note)) return;
+    const primit = ca_data_abonare(r[k.primit - 1]);
+    if (!primit) return;
+    const zile = Math.round((new Date(azi) - new Date(zi(primit))) / 86400000);
+    if (zile < 3) return;
+    const rez = trimite_confirmare('abonare - ziua 3', { 'E-mail': mail, 'Vrea oferte de la parteneri': String(r[k.oferte - 1]).trim() });
+    const acum = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
+    const nota = rez === 'Brevo' || rez === 'Gmail' ? acum + ' - mail „ziua 3” trimis la ' + mail : acum + ' - mail „ziua 3” NU a plecat la ' + mail;
+    fila.getRange(i + 2, k.note).setValue((note.trim() ? note.replace(/\s+$/, '') + '\n\n' : '') + nota);
+  });
+}
+
+/** „Primit la” poate fi dată reală sau text „dd.MM.yyyy HH:mm:ss”. */
+function ca_data_abonare(x) {
+  if (x instanceof Date && !isNaN(x)) return x;
+  const m = String(x || '').match(/(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})/);
+  return m ? new Date(+m[3], +m[2] - 1, +m[1], 12) : null;
+}
+
+/** Semnătura din linkul de dezabonare: nimeni nu poate dezabona pe altcineva doar știindu-i adresa. */
+function semnatura_dezabonare(mail) {
+  const pr = PropertiesService.getScriptProperties();
+  let secret = pr.getProperty('DEZABONARE_SECRET');
+  if (!secret) { secret = Utilities.getUuid() + Utilities.getUuid(); pr.setProperty('DEZABONARE_SECRET', secret); }
+  const b = Utilities.computeHmacSha256Signature(String(mail).trim().toLowerCase(), secret);
+  return Utilities.base64EncodeWebSafe(b).replace(/=+$/, '').slice(0, 22);
+}
+
+function link_dezabonare(mail, oferte) {
+  return SITE + '/?dezabonare=' + encodeURIComponent(String(mail).trim()) + (oferte ? '&o=1' : '') + '&t=' + semnatura_dezabonare(mail);
+}
+
+/** Vine de pe pagina cefacemcucopiii.ro/#dezabonare. ce = „tot” (Status = Dezabonat) sau „oferte” (Vrea oferte = Nu). */
+function dezabonare(c) {
+  const mail = String(c.email || '').trim().toLowerCase();
+  if (!mail || String(c.t || '') !== semnatura_dezabonare(mail)) return { ok: false, eroare: 'link invalid' };
+  const ce = c.ce === 'oferte' ? 'oferte' : 'tot';
+  const fila = SpreadsheetApp.openById(CONTACTE_ID).getSheetByName(FILE.abonare.nume);
+  if (!fila || fila.getLastRow() < 2) return { ok: false, eroare: 'nu există abonați' };
+  const k = col_abonati(fila);
+  const v = fila.getRange(2, 1, fila.getLastRow() - 1, fila.getLastColumn()).getValues();
+  const acum = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
+  let gasit = 0;
+  v.forEach(function (r, i) {
+    if (String(r[k.mail - 1] || '').trim().toLowerCase() !== mail) return;
+    gasit++;
+    const rand = i + 2;
+    if (ce === 'oferte') fila.getRange(rand, k.oferte).setValue('Nu');
+    else if (k.status) fila.getRange(rand, k.status).setValue('Dezabonat');
+    const note = String(r[k.note - 1] || '');
+    fila.getRange(rand, k.note).setValue((note.trim() ? note.replace(/\s+$/, '') + '\n\n' : '') + acum + (ce === 'oferte' ? ' - a renunțat la oferte (link din mail)' : ' - s-a dezabonat (link din mail)'));
+  });
+  if (gasit) {
+    try {
+      const s = setari_notificari()['abonare'];
+      if (s && s.da && s.catre) s.catre.split(/[,;\s]+/).filter(function (a) { return /^\S+@\S+\.\S+$/.test(a); }).forEach(function (a) {
+        trimite_email(a, '[CFCC] ' + (ce === 'oferte' ? 'Renunțare la oferte: ' : 'Dezabonare: ') + mail,
+          '<p>' + esc(mail) + (ce === 'oferte' ? ' nu mai vrea ofertele de la parteneri (rămâne la newsletter).' : ' s-a dezabonat de la newsletter.') + '</p><p>Am notat în <a href="https://docs.google.com/spreadsheets/d/' + CONTACTE_ID + '/edit">Contacte → Abonați</a>.</p>');
+      });
+    } catch (err) { console.warn('Notificare dezabonare: ' + err); }
+  }
+  return { ok: !!gasit };
+}
+
+/** Test: trimite mailul de la 3 zile la adresa ta, cu link de dezabonare funcțional pentru adresa ta. */
+function testMailZiua3() {
+  const eu = Session.getEffectiveUser().getEmail();
+  return trimite_confirmare('abonare - ziua 3', { 'E-mail': eu, 'Vrea oferte de la parteneri': 'Da' });
 }

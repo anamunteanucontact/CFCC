@@ -682,6 +682,26 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     </div>
   </div>
 </section>
+<!-- DEZABONARE: se deschide din linkul din mailuri (?dezabonare=<email>&o=1&t=<semnătură>) -->
+<section id="v-dezabonare" class="view vwrap about" hidden>
+  <div class="wrap">
+    <div class="sec-h">
+      <span class="eyebrow">Newsletter</span>
+      <h2 id="dz-h">Te dezabonezi?</h2>
+    </div>
+    <div id="dz-ask">
+      <p>Adresa <strong id="dz-mail"></strong> nu va mai primi mailurile noastre săptămânale.</p>
+      <p id="dz-off-p" hidden>Dacă vrei doar să nu mai primești ofertele de la parteneri, dar să rămâi la programul săptămânal, alege a doua variantă.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px">
+        <button class="btn btn-main" type="button" id="dz-all">Da, mă dezabonez</button>
+        <button class="btn btn-soft" type="button" id="dz-off" hidden>Nu mai vreau doar ofertele</button>
+        <a class="btn btn-soft" href="#calendar" id="dz-stay">Rămân abonat</a>
+      </div>
+    </div>
+    <div id="dz-done" hidden><p id="dz-done-t"></p><p><a class="btn btn-soft" href="#calendar">Înapoi la calendar</a></p></div>
+    <div id="dz-none" hidden><p>Ca să te dezabonezi, folosește linkul de la finalul oricărui mail de la noi sau scrie-ne la <strong>hello@cefacemcucopiii.ro</strong> și te scoatem noi de pe listă.</p></div>
+  </div>
+</section>
 <section id="v-confidentialitate" class="view vwrap about" hidden>
   <div class="wrap">
     <div class="sec-h">
@@ -774,7 +794,7 @@ function parseCSV(t){
 const slug=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40);
 // linkuri curate: doar titlul (max ~60 caractere, tăiat la cuvânt întreg); la titluri repetate se adaugă data, ex. detectivii-beta-18-octombrie
 const LUNI_SLUG=["ianuarie","februarie","martie","aprilie","mai","iunie","iulie","august","septembrie","octombrie","noiembrie","decembrie"];
-const RESERVED_IDS=new Set(["calendar","despre","recomandari","colaborari","profil","confidentialitate","formular","formular-partener","adauga-eveniment","colaborare-promovare"]);
+const RESERVED_IDS=new Set(["dezabonare","calendar","despre","recomandari","colaborari","profil","confidentialitate","formular","formular-partener","adauga-eveniment","colaborare-promovare"]);
 function titleSlug(n){let x=n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");if(x.length>60){x=x.slice(0,61);x=x.includes("-")?x.slice(0,x.lastIndexOf("-")):x.slice(0,60)}return x||"eveniment"}
 const dateSlug=d=>{const p=d.split("-");return (+p[2])+"-"+LUNI_SLUG[+p[1]-1]};
 function cleanUrl(u){u=(u||"").trim();if(!/^https?:\/\//i.test(u))return"";try{const x=new URL(u);["stkn","fbclid","igsh","mibextid","utm_source","utm_medium","utm_campaign"].forEach(k=>x.searchParams.delete(k));return x.toString()}catch(_){return""}}
@@ -1073,7 +1093,7 @@ async function subscribe(form,mailId,offId,onOk){const m=val(mailId);if(!/^\S+@\
   catch(_){toast("Nu s-a putut trimite. Încearcă din nou.")}finally{btn.disabled=false}}
 document.getElementById("nl-form").addEventListener("submit",ev=>{ev.preventDefault();subscribe(ev.target,"nl-mail","nl-offers",()=>{const ok=document.getElementById("nl-ok");ok.textContent="Gata, te-am notat!";ok.hidden=false})});
 document.getElementById("nl2-form").addEventListener("submit",ev=>{ev.preventDefault();subscribe(ev.target,"nl2-mail",null,()=>{toast("Gata, te-am notat! Primești programul pe e-mail.");nlCta()})});
-function nlCta(){const c=document.getElementById("nl-cta");if(c)c.hidden=!!(sub&&sub.email)||["profil","formular","colaborari","confidentialitate"].includes(curView)}
+function nlCta(){const c=document.getElementById("nl-cta");if(c)c.hidden=!!(sub&&sub.email)||["profil","formular","colaborari","confidentialitate","dezabonare"].includes(curView)}
 
 /* formular partener: pagina ascunsă #formular-partener. Trimite totul în fila „Pagini parteneri - de verificat” din centralizator. */
 (()=>{
@@ -1268,7 +1288,7 @@ function renderRec(){
 }
 
 /* navigare */
-const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate","comunitate","org","articol","formular"];
+const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate","comunitate","org","articol","formular","dezabonare"];
 function go(v,scroll){
   VIEWS.forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
   const nv=v==="articol"?"recomandari":v==="org"?"comunitate":v;
@@ -1291,6 +1311,7 @@ function route(){
   if(BYID[h]){state.per="all";document.querySelectorAll("#f-per .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v==="all"?"true":"false"));state.open=h;state.day=BYID[h].d;go("calendar");render();setTimeout(()=>document.getElementById(h)?.scrollIntoView({block:"center"}),50);return}
   if(h==="adauga-eveniment"||h==="colaborare-promovare"){go("colaborari",true);openForm(h==="adauga-eveniment"?"ev":"pr",true);return}
   if(h==="colaborari")openForm(null);
+  if(h==="dezabonare"){showUnsub();go("dezabonare",true);return}
   go(VIEWS.includes(h)?h:"calendar",true);
 }
 window.addEventListener("hashchange",route);
@@ -1383,6 +1404,29 @@ function pixel(ev,params){try{if(pixelOn&&window.fbq)fbq("track",ev,params||{})}
   document.getElementById("cookie-settings").addEventListener("click",e=>{e.preventDefault();if(META_PIXEL_ID)box.hidden=false;else toast("Site-ul nu folosește cookie-uri de reclamă.")});
 })();
 
+
+/* dezabonare: linkul din mailuri duce aici; abia la clic se trimite cererea (ca să nu dezaboneze singure programele care verifică linkurile din mailuri) */
+const UNSUB=(()=>{const q=new URLSearchParams(location.search);const m=q.get("dezabonare"),t=q.get("t");return m&&t?{m,t,o:q.get("o")==="1"}:null})();
+function showUnsub(){
+  const $=id=>document.getElementById(id);
+  $("dz-done").hidden=true;
+  if(!UNSUB){$("dz-ask").hidden=true;$("dz-none").hidden=false;$("dz-h").textContent="Dezabonare";return}
+  $("dz-none").hidden=true;$("dz-ask").hidden=false;$("dz-mail").textContent=UNSUB.m;
+  $("dz-off").hidden=$("dz-off-p").hidden=!UNSUB.o;
+}
+async function doUnsub(ce){
+  const $=id=>document.getElementById(id);
+  $("dz-all").disabled=$("dz-off").disabled=true;
+  try{await sendForm("dezabonare",{email:UNSUB.m,t:UNSUB.t,ce})}catch(_){}
+  if(sub&&sub.email&&sub.email.toLowerCase()===UNSUB.m.toLowerCase()){if(ce==="oferte"){sub={...sub,offers:false}}else{sub=null}store.set("sub",sub)}
+  track(ce==="oferte"?"Renunțare oferte":"Dezabonare newsletter");
+  $("dz-ask").hidden=true;$("dz-done").hidden=false;
+  $("dz-h").textContent=ce==="oferte"?"Gata, fără oferte":"Gata, te-am dezabonat";
+  $("dz-done-t").textContent=ce==="oferte"?"Nu îți mai trimitem ofertele de la parteneri. Programul săptămânal vine în continuare, în fiecare miercuri.":"Nu mai primești mailurile noastre. Calendarul rămâne aici oricând ai nevoie de idei pentru copii. Dacă te răzgândești, te poți abona din nou din josul oricărei pagini.";
+}
+document.getElementById("dz-all").addEventListener("click",()=>doUnsub("tot"));
+document.getElementById("dz-off").addEventListener("click",()=>doUnsub("oferte"));
+if(UNSUB)history.replaceState(null,"",location.pathname+"#dezabonare"); /* scoatem adresa din bara de adrese */
 /* linkuri directe pentru reclame: ?cand=weekend|saptamana|luna &varsta=0-3|3-6|6-12|12 &ce=Teatru... */
 (function(){
   const q=new URLSearchParams(location.search);
