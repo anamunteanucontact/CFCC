@@ -108,6 +108,15 @@ button{font-family:inherit}
 
 /* zile si evenimente */
 .days{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;margin-bottom:8px;scrollbar-width:none;scroll-behavior:smooth}
+/* rânduri care se derulează pe orizontală: margine estompată + săgeți pe desktop, ca să se vadă că mai e ceva */
+.hs{position:relative}
+.hs.more-r>.row,.hs.more-r>.days{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 56px),transparent)}
+.hs.more-l>.row,.hs.more-l>.days{-webkit-mask-image:linear-gradient(to left,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(to left,#000 calc(100% - 56px),transparent)}
+.hs.more-l.more-r>.row,.hs.more-l.more-r>.days{-webkit-mask-image:linear-gradient(to right,transparent,#000 56px,#000 calc(100% - 56px),transparent);mask-image:linear-gradient(to right,transparent,#000 56px,#000 calc(100% - 56px),transparent)}
+.hs-btn{display:none;position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--fg);box-shadow:0 2px 8px rgba(31,78,95,.18);cursor:pointer;z-index:3;font:700 1.25rem/1 var(--body);padding:0}
+.hs>.days~.hs-btn{top:calc(50% - 6px)}
+.hs-l{left:-4px}.hs-r{right:-4px}
+@media (hover:hover) and (pointer:fine){.hs.more-l>.hs-l,.hs.more-r>.hs-r{display:grid;place-items:center}}
 .dpill{flex:none;width:62px;border:2px solid var(--line);background:var(--surface);color:var(--fg);border-radius:16px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-family:var(--body)}
 .dpill .dz{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .dpill .dd{font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1}
@@ -1398,6 +1407,19 @@ render();renderProfile();route();
 renderRec();
 const comRoute=h=>/^(comunitate|organizatori|org\/|articol\/)/.test(h);
 loadCom().then(()=>{renderRec();if(comRoute(location.hash.slice(1)))route();if(loadState==="ok")render()});
+/* derulare orizontală: estompare la margini, săgeți pe desktop, rotița mouse-ului derulează lateral */
+function hscroll(el){if(!el||el.parentNode.classList.contains("hs"))return;
+  const w=document.createElement("div");w.className="hs";el.parentNode.insertBefore(w,el);w.appendChild(el);
+  const btn=d=>{const b=document.createElement("button");b.type="button";b.className="hs-btn hs-"+d;b.setAttribute("aria-label",d==="l"?"Înapoi":"Mai departe");b.textContent=d==="l"?"‹":"›";
+    b.addEventListener("click",()=>el.scrollBy({left:(d==="l"?-1:1)*Math.max(160,el.clientWidth*.7),behavior:"smooth"}));w.appendChild(b)};
+  btn("l");btn("r");
+  const upd=()=>{w.classList.toggle("more-l",el.scrollLeft>4);w.classList.toggle("more-r",el.scrollLeft+el.clientWidth<el.scrollWidth-4)};
+  el.addEventListener("scroll",upd,{passive:true});
+  el.addEventListener("wheel",e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)&&el.scrollWidth>el.clientWidth+4){const max=el.scrollWidth-el.clientWidth;if((e.deltaY<0&&el.scrollLeft>0)||(e.deltaY>0&&el.scrollLeft<max)){el.scrollLeft+=e.deltaY;e.preventDefault()}}},{passive:false});
+  if(window.ResizeObserver)new ResizeObserver(upd).observe(el);
+  new MutationObserver(()=>requestAnimationFrame(upd)).observe(el,{childList:true,subtree:true});
+  upd();setTimeout(upd,400)}
+["f-per","f-age","f-cat","days"].forEach(id=>hscroll(document.getElementById(id)));
 loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();const h=location.hash.slice(1);if(BYID[h]||comRoute(h))route();else if(h.startsWith("previzualizare/")&&ORG_BY.__prev)renderOrg("__prev")});
 </script>
 </body>
