@@ -40,7 +40,7 @@ const FILE = {
   },
   pagina: {
     nume: 'Pagini parteneri - de verificat', fisier: 'onboarding', status: 'De verificat', rosu: true, lungime: 5000,
-    coloane: [['Link pagină'], ['Primit la'], ['Status'], ['Nume'], ['Cum se descriu', 'Ce sunt'], ['Descriere'], ['Vârste'], ['Adresă'],
+    coloane: [['Link pagină'], ['Primit la'], ['Status'], ['Pachet'], ['Nume'], ['Cum se descriu', 'Ce sunt'], ['Descriere'], ['Vârste'], ['Adresă'],
       ['Telefon public'], ['E-mail public'], ['Instagram'], ['Facebook'], ['Website'], ['Activități'], ['Nume în calendar'],
       ['Logo'], ['Poza principală'], ['Alte poze'], ['Folder poze'], ['Persoană de contact'], ['Telefon contact'], ['E-mail'],
       ['Denumire legală'], ['CUI'], ['Nr. înregistrare'], ['Sediu social'], ['Observații'], ['Acord publicare'], ['Note']]
@@ -712,7 +712,8 @@ function la_editare_onboarding(e) {
     if (val === STATUS_CREEAZA || val === STATUS_CREATA) {
       if (!nume) throw new Error('lipsește numele');
       const link = link_previzualizare(fila, rand, true);
-      e.source.toast('Pagina „' + nume + '” e gata de verificat. Linkul de previzualizare e în coloana Note: ' + link, titlu, 15);
+      const fara = !fila.getRange(rand, colsP.indexOf('Pachet') + 1).getDisplayValue().trim();
+      e.source.toast((fara ? 'Atenție: nu ai ales Pachetul, folosesc pachetul vechi (sau Partener). ' : '') + 'Pagina „' + nume + '” e gata de verificat. Linkul de previzualizare e în coloana A: ' + link, titlu, 15);
     } else if (/aprobare/i.test(val)) {
       const link = link_previzualizare(fila, rand, true);
       e.source.toast(mail_spre_aprobare(fila, rand, id, link), titlu, 12);
@@ -843,7 +844,7 @@ function rand_comunitate(p, existent, doar_citire) {
   [p['Nume']].concat(String(p['Nume în calendar'] || '').split(/\n+/), String(vechi[15] || '').split(/\n+/)).forEach(function (x) {
     x = String(x).trim(); if (x && chei.map(norm_nume).indexOf(norm_nume(x)) < 0) chei.push(x);
   });
-  return [existent ? vechi[0] : slug_id(p['Nume']), p['Nume'], ia(p['Cum se descriu'], 2), existent ? (vechi[3] || 'Partener') : 'Partener', 'Da',
+  return [existent ? vechi[0] : slug_id(p['Nume']), p['Nume'], ia(p['Cum se descriu'], 2), String(p['Pachet'] || '').trim() || (existent ? (vechi[3] || 'Partener') : 'Partener'), 'Da',
     ia(p['Descriere'], 5), ia(p['Vârste'], 6), ia(p['Adresă'], 7), p['Telefon public'] ? text(p['Telefon public']) : (vechi[8] ? text(vechi[8]) : ''),
     ia(p['E-mail public'], 9), ia(link_social(p['Instagram'], 'instagram'), 10), ia(link_social(p['Facebook'], 'facebook'), 11),
     ia(p['Website'], 12), ia(logo, 13), ia(cover, 14), chei.join('\n'),
