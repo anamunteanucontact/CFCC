@@ -12,6 +12,8 @@
  *    cu status „De verificat”; „Publicat” (verde) o mută direct publicată. Statusul se sincronizează în ambele sensuri.
  * 3. În „CFCC - Onboarding parteneri”, când un rând primește statusul „Verificat - creează pagina”,
  *    face link de previzualizare, trimite mailul spre aprobare și, la „Publicat”, copiază pagina în „Comunitatea CFCC”. Pornește o dată cu porneste_onboarding().
+ * 4. Abonații de pe site intră și în Brevo (lista „Newsletter CFCC”); o dată pe zi, dimineața, dezabonările din Brevo
+ *    ajung în Contacte → Abonați (Status = Dezabonat, rând gri). Meniu în Contacte. Pornește o dată cu porneste_brevo().
  */
 
 const NUME_EXPEDITOR = 'Ce facem cu copiii?';
@@ -37,7 +39,8 @@ const FILE = {
   },
   abonare: {
     nume: 'Abonați', fisier: 'contacte',
-    coloane: [['Primit la'], ['E-mail'], ['Vrea oferte speciale', 'Vrea oferte de la parteneri'], ['Note']]
+    status: 'Abonat', // Status: Abonat / Dezabonat (dezabonările vin din Brevo, o dată pe zi)
+    coloane: [['Primit la'], ['E-mail'], ['Status'], ['Vrea oferte speciale', 'Vrea oferte de la parteneri'], ['Note']]
   },
   pagina: {
     nume: 'Pagini parteneri - de verificat', fisier: 'onboarding', status: 'De verificat', rosu: true, lungime: 5000,
@@ -62,6 +65,7 @@ function doPost(e) {
     if (!tip) return raspuns({ ok: false, eroare: 'tip necunoscut' });
     const campuri = date.campuri || {};
     if (date.tip === 'pagina') salveaza_poze(campuri);
+    if (date.tip === 'abonare') return raspuns(abonare_site(campuri));
 
     const fila = ia_fila(tip);
     const rand = tip.coloane.map(function (c) {
@@ -574,6 +578,233 @@ function adresa_cunoscuta(fila, loc, randExclus) {
   }
   const g = gaseste_organizator(fila.getParent(), loc);
   return g && g.adresa ? g.adresa : '';
+}
+
+/* ---------- abonare de pe site + Brevo ---------- */
+/* Abonările de pe site (Agenda mea și bara de newsletter):
+   1. rândul în Contacte → Abonați, cu Status = Abonat. Dacă adresa era deja acolo (de ex. Dezabonat), rândul vechi
+      redevine Abonat și nu se mai face unul nou;
+   2. mailul „bine ai venit” (notat în Note);
+   3. contactul intră în Brevo, în lista „Newsletter CFCC” (notat în Note). Dacă Brevo nu răspunde, abonarea merge oricum,
+      iar verificarea zilnică (sau meniul din Contacte) îl adaugă mai târziu. */
+function abonare_site(c) {
+  const tip = FILE.abonare;
+  c['E-mail'] = String(c['E-mail'] || '').trim();
+  const email = String(c['E-mail'] || '').trim();
+  if (!/^\S+@\S+\.\S+$/.test(email)) return { ok: false, eroare: 'e-mail invalid' };
+  const oferte = c['Vrea oferte de la parteneri'] === 'Da' ? 'Da' : 'Nu';
+  const fila = ia_fila(tip);
+  const k = ab_coloane(fila);
+  const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
+  const lacat = LockService.getScriptLock();
+  lacat.waitLock(20000);
+  let nrRand, eraDezabonat = false;
+  try {
+    nrRand = ab_rand_dupa_email(fila, k, email);
+    if (nrRand) {
+      eraDezabonat = /dezabonat/i.test(fila.getRange(nrRand, k.status).getDisplayValue());
+      ab_seteaza_status(fila, nrRand, k, AB_ABONAT);
+      if (k.oferte) fila.getRange(nrRand, k.oferte).setValue(oferte);
+      ab_noteaza(fila, nrRand, k, azi + ' - ' + (eraDezabonat ? 's-a abonat din nou de pe site (era Dezabonat)' : 's-a abonat din nou de pe site'));
+    } else {
+      // după titlurile din sheet, nu după poziție (coloanele se pot muta)
+      const rand = new Array(k.nc).fill('');
+      if (k.primit) rand[k.primit - 1] = new Date();
+      if (k.email) rand[k.email - 1] = "'" + email;
+      if (k.status) rand[k.status - 1] = AB_ABONAT;
+      if (k.oferte) rand[k.oferte - 1] = oferte;
+      fila.appendRow(rand);
+      nrRand = fila.getLastRow();
+    }
+  } finally { lacat.releaseLock(); }
+
+  let rezultatMail;
+  try { rezultatMail = trimite_confirmare('abonare', c); } catch (errMail) { rezultatMail = 'eroare: ' + errMail; }
+  try {
+    ab_noteaza(fila, nrRand, k, Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm') + ' - mail „bine ai venit” ' +
+      (rezultatMail === 'Brevo' || rezultatMail === 'Gmail' ? 'trimis la ' + email : 'NU a plecat la ' + email + (rezultatMail ? ' (' + String(rezultatMail).slice(0, 200) + ')' : '')));
+  } catch (errNota) { console.warn('Notă: ' + errNota); }
+  try {
+    const r = brevo_adauga(email, true);
+    ab_noteaza(fila, nrRand, k, Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm') + ' - ' +
+      (r.ok ? MARCA_BREVO_ADAUGAT : 'NU a intrat în Brevo (' + r.eroare + '). Încercăm din nou la verificarea zilnică.'));
+  } catch (errBrevo) { console.warn('Brevo: ' + errBrevo); }
+  try { notifica_echipa('abonare', c); } catch (errNotif) { console.warn('Notificare: ' + errNotif); }
+  return { ok: true };
+}
+
+const AB_ABONAT = 'Abonat', AB_DEZABONAT = 'Dezabonat';
+const BREVO_LISTA_NEWSLETTER = 3; // lista „Newsletter CFCC” din Brevo
+const MARCA_BREVO_ADAUGAT = 'adăugat în Brevo, lista Newsletter CFCC';
+const MARCA_BREVO_GASIT = 'e deja în Brevo, lista Newsletter CFCC';
+const AB_GRI_FUNDAL = '#e6e6e6', AB_GRI_TEXT = '#808080';
+
+/** Coloanele din Abonați, după titlu (1, 2, ...; 0 dacă lipsește). */
+function ab_coloane(fila) {
+  const nc = fila.getLastColumn();
+  const cap = fila.getRange(1, 1, 1, nc).getDisplayValues()[0].map(function (x) { return String(x).trim(); });
+  const c = function (t) { return cap.indexOf(t) + 1; };
+  return { nc: nc, primit: c('Primit la'), email: c('E-mail'), status: c('Status'), oferte: c('Vrea oferte speciale'), note: c('Note') };
+}
+
+function ab_rand_dupa_email(fila, k, email) {
+  if (fila.getLastRow() < 2 || !k.email) return 0;
+  const v = fila.getRange(2, k.email, fila.getLastRow() - 1, 1).getDisplayValues();
+  const e = email.toLowerCase();
+  for (let i = v.length - 1; i >= 0; i--) if (String(v[i][0]).trim().toLowerCase() === e) return i + 2;
+  return 0;
+}
+
+function ab_noteaza(fila, rand, k, text) {
+  if (!k.note) return;
+  const c = fila.getRange(rand, k.note);
+  const vechi = c.getDisplayValue();
+  c.setValue((vechi ? vechi.replace(/\s+$/, '') + '\n\n' : '') + text);
+}
+
+/** Pune statusul și culoarea rândului: Dezabonat = gri, Abonat = fără culoare. Rândul nu se șterge niciodată. */
+function ab_seteaza_status(fila, rand, k, status) {
+  if (!k.status) return;
+  fila.getRange(rand, k.status).setValue(status);
+  const r = fila.getRange(rand, 1, 1, k.nc);
+  if (status === AB_DEZABONAT) r.setBackground(AB_GRI_FUNDAL).setFontColor(AB_GRI_TEXT);
+  else r.setBackground(null).setFontColor(null);
+}
+
+/** Apel la Brevo. Întoarce { cod, date, text }. Cheia: Script Properties → BREVO_API_KEY. */
+function brevo_api(metoda, cale, corp) {
+  const cheie = PropertiesService.getScriptProperties().getProperty('BREVO_API_KEY');
+  if (!cheie) return { cod: 0, date: null, text: 'lipsește BREVO_API_KEY' };
+  const opt = { method: metoda, muteHttpExceptions: true, headers: { 'api-key': cheie, accept: 'application/json' } };
+  if (corp) { opt.contentType = 'application/json'; opt.payload = JSON.stringify(corp); }
+  const r = UrlFetchApp.fetch('https://api.brevo.com/v3' + cale, opt);
+  const t = r.getContentText();
+  let d = null; try { d = t ? JSON.parse(t) : null; } catch (e) {}
+  return { cod: r.getResponseCode(), date: d, text: t };
+}
+
+/** Adaugă (sau actualizează) contactul în lista „Newsletter CFCC”. deblocheaza = true doar când omul s-a abonat chiar acum de pe site. */
+function brevo_adauga(email, deblocheaza) {
+  const corp = { email: email, listIds: [BREVO_LISTA_NEWSLETTER], updateEnabled: true };
+  if (deblocheaza) corp.emailBlacklisted = false;
+  let r;
+  try { r = brevo_api('post', '/contacts', corp); } catch (err) { return { ok: false, eroare: String(err).slice(0, 150) }; }
+  if (r.cod >= 200 && r.cod < 300) return { ok: true };
+  return { ok: false, eroare: r.cod ? 'Brevo ' + r.cod + ': ' + String(r.date && r.date.message || r.text).slice(0, 150) : r.text };
+}
+
+/** Citește din Brevo mai multe contacte deodată. Întoarce { email: {cod, date} }. */
+function brevo_citeste_contacte(emails) {
+  const cheie = PropertiesService.getScriptProperties().getProperty('BREVO_API_KEY');
+  if (!cheie) throw new Error('lipsește BREVO_API_KEY');
+  const rez = {};
+  for (let i = 0; i < emails.length; i += 20) {
+    const bucata = emails.slice(i, i + 20);
+    const raspunsuri = UrlFetchApp.fetchAll(bucata.map(function (e) {
+      return { url: 'https://api.brevo.com/v3/contacts/' + encodeURIComponent(e), method: 'get', muteHttpExceptions: true,
+        headers: { 'api-key': cheie, accept: 'application/json' } };
+    }));
+    raspunsuri.forEach(function (r, j) {
+      let d = null; try { d = JSON.parse(r.getContentText()); } catch (e) {}
+      rez[bucata[j].toLowerCase()] = { cod: r.getResponseCode(), date: d };
+    });
+    if (i + 20 < emails.length) Utilities.sleep(1100); // Brevo limitează numărul de cereri pe secundă
+  }
+  return rez;
+}
+
+/** Trece prin toți abonații cu Status = Abonat și îi compară cu Brevo.
+ *  - dezabonat din newsletter (emailBlacklisted) sau scos din lista „Newsletter CFCC” după ce fusese adăugat → Status = Dezabonat, rând gri, notă;
+ *  - nu e încă în Brevo (sau nu e în listă și n-a fost niciodată adăugat) → îl adaugă, dacă adauga = true;
+ *  - e deja în listă, dar nu scrie în Note → notează „e deja în Brevo” (ca să știm că, dacă dispare, s-a dezabonat).
+ *  Întoarce un rezumat în cuvinte. */
+function sincronizeaza_abonati_brevo(adauga, dezabonari) {
+  const fila = SpreadsheetApp.openById(CONTACTE_ID).getSheetByName(FILE.abonare.nume);
+  if (!fila || fila.getLastRow() < 2) return 'Nu sunt abonați în sheet.';
+  const k = ab_coloane(fila);
+  if (!k.email || !k.status) return 'Lipsește coloana E-mail sau Status din Abonați.';
+  const v = fila.getRange(2, 1, fila.getLastRow() - 1, k.nc).getDisplayValues();
+  const randuri = [];
+  v.forEach(function (r, i) {
+    const email = String(r[k.email - 1] || '').trim();
+    if (!/^\S+@\S+\.\S+$/.test(email)) return;
+    if (/dezabonat/i.test(r[k.status - 1])) return;
+    randuri.push({ rand: i + 2, email: email, note: k.note ? String(r[k.note - 1] || '') : '', status: String(r[k.status - 1] || '').trim() });
+  });
+  if (!randuri.length) return 'Niciun abonat activ de verificat.';
+  const brevo = brevo_citeste_contacte(randuri.map(function (x) { return x.email; }));
+  const azi = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy');
+  const acum = Utilities.formatDate(new Date(), 'Europe/Bucharest', 'dd.MM.yyyy HH:mm');
+  const n = { adaugati: 0, dezabonati: 0, ok: 0, erori: [] };
+  randuri.forEach(function (x) {
+    const b = brevo[x.email.toLowerCase()] || {};
+    const fusese = x.note.indexOf(MARCA_BREVO_ADAUGAT) >= 0 || x.note.indexOf(MARCA_BREVO_GASIT) >= 0;
+    if (x.status !== AB_ABONAT) ab_seteaza_status(fila, x.rand, k, AB_ABONAT); // „Activ” sau gol → Abonat
+    if (b.cod === 200 && b.date) {
+      const scosDinLista = (b.date.listUnsubscribed || []).indexOf(BREVO_LISTA_NEWSLETTER) >= 0;
+      const inLista = (b.date.listIds || []).indexOf(BREVO_LISTA_NEWSLETTER) >= 0 && !scosDinLista;
+      if (dezabonari && (b.date.emailBlacklisted || scosDinLista || (!inLista && fusese))) {
+        ab_seteaza_status(fila, x.rand, k, AB_DEZABONAT);
+        ab_noteaza(fila, x.rand, k, acum + ' - dezabonat din Brevo pe ' + azi +
+          (b.date.emailBlacklisted ? ' (s-a dezabonat de la mailuri)' : ' (scos din lista Newsletter CFCC)'));
+        n.dezabonati++;
+      } else if (inLista) {
+        if (!fusese) ab_noteaza(fila, x.rand, k, acum + ' - ' + MARCA_BREVO_GASIT);
+        n.ok++;
+      } else if (adauga && !b.date.emailBlacklisted) {
+        const r = brevo_adauga(x.email, false);
+        ab_noteaza(fila, x.rand, k, acum + ' - ' + (r.ok ? MARCA_BREVO_ADAUGAT : 'NU a intrat în Brevo (' + r.eroare + ')'));
+        if (r.ok) n.adaugati++; else n.erori.push(x.email);
+      }
+    } else if (b.cod === 404) {
+      if (dezabonari && fusese) {
+        ab_seteaza_status(fila, x.rand, k, AB_DEZABONAT);
+        ab_noteaza(fila, x.rand, k, acum + ' - dezabonat din Brevo pe ' + azi + ' (contactul a fost șters din Brevo)');
+        n.dezabonati++;
+      } else if (adauga) {
+        const r = brevo_adauga(x.email, false);
+        ab_noteaza(fila, x.rand, k, acum + ' - ' + (r.ok ? MARCA_BREVO_ADAUGAT : 'NU a intrat în Brevo (' + r.eroare + ')'));
+        if (r.ok) n.adaugati++; else n.erori.push(x.email);
+      }
+    } else {
+      n.erori.push(x.email + ' (Brevo ' + (b.cod || '?') + ')');
+    }
+  });
+  return 'Verificați: ' + randuri.length + '. Deja în Brevo: ' + n.ok + '. Adăugați acum: ' + n.adaugati +
+    '. Trecuți pe Dezabonat: ' + n.dezabonati + '.' + (n.erori.length ? ' Probleme la: ' + n.erori.join(', ') + '.' : '');
+}
+
+/** Rulează zilnic, dimineața: dezabonările din Brevo ajung în sheet, iar abonații care nu au intrat în Brevo se adaugă. */
+function brevo_zilnic() {
+  const rez = sincronizeaza_abonati_brevo(true, true);
+  console.log(rez);
+}
+
+/** Meniu „Ce facem cu copiii?” → „Trimite abonații în Brevo”. */
+function trimite_abonatii_in_brevo() { ab_arata(sincronizeaza_abonati_brevo(true, false)); }
+
+/** Meniu „Ce facem cu copiii?” → „Verifică dezabonările din Brevo”. */
+function verifica_dezabonarile_brevo() { ab_arata(sincronizeaza_abonati_brevo(false, true)); }
+
+function ab_arata(text) {
+  SpreadsheetApp.flush(); // scrierile din sheet se văd înainte de fereastra cu rezultatul
+  try { SpreadsheetApp.getUi().alert('Brevo', text, SpreadsheetApp.getUi().ButtonSet.OK); } catch (e) { console.log(text); }
+}
+
+/** Meniul din sheet-ul Contacte (pornit de un trigger „la deschidere” pe Contacte). */
+function meniu_contacte() {
+  SpreadsheetApp.getUi().createMenu('Ce facem cu copiii?')
+    .addItem('Trimite abonații în Brevo', 'trimite_abonatii_in_brevo')
+    .addItem('Verifică dezabonările din Brevo', 'verifica_dezabonarile_brevo')
+    .addToUi();
+}
+
+/** Rulează o dată din editor: pornește meniul din Contacte și verificarea zilnică de la 6 dimineața. */
+function porneste_brevo() {
+  const t = ScriptApp.getProjectTriggers().map(function (x) { return x.getHandlerFunction(); });
+  if (t.indexOf('meniu_contacte') < 0) ScriptApp.newTrigger('meniu_contacte').forSpreadsheet(CONTACTE_ID).onOpen().create();
+  if (t.indexOf('brevo_zilnic') < 0) ScriptApp.newTrigger('brevo_zilnic').timeBased().everyDays(1).atHour(6).inTimezone('Europe/Bucharest').create();
+  console.log('Gata: meniul din Contacte și verificarea zilnică Brevo sunt pornite.');
 }
 
 /* ---------- mail „bine ai venit” pentru abonații adăugați de mână ---------- */
