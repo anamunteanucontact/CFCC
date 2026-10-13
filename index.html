@@ -1164,7 +1164,7 @@ const COM_TABS={parteneri:0,activitati:1001,galerie:1002,articole:1003};
 let ORGS=[],ORG_ALL=[],ORG_BY={},ARTS=[],ART_BY={},orgState="loading";
 const norm=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
 /* imagini: link https sau fișier din site (ex. assets/logos/merlin.png) */
-const imgUrl=u=>{u=(u||"").trim();return /^[\w\-./]+\.(png|jpe?g|webp|svg)$/i.test(u)&&!u.includes("..")?"/"+u.replace(/^\/+/,""):cleanUrl(u)};
+const imgUrl=u=>{u=(u||"").trim();const dm=u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:[^#]*&)?id=)([\w-]{20,})/);if(dm)return"https://lh3.googleusercontent.com/d/"+dm[1];return /^[\w\-./]+\.(png|jpe?g|webp|svg)$/i.test(u)&&!u.includes("..")?"/"+u.replace(/^\/+/,""):cleanUrl(u)};
 const da=v=>/^da/i.test((v||"").trim());
 function buildCom(t){
   const rows=k=>(t[k]||[]).slice(1).map(r=>{const g=i=>(r[i]||"").trim();return g});
