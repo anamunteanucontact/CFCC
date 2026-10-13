@@ -431,11 +431,15 @@ function muta_in_calendar(filaProp, rand, publica) {
 
   // rândul nou: coloanele B-V din „Evenimente” (coloana A e formula cu linkul de pe site)
   const notaProp = 'Din propunerea primită pe ' + primit + '.';
-  const lipsa = p['Categorie'] ? '' : 'categoria';
+  // categoria: doar dacă e din lista noastră (Liste, coloana C); altfel rămâne de ales, cu propunerea lor în „De verificat”
+  const catProp = String(p['Categorie'] || '').trim();
+  const catLista = (ss.getSheetByName('Liste').getRange('C3:C30').getValues()).map(function (x) { return String(x[0]).trim(); }).filter(String);
+  const catOk = catLista.indexOf(catProp) >= 0 ? catProp : '';
+  const lipsa = catOk ? '' : (catProp ? 'categoria (propusă de ei: ' + catProp + ')' : 'categoria');
   const nou = [
     publica ? 'Publicat' : 'De verificat', lipsa, 'Nu', dataTxt, '', ora ? "'" + ora : '', '',
     p['Nume eveniment'], p['Organizator'], p['Locație'], p['Descriere'],
-    p['Vârstă minimă'], p['Vârstă maximă'], p['Categorie'] || '', p['Adresă'] || adresa_cunoscuta(ev, p['Locație']),
+    p['Vârstă minimă'], p['Vârstă maximă'], catOk, p['Adresă'] || adresa_cunoscuta(ev, p['Locație']),
     bilet, p['Link bilete / înscriere'], contact, notaProp,
     'Organizator', Utilities.formatDate(new Date(), tz, 'dd.MM.yyyy')
   ];

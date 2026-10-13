@@ -576,6 +576,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
         <label for="ev-amin">Vârsta minimă recomandată<input id="ev-amin" placeholder="ex. 3 ani"></label>
         <label for="ev-amax">Vârsta maximă recomandată<input id="ev-amax" placeholder="ex. 8 ani"></label>
       </div>
+      <label for="ev-cat">Ce fel de eveniment e?<select id="ev-cat"><option value="">Alege</option><option>Teatru / spectacol</option><option>Concert</option><option>Atelier</option><option>Film</option><option>Expoziție / muzeu</option><option>Festival / târg</option><option>Sport / mișcare</option><option>Dans contemporan</option><option>Educativ / știință</option><option>Outdoor / natură</option><option>Lectură / bibliotecă</option><option>Petrecere / animație</option><option>Joc / quiz</option><option value="__alta">Altă categorie</option></select></label>
+      <label for="ev-cat-alta" id="ev-cat-alta-wrap" hidden>Care categorie? <small>(sau spune-ne în descriere)</small><input id="ev-cat-alta" placeholder="ex. dans, magie, robotică"></label>
       <label for="ev-acc">Acces<select id="ev-acc"><option value="">Alege</option><option>Gratuit</option><option>Cu înscriere</option><option>Cu bilet</option></select></label>
       <label for="ev-link" id="ev-link-wrap" hidden><span id="ev-link-lbl">Link</span><input id="ev-link" type="url" placeholder="https://"></label>
       <label for="ev-desc">Descriere scurtă<textarea id="ev-desc" placeholder="Ce se întâmplă, cât durează, dacă e nevoie de înscriere"></textarea></label>
@@ -1035,6 +1037,10 @@ function wireForm(fid,req,errId,okId,okText,tip,build){
     finally{btn.disabled=false;btn.textContent=lbl}
   });
 }
+/* categoria: aceeași listă ca în The Sheet (fila Liste, coloana C) - dacă se adaugă o categorie acolo, se adaugă și aici */
+const evCat=document.getElementById("ev-cat"),catAltaWrap=document.getElementById("ev-cat-alta-wrap");
+evCat.addEventListener("change",()=>{catAltaWrap.hidden=evCat.value!=="__alta"});
+const evCatVal=()=>evCat.value==="__alta"?val("ev-cat-alta"):evCat.value;
 const evAcc=document.getElementById("ev-acc"),linkWrap=document.getElementById("ev-link-wrap");
 evAcc.addEventListener("change",()=>{
   const v=evAcc.value, show=v==="Cu înscriere"||v==="Cu bilet";
@@ -1049,8 +1055,8 @@ document.getElementById("form-ev").addEventListener("submit",ev=>{
 wireForm("form-ev",["ev-name","ev-org","ev-date","ev-time","ev-place","ev-acc","ev-mail"],"ev-err","ev-ok","Mulțumim! Verificăm evenimentul și îl adăugăm în calendar.","eveniment",()=>({
   "Nume eveniment":val("ev-name"),"Organizator":val("ev-org"),"Data":val("ev-date"),"Ora":val("ev-time"),"Locație":val("ev-place"),"Adresă":val("ev-addr"),
   "Vârstă minimă":val("ev-amin"),"Vârstă maximă":val("ev-amax"),"Acces":val("ev-acc"),"Link bilete / înscriere":linkWrap.hidden?"":val("ev-link"),
-  "Descriere":val("ev-desc"),"E-mail":val("ev-mail"),"Telefon":val("ev-tel")}));
-document.getElementById("form-ev").addEventListener("sent",()=>{linkWrap.hidden=true});
+  "Descriere":val("ev-desc"),"E-mail":val("ev-mail"),"Telefon":val("ev-tel"),"Categorie":evCatVal()}));
+document.getElementById("form-ev").addEventListener("sent",()=>{linkWrap.hidden=true;catAltaWrap.hidden=true});
 wireForm("form-pr",["pr-name","pr-person","pr-mail","pr-tel","pr-about"],"pr-err","pr-ok","Mulțumim! Te contactăm curând ca să ne cunoaștem.","colaborare",()=>({
   "Afacere / brand":val("pr-name"),"Persoană de contact":val("pr-person"),"E-mail":val("pr-mail"),"Telefon":val("pr-tel"),"Instagram":val("pr-ig"),
   "Facebook":val("pr-fb"),"Website":val("pr-web"),"Despre ei":val("pr-about"),"Ce au nevoie":val("pr-need")}));
