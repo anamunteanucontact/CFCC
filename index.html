@@ -322,6 +322,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .art-cta b{font-family:var(--display);font-size:1.2rem;font-weight:800;line-height:1.15}
 .art-cta span{color:var(--muted)}
 .art-cta .btn{margin-top:6px}
+.art-prev{max-width:65ch;margin:0 0 14px;padding:10px 14px;border-radius:12px;background:var(--chip);border:2px dashed var(--hl);font-size:.9rem;font-weight:600}
 .rec-arts{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .rec-arts a{font-weight:700;font-size:.92rem;color:var(--accent)}
 .fs{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -1167,9 +1168,11 @@ const imgUrl=u=>{u=(u||"").trim();return /^[\w\-./]+\.(png|jpe?g|webp|svg)$/i.te
 const da=v=>/^da/i.test((v||"").trim());
 function buildCom(t){
   const rows=k=>(t[k]||[]).slice(1).map(r=>{const g=i=>(r[i]||"").trim();return g});
-  ARTS=rows("articole").filter(g=>g(1)&&da(g(8))).map(g=>({id:slug(g(0)||g(1)),t:g(1),rub:g(2),data:g(3),rez:g(4),text:g(5),poza:imgUrl(g(6)),poz:g(9),fin:g(10),cat:g(11),
+  const artSt=v=>{v=norm(v);return /^(da|publicat)/.test(v)?"pub":/^previz/.test(v)?"prev":""};
+  const ARTS_ALL=rows("articole").filter(g=>g(1)&&artSt(g(8))).map(g=>({prev:artSt(g(8))==="prev",id:slug(g(0)||g(1)),t:g(1),rub:g(2),data:g(3),rez:g(4),text:g(5),poza:imgUrl(g(6)),poz:g(9),fin:g(10),cat:g(11),
     parts:g(7).split(/[,\n]+/).map(x=>slug(x)).filter(Boolean)}));
-  ART_BY=Object.fromEntries(ARTS.map(a=>[a.id,a]));
+  ARTS=ARTS_ALL.filter(a=>!a.prev);
+  ART_BY=Object.fromEntries(ARTS_ALL.map(a=>[a.id,a]));
   const acts=rows("activitati"),gal=rows("galerie");
   ORG_ALL=rows("parteneri").filter(g=>g(1)).map(g=>{const id=slug(g(0)||g(1));
     return {slug:id,n:g(1),tip:g(2),pro:/^partener/i.test(g(3)),full:/^partener|complet/i.test(norm(g(3))),desc:g(5),age:g(6),ad:g(7),tel:g(8),mail:g(9),ig:cleanUrl(g(10)),fb:cleanUrl(g(11)),web:cleanUrl(g(12)),
@@ -1279,7 +1282,7 @@ function renderArt(id){
   if(!a){el.innerHTML=back+'<div class="empty">Nu am găsit articolul.</div>';return}
   document.title=a.t+" | Ce facem cu copiii?";
   const ps=a.parts.map(p=>ORG_BY[p]).filter(o=>o&&o.live);
-  el.innerHTML=`${back}<article class="art-body"><span class="eyebrow">${esc(a.rub||"Recomandările noastre")}${a.data?" · "+esc(a.data):""}</span><h2>${esc(a.t)}</h2>
+  el.innerHTML=`${back}${a.prev?'<p class="art-prev">Previzualizare - articolul nu e încă public. Îl vezi doar tu, cu acest link. Ca să apară pe site, pune „Publicat” în sheet.</p>':""}<article class="art-body"><span class="eyebrow">${esc(a.rub||"Recomandările noastre")}${a.data?" · "+esc(a.data):""}</span><h2>${esc(a.t)}</h2>
     ${a.rez?`<p class="art-lead">${artInline(a.rez)}</p>`:""}${a.poza?`<img class="org-photo" src="${esc(a.poza)}" alt="" loading="lazy" style="object-position:${artPoz(a.poz)}">`:""}
     ${artText(a.text)}
     ${ps.length?`<div class="org-sec"><h3>Despre cine am scris</h3><div class="org-grid">${ps.map(orgCard).join("")}</div></div>`:""}
