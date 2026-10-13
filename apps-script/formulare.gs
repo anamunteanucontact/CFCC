@@ -576,6 +576,36 @@ function adresa_cunoscuta(fila, loc, randExclus) {
   return g && g.adresa ? g.adresa : '';
 }
 
+/* ---------- mail „bine ai venit” pentru abonații adăugați de mână ---------- */
+/* La fiecare 15 minute (odată cu verificarea evenimentelor publicate): rândurile din Contacte → Abonați
+   cu e-mail valid, Status ≠ Dezabonat și fără mail „bine ai venit” în Note primesc mailul o singură dată.
+   Ca să nu plece la o adresă scrisă pe jumătate, mailul pleacă abia la a doua verificare în care rândul arată la fel. */
+function bun_venit_abonati_manuali() {
+  const fila = SpreadsheetApp.openById(CONTACTE_ID).getSheetByName('Abonați');
+  if (!fila || fila.getLastRow() < 2) return;
+  const nc = fila.getLastColumn();
+  const cap = fila.getRange(1, 1, 1, nc).getDisplayValues()[0].map(function (x) { return String(x).trim(); });
+  const cE = cap.indexOf('E-mail'), cO = cap.indexOf('Vrea oferte speciale'), cN = cap.indexOf('Note'), cS = cap.indexOf('Status');
+  if (cE < 0 || cN < 0) return;
+  const v = fila.getRange(2, 1, fila.getLastRow() - 1, nc).getDisplayValues();
+  const props = PropertiesService.getScriptProperties();
+  const vazuti = JSON.parse(props.getProperty('AB_MANUAL_ASTEAPTA') || '{}');
+  const nouVazuti = {};
+  v.forEach(function (r, i) {
+    const email = String(r[cE] || '').trim();
+    if (!/^\S+@\S+\.\S+$/.test(email)) return;
+    if (cS >= 0 && /dezabonat/i.test(r[cS])) return;
+    if (/mail „bine ai venit” (trimis|NU a plecat)/.test(r[cN])) return;
+    const oferte = cO >= 0 && /^da$/i.test(String(r[cO]).trim()) ? 'Da' : 'Nu';
+    const cheie = email.toLowerCase() + '|' + oferte;
+    if (!vazuti[cheie]) { nouVazuti[cheie] = 1; return; }
+    let rez;
+    try { rez = trimite_confirmare('abonare', { 'E-mail': email, 'Vrea oferte de la parteneri': oferte }); } catch (err) { rez = 'eroare: ' + err; }
+    noteaza_mail_confirmare(fila, i + 2, FILE.abonare, 'abonare', { 'E-mail': email }, rez);
+  });
+  props.setProperty('AB_MANUAL_ASTEAPTA', JSON.stringify(nouVazuti));
+}
+
 /* ---------- mail „evenimentul tău e pe site” ---------- */
 /* La fiecare 15 minute: evenimentele venite prin formular (Adăugat de = Organizator) care au Status = Publicat
    și n-au primit încă mailul îl primesc o singură dată, la adresa din Contact organizator.
@@ -600,6 +630,7 @@ function testMailEvenimentPublicat() {
 }
 
 function mail_evenimente_publicate() {
+  try { bun_venit_abonati_manuali(); } catch (errAb) { console.warn('Bun venit abonați manuali: ' + errAb); }
   const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Evenimente');
   if (!fila || ultim_rand_ev(fila) < 3) return;
   const n = ultim_rand_ev(fila) - 2;
