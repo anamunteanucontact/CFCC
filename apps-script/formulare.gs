@@ -26,8 +26,9 @@ const ONBOARDING_ID = '1wyNnAA3GNJis2cofoQixTLizss0zU-90uBpFaaQIir0'; // „CFCC
 const FILE = {
   eveniment: {
     nume: 'Propuneri evenimente', fisier: 'principal',
-    coloane: [['Primit la'], ['Nume eveniment'], ['Organizator'], ['Data'], ['Ora'], ['Locație'], ['Adresă'],
-      ['Vârstă minimă'], ['Vârstă maximă'], ['Acces'], ['Link bilete / înscriere'], ['Descriere'], ['E-mail'], ['Telefon'], ['Categorie'], ['Status'], ['Note']]
+    // Status pe coloana B (din 13 oct), ca în Evenimente
+    coloane: [['Primit la'], ['Status'], ['Nume eveniment'], ['Organizator'], ['Data'], ['Ora'], ['Locație'], ['Adresă'],
+      ['Vârstă minimă'], ['Vârstă maximă'], ['Acces'], ['Link bilete / înscriere'], ['Descriere'], ['E-mail'], ['Telefon'], ['Categorie'], ['Note']]
   },
   colaborare: {
     nume: 'Colaborări', fisier: 'contacte',
@@ -401,10 +402,11 @@ function rand_propunere(ss, nume, data) {
   const prop = ss.getSheetByName(FILE.eveniment.nume);
   if (!prop || prop.getLastRow() < 2) return 0;
   const tz = ss.getSpreadsheetTimeZone(), n = String(nume || '').trim().toLowerCase(), d = ca_data(data, tz);
-  const rows = prop.getRange(2, 1, prop.getLastRow() - 1, 4).getValues();
+  const cn = prop_col('Nume eveniment') - 1, cd = prop_col('Data') - 1;
+  const rows = prop.getRange(2, 1, prop.getLastRow() - 1, FILE.eveniment.coloane.length).getValues();
   for (let i = 0; i < rows.length; i++) {
-    const dd = ca_data(rows[i][3], tz);
-    if (String(rows[i][1] || '').trim().toLowerCase() === n && d && dd && dd.toDateString() === d.toDateString()) return i + 2;
+    const dd = ca_data(rows[i][cd], tz);
+    if (String(rows[i][cn] || '').trim().toLowerCase() === n && d && dd && dd.toDateString() === d.toDateString()) return i + 2;
   }
   return 0;
 }
@@ -490,8 +492,8 @@ function sincronizeaza_propunerea(ev, rand) {
   const note = prop.getRange(2, cs, prop.getLastRow() - 1, 1).getNotes();
   for (let i = 0; i < rows.length; i++) {
     if (String(note[i][0] || '').indexOf(NOTA_MUTAT) !== 0) continue;
-    const dd = ca_data(rows[i][3], tz);
-    if (String(rows[i][1] || '').trim().toLowerCase() === nume && d && dd && dd.toDateString() === d.toDateString()) {
+    const dd = ca_data(rows[i][prop_col('Data') - 1], tz);
+    if (String(rows[i][prop_col('Nume eveniment') - 1] || '').trim().toLowerCase() === nume && d && dd && dd.toDateString() === d.toDateString()) {
       const nou = st === 'Publicat' ? STATUS_PUBLICAT : st === 'Anulat' ? 'Respins' : STATUS_IN_CALENDAR;
       if (String(rows[i][cs - 1] || '') !== nou) {
         prop.getRange(i + 2, cs).setValue(nou);
