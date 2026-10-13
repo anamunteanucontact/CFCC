@@ -313,6 +313,15 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .art-body h2{font-size:clamp(1.7rem,5vw,2.3rem);font-weight:800}
 .art-body p{margin:0}
 .art-lead{font-size:1.1rem;color:var(--muted)}
+.art-body h3.art-h{font-size:1.35rem;font-weight:800;color:var(--head);margin-top:14px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .art-body h3.art-h{color:var(--hl)}}
+:root[data-theme="dark"] .art-body h3.art-h{color:var(--hl)}
+.art-body p.tip>strong:first-child{color:var(--accent)}
+.art-body .next{color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin-top:8px}
+.art-cta{display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:10px}
+.art-cta b{font-family:var(--display);font-size:1.2rem;font-weight:800;line-height:1.15}
+.art-cta span{color:var(--muted)}
+.art-cta .btn{margin-top:6px}
 .rec-arts{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .rec-arts a{font-weight:700;font-size:.92rem;color:var(--accent)}
 .fs{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -1158,7 +1167,7 @@ const imgUrl=u=>{u=(u||"").trim();return /^[\w\-./]+\.(png|jpe?g|webp|svg)$/i.te
 const da=v=>/^da/i.test((v||"").trim());
 function buildCom(t){
   const rows=k=>(t[k]||[]).slice(1).map(r=>{const g=i=>(r[i]||"").trim();return g});
-  ARTS=rows("articole").filter(g=>g(1)&&da(g(8))).map(g=>({id:slug(g(0)||g(1)),t:g(1),rub:g(2),data:g(3),rez:g(4),text:g(5),poza:imgUrl(g(6)),
+  ARTS=rows("articole").filter(g=>g(1)&&da(g(8))).map(g=>({id:slug(g(0)||g(1)),t:g(1),rub:g(2),data:g(3),rez:g(4),text:g(5),poza:imgUrl(g(6)),poz:g(9),fin:g(10),cat:g(11),
     parts:g(7).split(/[,\n]+/).map(x=>slug(x)).filter(Boolean)}));
   ART_BY=Object.fromEntries(ARTS.map(a=>[a.id,a]));
   const acts=rows("activitati"),gal=rows("galerie");
@@ -1271,11 +1280,33 @@ function renderArt(id){
   document.title=a.t+" | Ce facem cu copiii?";
   const ps=a.parts.map(p=>ORG_BY[p]).filter(o=>o&&o.live);
   el.innerHTML=`${back}<article class="art-body"><span class="eyebrow">${esc(a.rub||"Recomandările noastre")}${a.data?" · "+esc(a.data):""}</span><h2>${esc(a.t)}</h2>
-    ${a.rez?`<p class="art-lead">${esc(a.rez)}</p>`:""}${a.poza?`<img class="org-photo" src="${esc(a.poza)}" alt="" loading="lazy">`:""}
-    ${a.text.split(/\n\s*\n/).map(p=>p.trim()).filter(Boolean).map(p=>`<p>${esc(p).replace(/\n/g,"<br>")}</p>`).join("")}
-    ${ps.length?`<div class="org-sec"><h3>Despre cine am scris</h3><div class="org-grid">${ps.map(orgCard).join("")}</div></div>`:""}</article>`;
+    ${a.rez?`<p class="art-lead">${artInline(a.rez)}</p>`:""}${a.poza?`<img class="org-photo" src="${esc(a.poza)}" alt="" loading="lazy" style="object-position:${artPoz(a.poz)}">`:""}
+    ${artText(a.text)}
+    ${ps.length?`<div class="org-sec"><h3>Despre cine am scris</h3><div class="org-grid">${ps.map(orgCard).join("")}</div></div>`:""}
+    <div class="art-cta"><b>${esc(a.fin||"Gata de o ieșire cu cei mici?")}</b><span>Vezi ce evenimente pentru copii sunt în Timișoara în perioada următoare.</span><a class="btn btn-main" href="#calendar" data-artcat="${esc(a.cat||"")}">Vezi calendarul</a></div></article>`;
   track("Articol",null,{articol:a.t});
 }
+/* Formatare articole (din sheet): totul trece întâi prin esc(), apoi:
+   „## Subtitlu” pe rând separat -> subtitlu; **text** -> îngroșat; *text* -> italic;
+   un paragraf care începe cu **...** e un sfat (îngroșatul iese coral); un paragraf tot în *...* e o notă de final;
+   rândurile noi din același paragraf rămân rânduri noi. */
+const artInline=t=>esc(t).replace(/\*\*([^*\n][^*]*?)\*\*/g,"<strong>$1</strong>").replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\w)/g,"$1<em>$2</em>").replace(/\n/g,"<br>");
+function artText(t){
+  const out=[];let buf=[];
+  const flush=()=>{const p=buf.join("\n").trim();buf=[];if(!p)return;
+    const cls=/^\*\*/.test(p)?' class="tip"':/^\*[^*][\s\S]*\*$/.test(p)||/^data viitoare/i.test(p)?' class="next"':"";
+    out.push(`<p${cls}>${artInline(p)}</p>`)};
+  String(t||"").replace(/\r/g,"").split("\n").forEach(l=>{
+    const h=l.match(/^\s*#{2,3}\s+(.+)$/);
+    if(h){flush();out.push(`<h3 class="art-h">${artInline(h[1].trim())}</h3>`)}
+    else if(!l.trim())flush();else buf.push(l)});
+  flush();return out.join("");
+}
+const artPoz=v=>({sus:"center 15%",centru:"center 50%",jos:"center 85%"})[norm(v)]||"center 30%";
+document.addEventListener("click",ev=>{const b=ev.target.closest("[data-artcat]");if(!b)return;
+  const c=norm(b.dataset.artcat);const ch=[...document.querySelectorAll("#f-cat .chip")];
+  const t=c&&ch.find(x=>x.dataset.v&&(norm(x.dataset.v).startsWith(c)||c.startsWith(norm(x.dataset.v))));
+  const pick=t||ch[0];if(pick){state.cat=pick.dataset.v;ch.forEach(x=>x.setAttribute("aria-pressed",x===pick?"true":"false"));render()}});
 function renderRec(){
   document.getElementById("rec-grid").innerHTML=RUBRICI.map(r=>{const arts=ARTS.filter(a=>norm(a.rub)===norm(r.t));
     return `<article class="rec">
