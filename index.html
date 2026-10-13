@@ -861,7 +861,7 @@ function ageLabel(e){
 const firstTime=e=>(e.t.match(/\d{1,2}:\d{2}/)||[null])[0];
 const timeLabel=e=>e.t?e.t.replace(/ si /g,"\n")+(e.te&&/^\d\d:\d\d$/.test(e.te)&&e.te>e.t?"\n- "+e.te:""):"ora\nîn curând";
 const dateLong=e=>{const d=dt(e.d);return `${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}`};
-const where=e=>[e.l,e.ad].filter(Boolean).join(", ");
+const where=e=>[locOf(e),adOf(e)].filter(Boolean).join(", ");
 
 /* link Google Calendar */
 function gcalUrl(e){
@@ -876,7 +876,7 @@ function gcalUrl(e){
   return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(e.n)+"&dates="+dates+"&ctz=Europe/Bucharest&location="+encodeURIComponent(where(e)+", Timișoara")+"&details="+encodeURIComponent(det);
 }
 const eventLink=e=>"https://cefacemcucopiii.ro/#"+e.id;
-const shareText=e=>`${e.n} - ${dateLong(e)}${firstTime(e)?", ora "+firstTime(e):""}, ${e.l}. Am găsit pe Ce facem cu copiii?`;
+const shareText=e=>`${e.n} - ${dateLong(e)}${firstTime(e)?", ora "+firstTime(e):""}${locOf(e)?", "+locOf(e):""}. Am găsit pe Ce facem cu copiii?`;
 
 /* filtre */
 const state={per:"all",age:"",cat:"",open:null};
@@ -909,15 +909,15 @@ function evCard(e){
   return `<article class="ev${open?" open":""}" id="${e.id}">
     <button class="ev-head" type="button" data-open="${e.id}" aria-expanded="${open}">
       <div class="tm">${esc(timeLabel(e))}</div>
-      <div><h3>${esc(e.n)}</h3>${(()=>{const same=sameOrgLoc(e);return same?`<div class="meta org loc">${I.pin}${esc(e.l)}</div>`:(e.o?`<div class="meta org">${esc(e.o)}</div>`:"")+(e.l?`<div class="meta loc">${I.pin}${esc(e.l)}</div>`:"")})()}
+      <div><h3>${esc(e.n)}</h3>${(()=>{const same=sameOrgLoc(e);const L=locOf(e);return same?`<div class="meta org loc">${I.pin}${esc(L)}</div>`:(e.o?`<div class="meta org">${esc(e.o)}</div>`:"")+(L?`<div class="meta loc">${I.pin}${esc(L)}</div>`:"")})()}
         <div class="tags"><span class="tag">${esc(e.c)}</span>${al?`<span class="tag age">${esc(al)}</span>`:""}${isSaved?'<span class="tag saved">Salvat</span>':""}</div></div>
       <span class="caret">${I.caret}</span>
     </button>
     ${open?`<div class="det">
       <dl>
         <dt>Când</dt><dd>${esc(dateLong(e))}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}</dd>
-        <dt>Unde</dt><dd>${orgLink(e.l)}</dd>
-        ${e.ad?`<dt>Adresa</dt><dd>${esc(e.ad)}</dd>`:""}
+        ${locOf(e)?`<dt>Unde</dt><dd>${orgLink(locOf(e))}</dd>`:""}
+        ${adOf(e)?`<dt>Adresa</dt><dd>${esc(adOf(e))}</dd>`:""}
         ${e.o&&!sameOrgLoc(e)?`<dt>Organizator</dt><dd>${orgsOf(e).map(orgLink).join(", ")}</dd>`:""}
       </dl>
       ${e.desc?`<p class="desc">${esc(e.desc)}</p>`:""}
@@ -1063,7 +1063,7 @@ wireForm("form-pr",["pr-name","pr-person","pr-mail","pr-tel","pr-about"],"pr-err
 
 /* profil */
 function miniEv(e,mode){
-  return `<div class="mini-ev"><div><b>${esc(e.n)}</b><span>${esc(dateLong(e))}${firstTime(e)?", "+firstTime(e):""} · ${esc(e.l)}</span></div>
+  return `<div class="mini-ev"><div><b>${esc(e.n)}</b><span>${esc(dateLong(e))}${firstTime(e)?", "+firstTime(e):""}${locOf(e)?" · "+esc(locOf(e)):""}</span></div>
   ${mode==="saved"?`<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="x" type="button" data-went="${e.id}">Am fost</button><button class="x" type="button" data-unsave="${e.id}" aria-label="Scoate ${esc(e.n)} din salvate">Scoate</button></div>`
    :`<button class="x on" type="button" data-went="${e.id}">Am fost ✓</button>`}</div>`;
 }
@@ -1187,7 +1187,10 @@ function orgByName(v){v=norm(v);if(!v)return null;if(v in ORG_CACHE)return ORG_C
 const orgsOf=e=>e.os&&e.os.length?e.os:(e.o?[e.o]:[]);
 const orgFor=e=>orgsOf(e).map(orgByName).find(Boolean)||orgByName(e.l);
 /* organizatorul e chiar locul (ex. Teatrul Merlin la Teatrul Merlin): îl arătăm o singură dată, la „Unde” */
-function sameOrgLoc(e){if(!e.o||!e.l||orgsOf(e).length>1)return false;if(norm(e.o)===norm(e.l))return true;const a=orgByName(e.o);return !!a&&a===orgByName(e.l)}
+/* locația lipsește, dar organizatorul e o instituție cu pagină în Comunitate -> locul e chiar instituția (rezervă; în sheet scriptul o completează singur) */
+function locOf(e){if(e.l)return e.l;return orgsOf(e).find(x=>orgByName(x))||""}
+function adOf(e){if(e.ad||e.l)return e.ad||"";const g=orgFor(e);return g&&g.ad||""}
+function sameOrgLoc(e){const l=locOf(e);if(!e.o||!l||orgsOf(e).length>1)return false;if(norm(e.o)===norm(l))return true;const a=orgByName(e.o);return !!a&&a===orgByName(l)}
 const orgLink=(v)=>{const g=orgByName(v);return g?`<a href="#comunitate/${g.slug}">${esc(v)}</a>`:esc(v)};
 const isOrgEv=(e,o)=>o.prev?[...orgsOf(e),e.l].some(v=>{v=norm(v);return v&&o.keys.some(k=>keyMatch(v,k))}):(orgsOf(e).some(x=>orgByName(x)===o)||orgByName(e.l)===o);
 const orgEvents=o=>EV.filter(e=>e.d>=iso(TODAY)&&isOrgEv(e,o)).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));

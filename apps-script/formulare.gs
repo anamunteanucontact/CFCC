@@ -530,6 +530,13 @@ function la_editare_evenimente(e) {
         e.source.toast('Rândul ' + r + ' e Publicat, dar la „De verificat” scrie încă: ' + lipsa + '. Dacă e rezolvat, șterge textul.', 'Atenție', 8);
       }
     }
+    // organizatorul e o instituție cu sediu propriu (Rol „Ambele” în Organizatori) și locația e goală -> locația e instituția
+    if (c0 <= EV_COL.organizator && EV_COL.organizator < c0 + nc) {
+      try {
+        const pus = locatie_din_organizator(e.source, fila, r);
+        if (pus) e.source.toast('Locația e „' + pus + '” (organizatorul are sediu propriu).', 'Ce facem cu copiii?', 4);
+      } catch (errL) { console.warn(errL); }
+    }
     // locația s-a schimbat și adresa e goală -> o luăm din intrările de dinainte sau din Organizatori
     if (c0 <= EV_COL.locatie && EV_COL.locatie < c0 + nc) {
       const loc = String(fila.getRange(r, EV_COL.locatie).getValue() || '').trim();
@@ -987,6 +994,7 @@ function onOpen() {
       .addItem('Arată și evenimentele trecute', 'arata_trecute')
       .addSeparator()
       .addItem('Actualizează fila Organizatori', 'actualizeaza_organizatori_tot')
+      .addItem('Completează locațiile goale (instituții cu sediu propriu)', 'completeaza_locatii_tot')
       .addToUi();
   } catch (err) { console.warn(err); }
   try { ascunde_trecute(); } catch (err) { console.warn(err); }
@@ -1093,6 +1101,42 @@ function actualizeaza_organizatori(ss, randuri) {
     });
   });
   return adaugate;
+}
+
+/** Dacă Locația e goală și organizatorul (sau unul din ei, pe rânduri diferite) are Rol „Ambele” în Organizatori,
+    pune ca locație numele organizatorului, așa cum e scris, și adresa din Organizatori (dacă Adresa e goală).
+    Întoarce locația pusă sau ''. Locația deja scrisă nu se atinge. */
+function locatie_din_organizator(ss, ev, r, date) {
+  const v = ev.getRange(r, 1, 1, EV_COL.adresa).getValues()[0];
+  if (String(v[EV_COL.locatie - 1] || '').trim()) return '';
+  const orgs = String(v[EV_COL.organizator - 1] || '').split(/\s*\n\s*/).map(function (x) { return x.trim(); }).filter(String);
+  const d = date || citeste_organizatori(ss);
+  for (let i = 0; i < orgs.length; i++) {
+    const g = gaseste_organizator(ss, orgs[i], d);
+    if (g && g.rol === 'Ambele') {
+      ev.getRange(r, EV_COL.locatie).setValue(orgs[i]);
+      const adr = g.adresa || adresa_cunoscuta(ev, orgs[i], r);
+      if (adr && !String(v[EV_COL.adresa - 1] || '').trim()) ev.getRange(r, EV_COL.adresa).setValue(adr);
+      return orgs[i];
+    }
+  }
+  return '';
+}
+
+/** Din meniu: aplică regula de mai sus pe tot sheet-ul (rândurile existente). */
+function completeaza_locatii_tot() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ev = ss.getSheetByName('Evenimente');
+  const d = citeste_organizatori(ss);
+  const u = ultim_rand_ev(ev);
+  const v = u >= 3 ? ev.getRange(3, 1, u - 2, EV_COL.locatie).getValues() : [];
+  let n = 0;
+  v.forEach(function (row, i) {
+    if (String(row[EV_COL.organizator - 1] || '').trim() && !String(row[EV_COL.locatie - 1] || '').trim()) {
+      if (locatie_din_organizator(ss, ev, i + 3, d)) n++;
+    }
+  });
+  ss.toast(n ? 'Am completat locația la ' + n + ' evenimente (organizatori cu sediu propriu).' : 'Nu era nicio locație de completat.', 'Ce facem cu copiii?', 6);
 }
 
 /** Din meniu: verifică tot sheet-ul Evenimente. */
