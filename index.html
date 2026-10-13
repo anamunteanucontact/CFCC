@@ -244,6 +244,8 @@ form>.btn[type=submit]{align-self:center;justify-content:center;min-width:260px;
 .check{flex-direction:row;align-items:center;gap:8px;font-weight:500}
 .check input{width:18px;height:18px;flex:none}
 .nl-cta{margin:28px auto 12px}
+.nl-cta .nl-bar{transition:box-shadow .4s,background .4s}
+.nl-hi .nl-bar{box-shadow:0 0 0 4px var(--galben);background:rgba(244,185,66,.32)}
 .nl-bar{display:flex;flex-direction:row;align-items:center;gap:10px 16px;flex-wrap:wrap;border-left:4px solid var(--galben);border-radius:12px;padding:12px 16px;background:rgba(244,185,66,.16)}
 .nl-bar p{margin:0;flex:1 1 280px;font-size:.88rem;line-height:1.4}
 .nl-bar p span{color:var(--muted)}
@@ -1356,6 +1358,10 @@ function route(){
   if(h.startsWith("articol/")){renderArt(decodeURIComponent(h.slice(8)));go("articol",true);return}
   if(BYID[h]){state.per="all";document.querySelectorAll("#f-per .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v==="all"?"true":"false"));state.open=h;state.day=BYID[h].d;go("calendar");render();setTimeout(()=>document.getElementById(h)?.scrollIntoView({block:"center"}),50);return}
   if(h==="adauga-eveniment"||h==="colaborare-promovare"){go("colaborari",true);openForm(h==="adauga-eveniment"?"ev":"pr",true);return}
+  if(h==="newsletter"||h==="abonare"){
+    const on=!!(sub&&sub.email);go(on?"profil":"calendar",true);
+    setTimeout(()=>{const t=document.getElementById(on?"nl-title":"nl-cta");if(t){t.scrollIntoView({behavior:"smooth",block:"center"});if(!on){t.classList.add("nl-hi");setTimeout(()=>t.classList.remove("nl-hi"),2400)}}},250);
+    return}
   if(h==="colaborari")openForm(null);
   go(VIEWS.includes(h)?h:"calendar",true);
 }
@@ -1477,7 +1483,7 @@ function hscroll(el){if(!el||el.parentNode.classList.contains("hs"))return;
   new MutationObserver(()=>requestAnimationFrame(upd)).observe(el,{childList:true,subtree:true});
   upd();setTimeout(upd,400)}
 ["f-per","f-age","f-cat","days"].forEach(id=>hscroll(document.getElementById(id)));
-loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();const h=location.hash.slice(1);if(BYID[h]||comRoute(h))route();else if(h.startsWith("previzualizare/")&&ORG_BY.__prev)renderOrg("__prev")});
+loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();const h=location.hash.slice(1);if(BYID[h]||comRoute(h)||h==="newsletter"||h==="abonare")route();else if(h.startsWith("previzualizare/")&&ORG_BY.__prev)renderOrg("__prev")});
 </script>
 </body>
 </html>
