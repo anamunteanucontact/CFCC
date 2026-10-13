@@ -322,6 +322,12 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .art-cta b{font-family:var(--display);font-size:1.2rem;font-weight:800;line-height:1.15}
 .art-cta span{color:var(--muted)}
 .art-cta .btn{margin-top:6px}
+.ev-guide{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--chip);color:var(--fg);text-decoration:none;font-weight:600;font-size:.92rem;line-height:1.3}
+.ev-guide small{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.ev-guide-ic{flex:none;width:32px;height:32px;border-radius:50%;background:#7fb7a4;color:#1F4E5F;display:grid;place-items:center}
+.ev-guide-ic svg{width:17px;height:17px}
+.ev-guide-go{margin-left:auto;color:var(--accent);font-weight:800}
+.ev-guide:hover{outline:2px solid var(--line)}
 .art-prev{max-width:65ch;margin:0 0 14px;padding:10px 14px;border-radius:12px;background:var(--chip);border:2px dashed var(--hl);font-size:.9rem;font-weight:600}
 .rec-arts{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .rec-arts a{font-weight:700;font-size:.92rem;color:var(--accent)}
@@ -914,6 +920,12 @@ const I={
  pin:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
  caret:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>'
 };
+/* Ghiduri potrivite: articolele publicate care au categoria evenimentului în coloana „Categorii potrivite” */
+function evGuides(e){
+  const c=norm(e.c);if(!c||!ARTS.length)return"";
+  const g=ARTS.filter(a=>a.tags.some(t=>{t=norm(t);return t&&(t===c||t.startsWith(c)||c.startsWith(t))})).slice(-2).reverse();
+  return g.map(a=>`<a class="ev-guide" href="#articol/${encodeURIComponent(a.id)}" data-trk="Ghid din eveniment" data-trk-id="${e.id}"><span class="ev-guide-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${RIC.book}</svg></span><span><small>Ghid pentru părinți</small>${esc(a.t)}</span><span class="ev-guide-go" aria-hidden="true">→</span></a>`).join("");
+}
 function evCard(e){
   const open=state.open===e.id, isSaved=saved.includes(e.id), al=ageLabel(e);
   return `<article class="ev${open?" open":""}" id="${e.id}">
@@ -937,6 +949,7 @@ function evCard(e){
         <button class="act${isSaved?" on":""}" type="button" data-save="${e.id}">${isSaved?I.saved:I.save}${isSaved?"Salvat":"Salvează"}</button>
         ${e.link?`<a class="act act-go" href="${esc(e.link)}" target="_blank" rel="noopener" data-trk="Click bilete / înscriere" data-trk-id="${e.id}">${I.ticket}${PART_LBL[accKey(e)]||"Participare"}</a>`:""}
       </div>
+      ${evGuides(e)}
       <div class="sharebox" id="sb-${e.id}" hidden>
         <a href="https://wa.me/?text=${encodeURIComponent(shareText(e)+" "+eventLink(e))}" target="_blank" rel="noopener">WhatsApp</a>
         <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventLink(e))}" target="_blank" rel="noopener">Facebook</a>
@@ -1169,8 +1182,9 @@ const da=v=>/^da/i.test((v||"").trim());
 function buildCom(t){
   const rows=k=>(t[k]||[]).slice(1).map(r=>{const g=i=>(r[i]||"").trim();return g});
   const artSt=v=>{v=norm(v);return /^(da|publicat)/.test(v)?"pub":/^previz/.test(v)?"prev":""};
-  const ARTS_ALL=rows("articole").filter(g=>g(1)&&artSt(g(8))).map(g=>({prev:artSt(g(8))==="prev",id:slug(g(0)||g(1)),t:g(1),rub:g(2),data:g(3),rez:g(4),text:g(5),poza:imgUrl(g(6)),poz:g(9),fin:g(10),cat:g(11),
+  const ARTS_ALL=rows("articole").filter(g=>g(1)&&artSt(g(8))).map(g=>({prev:artSt(g(8))==="prev",id:slug(g(0)||g(1)),t:g(1),rub:g(2),data:g(3),rez:g(4),text:g(5),poza:imgUrl(g(6)),poz:g(9),fin:g(10),tags:g(11).split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean),
     parts:g(7).split(/[,\n]+/).map(x=>slug(x)).filter(Boolean)}));
+  ARTS_ALL.forEach(a=>a.cat=a.tags[0]||"");
   ARTS=ARTS_ALL.filter(a=>!a.prev);
   ART_BY=Object.fromEntries(ARTS_ALL.map(a=>[a.id,a]));
   const acts=rows("activitati"),gal=rows("galerie");
