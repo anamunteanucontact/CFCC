@@ -142,6 +142,8 @@ button{font-family:inherit}
 .evs{display:flex;flex-direction:column;gap:10px;min-width:0}
 .ev{background:var(--surface);border-radius:14px;min-width:0;border:2px solid transparent}
 .ev.open{border-color:var(--galben)}
+.ev.ev-pro{border-color:rgba(244,185,66,.55);background:linear-gradient(100deg,rgba(244,185,66,.14),var(--surface) 45%)}
+.ev.ev-pro.open{border-color:var(--galben)}
 .ev-head{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:58px 1fr 22px;gap:10px;padding:12px 14px;width:100%;border-radius:12px}
 .ev-head:focus-visible{outline:3px solid var(--hl)}
 .tm{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1.3;white-space:pre-line}
@@ -157,6 +159,9 @@ button{font-family:inherit}
 .tag.age{background:transparent;box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--accent)}
 .tag.acc{background:transparent;box-shadow:inset 0 0 0 1.5px var(--muted);color:var(--fg)}
 .tag.saved{background:var(--galben);color:#1F4E5F}
+.tag.pro{background:#1F4E5F;color:#F4B942;font-weight:700}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tag.pro{background:#F4B942;color:#1F4E5F}}
+:root[data-theme="dark"] .tag.pro{background:#F4B942;color:#1F4E5F}
 .caret{align-self:center;transition:transform .2s;color:var(--muted)}
 .ev.open .caret{transform:rotate(180deg)}
 @media (prefers-reduced-motion:reduce){.caret{transition:none}}
@@ -962,12 +967,12 @@ function evGuides(e){
   return g.map(a=>`<a class="ev-guide" href="#articol/${encodeURIComponent(a.id)}" data-trk="Ghid din eveniment" data-trk-id="${e.id}"><span class="ev-guide-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${RIC.book}</svg></span><span><small>Ghid pentru părinți</small>${esc(a.t)}</span><span class="ev-guide-go" aria-hidden="true">→</span></a>`).join("");
 }
 function evCard(e){
-  const open=state.open===e.id, isSaved=saved.includes(e.id), al=ageLabel(e);
-  return `<article class="ev${open?" open":""}" id="${e.id}">
+  const open=state.open===e.id, isSaved=saved.includes(e.id), al=ageLabel(e), pro=partnerOf(e);
+  return `<article class="ev${open?" open":""}${pro?" ev-pro":""}" id="${e.id}">
     <button class="ev-head" type="button" data-open="${e.id}" aria-expanded="${open}">
       <div class="tm">${esc(timeLabel(e))}</div>
       <div><h3>${esc(e.n)}</h3>${(()=>{const same=sameOrgLoc(e);const L=locOf(e);return same?`<div class="meta org loc">${I.pin}${esc(L)}</div>`:(e.o?`<div class="meta org">${esc(e.o)}</div>`:"")+(L?`<div class="meta loc">${I.pin}${esc(L)}</div>`:"")})()}
-        <div class="tags"><span class="tag">${esc(e.c)}</span>${al?`<span class="tag age">${esc(al)}</span>`:""}${isSaved?'<span class="tag saved">Salvat</span>':""}</div></div>
+        <div class="tags">${pro?'<span class="tag pro">★ Partener CFCC</span>':""}<span class="tag">${esc(e.c)}</span>${al?`<span class="tag age">${esc(al)}</span>`:""}${isSaved?'<span class="tag saved">Salvat</span>':""}</div></div>
       <span class="caret">${I.caret}</span>
     </button>
     ${open?`<div class="det">
@@ -1250,6 +1255,8 @@ const orgsOf=e=>e.os&&e.os.length?e.os:(e.o?[e.o]:[]);
 const orgFor=e=>orgsOf(e).map(orgByName).find(Boolean)||orgByName(e.l);
 /* organizatorul e chiar locul (ex. Teatrul Merlin la Teatrul Merlin): îl arătăm o singură dată, la „Unde” */
 /* locația lipsește, dar organizatorul e o instituție cu pagină în Comunitate -> locul e chiar instituția (rezervă; în sheet scriptul o completează singur) */
+// partener CFCC (pachetul Partener, pagină pe Da): organizatorul sau locația
+function partnerOf(e){return [...orgsOf(e),e.l].map(orgByName).find(o=>o&&o.pro)||null}
 function locOf(e){if(e.l)return e.l;return orgsOf(e).find(x=>orgByName(x))||""}
 function adOf(e){if(e.ad||e.l)return e.ad||"";const g=orgFor(e);return g&&g.ad||""}
 function sameOrgLoc(e){const l=locOf(e);if(!e.o||!l||orgsOf(e).length>1)return false;if(norm(e.o)===norm(l))return true;const a=orgByName(e.o);return !!a&&a===orgByName(l)}
