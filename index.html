@@ -961,7 +961,9 @@ const I={
 /* Ghiduri potrivite: articolele publicate care au categoria evenimentului în coloana „Categorii potrivite” */
 function evGuides(e){
   const c=norm(e.c);if(!c||!ARTS.length)return"";
-  const g=ARTS.filter(a=>a.tags.some(t=>{t=norm(t);return t&&(t===c||t.startsWith(c)||c.startsWith(t))})).slice(-2).reverse();
+  const catOk=a=>!a.cats.length||a.cats.some(t=>{t=norm(t);return t&&(t===c||t.startsWith(c)||c.startsWith(t))});
+  // un articol cu tag de ediție (ex. Halloween) apare doar la evenimentele din ediția aceea
+  const g=ARTS.filter(a=>(a.eds.length?a.eds.some(x=>edMatch(x,e)):a.cats.length)&&catOk(a)).slice(-2).reverse();
   return g.map(a=>`<a class="ev-guide" href="#articol/${encodeURIComponent(a.id)}" data-trk="Ghid din eveniment" data-trk-id="${e.id}"><span class="ev-guide-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${RIC.book}</svg></span><span><small>Ghid pentru părinți</small>${esc(a.t)}</span><span class="ev-guide-go" aria-hidden="true">→</span></a>`).join("");
 }
 function evCard(e){
@@ -1222,7 +1224,8 @@ function buildCom(t){
   const artSt=v=>{v=norm(v);return /^(da|publicat)/.test(v)?"pub":/^previz/.test(v)?"prev":""};
   const ARTS_ALL=rows("articole").filter(g=>g(1)&&artSt(g(8))).map(g=>({prev:artSt(g(8))==="prev",id:slug(g(0)||g(1)),t:g(1),rub:g(2),data:g(3),rez:g(4),text:g(5),poza:imgUrl(g(6)),poz:g(9),fin:g(10),tags:g(11).split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean),
     parts:g(7).split(/[,\n]+/).map(x=>slug(x)).filter(Boolean)}));
-  ARTS_ALL.forEach(a=>a.cat=a.tags[0]||"");
+  ARTS_ALL.forEach(a=>{const edOf=t=>EDITII.find(x=>norm(t)===norm(x.id)||norm(t)===norm(x.t)||norm(t)===norm(x.t.replace(/ cu copiii$/,"")));
+    a.eds=a.tags.map(edOf).filter(Boolean);a.cats=a.tags.filter(t=>!edOf(t));a.cat=a.cats[0]||""});
   ARTS=ARTS_ALL.filter(a=>!a.prev);
   ART_BY=Object.fromEntries(ARTS_ALL.map(a=>[a.id,a]));
   const acts=rows("activitati"),gal=rows("galerie");
@@ -1342,7 +1345,7 @@ function renderArt(id){
     ${a.rez?`<p class="art-lead">${artInline(a.rez)}</p>`:""}${a.poza?`<img class="org-photo" src="${esc(a.poza)}" alt="" loading="lazy" style="object-position:${artPoz(a.poz)}">`:""}
     ${artText(a.text,a.parts,a.prev)}
     ${ps.length?`<div class="org-sec"><h3>Despre cine am scris</h3><div class="org-grid">${ps.map(orgCard).join("")}</div></div>`:""}
-    <div class="art-cta"><b>${esc(a.fin||"Gata de o ieșire cu cei mici?")}</b><span>Vezi ce evenimente pentru copii sunt în Timișoara în perioada următoare.</span><a class="btn btn-main" href="#calendar" data-artcat="${esc(a.cat||"")}">Vezi calendarul</a></div></article>`;
+    <div class="art-cta"><b>${esc(a.fin||"Gata de o ieșire cu cei mici?")}</b><span>Vezi ce evenimente pentru copii sunt în Timișoara în perioada următoare.</span>${a.eds&&a.eds.length?`<a class="btn btn-main" href="#${a.eds[0].id}">Vezi ${esc(a.eds[0].t.replace(/ cu copiii$/,""))} în calendar</a>`:`<a class="btn btn-main" href="#calendar" data-artcat="${esc(a.cat||"")}">Vezi calendarul</a>`}</div></article>`;
   track("Articol",null,{articol:a.t});
 }
 /* Formatare articole (din sheet): totul trece întâi prin esc(), apoi:
@@ -1406,7 +1409,8 @@ const EDITII=[
 ];
 const ED_BY=Object.fromEntries(EDITII.map(x=>[x.id,x]));
 const ed={cur:null,day:"",age:""};
-const edEvents=x=>EV.filter(e=>e.d>=x.de&&e.d<=x.pana&&e.d>=iso(TODAY)&&x.kw.test(e.n+" "+e.desc+" "+e.c))
+const edMatch=(x,e)=>e.d>=x.de&&e.d<=x.pana&&x.kw.test(e.n+" "+e.desc+" "+e.c);
+const edEvents=x=>EV.filter(e=>e.d>=iso(TODAY)&&edMatch(x,e))
   .sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
 const edLive=x=>x.public&&iso(TODAY)>=x.banner&&iso(TODAY)<=x.pana;
 function edBanner(){
