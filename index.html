@@ -1390,7 +1390,7 @@ function renderEd(){
   const prev=x.public?"":'<p class="art-prev">Previzualizare - pagina nu e încă publică (nu apare în Calendar). O vezi doar cu acest link.</p>';
   const hero=`<header class="ed-hero" style="--c1:${x.c1};--c2:${x.c2}"><span class="ed-em" aria-hidden="true">${x.em}</span>
     <span class="ed-city">Timișoara</span><h2>${esc(x.t)}</h2><p>${esc(x.intro)}</p>
-    <div class="ed-acts"><button class="btn ed-share" type="button" data-edshare="${x.id}">Trimite pagina unei prietene</button></div></header>`;
+    <div class="ed-acts"><button class="btn ed-share" type="button" data-edshare="${x.id}">Trimite pagina unui părinte cu chef de joacă</button></div></header>`;
   if(loadState!=="ok"){el.innerHTML=prev+hero+`<div class="empty">${loadState==="loading"?"Se încarcă...":"Calendarul nu s-a putut încărca. Reîncarcă pagina."}</div>`;return}
   let all=edEvents(x);
   const days=[...new Set(all.map(e=>e.d))];
