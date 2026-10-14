@@ -1226,9 +1226,10 @@ function buildCom(t){
       logo:imgUrl(g(13)),cover:imgUrl(g(14)),keys:[g(1),...g(15).split(/\n+/)].map(norm).filter(Boolean),
       svc:acts.filter(a=>slug(a(0))===id&&a(1)).map(a=>({t:a(1),d:a(2)})),
       foto:gal.filter(a=>slug(a(0))===id).map(a=>({u:imgUrl(a(1)),alt:a(2)})).filter(x=>x.u),
-      art:ARTS.filter(a=>a.parts.includes(id)),live:da(g(4))}});
+      art:ARTS.filter(a=>a.parts.includes(id)),live:da(g(4)),prev:/^previz/i.test(g(4).trim())}});
   ORGS=ORG_ALL.filter(o=>o.live);
-  ORG_BY=Object.fromEntries(ORGS.map(o=>[o.slug,o]));ORG_CACHE={};orgState="ok";
+  // „Previzualizare” în Pe site: pagina se deschide doar cu linkul direct, nu apare în liste
+  ORG_BY=Object.fromEntries(ORG_ALL.filter(o=>o.live||o.prev).map(o=>[o.slug,o]));ORG_CACHE={};orgState="ok";
 }
 async function loadCom(){
   if(COM_SHEET){try{const t={},v=Math.floor(Date.now()/60000);
