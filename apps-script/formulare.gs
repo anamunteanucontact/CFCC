@@ -1262,9 +1262,38 @@ function onOpen() {
       .addSeparator()
       .addItem('Actualizează fila Organizatori', 'actualizeaza_organizatori_tot')
       .addItem('Completează locațiile goale (instituții cu sediu propriu)', 'completeaza_locatii_tot')
+      .addSeparator()
+      .addItem('Propuneri: ascunde cele publicate și respinse', 'ascunde_propuneri_gata')
+      .addItem('Propuneri: arată toate', 'arata_propuneri')
       .addToUi();
   } catch (err) { console.warn(err); }
   try { ascunde_trecute(); } catch (err) { console.warn(err); }
+  try { ascunde_propuneri_gata(); } catch (err) { console.warn(err); }
+}
+
+/** „Propuneri evenimente”: propunerile terminate (Publicat, Respins) sunt gri și se ascund la deschidere,
+    ca la evenimentele trecute. Rămân în sheet (scripturile au nevoie de ele); din meniu le arăți la loc. */
+function ascunde_propuneri_gata() {
+  const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(FILE.eveniment.nume);
+  if (!fila || fila.getLastRow() < 2) return;
+  const prim = 2, ultim = fila.getLastRow();
+  const st = fila.getRange(prim, prop_col('Status'), ultim - prim + 1, 1).getValues();
+  let start = prim, gata = null;
+  const aplica = function (de, pana, ascunde) {
+    if (ascunde === null) return;
+    if (ascunde) fila.hideRows(de, pana - de + 1); else fila.showRows(de, pana - de + 1);
+  };
+  for (let i = 0; i < st.length; i++) {
+    const v = String(st[i][0] || '').trim();
+    const g = v === STATUS_PUBLICAT || v === 'Respins';
+    if (gata === null) { gata = g; start = prim + i; continue; }
+    if (g !== gata) { aplica(start, prim + i - 1, gata); start = prim + i; gata = g; }
+  }
+  aplica(start, ultim, gata);
+}
+function arata_propuneri() {
+  const fila = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(FILE.eveniment.nume);
+  if (fila && fila.getMaxRows() > 1) fila.showRows(2, fila.getMaxRows() - 1);
 }
 
 function ascunde_trecute() {
