@@ -1224,7 +1224,7 @@ function buildCom(t){
   ART_BY=Object.fromEntries(ARTS_ALL.map(a=>[a.id,a]));
   const acts=rows("activitati"),gal=rows("galerie");
   ORG_ALL=rows("parteneri").filter(g=>g(1)).map(g=>{const id=slug(g(0)||g(1));
-    return {slug:id,n:g(1),tip:g(2),pro:/^partener/i.test(g(3)),full:/^partener|complet/i.test(norm(g(3))),desc:g(5),age:g(6),ad:g(7),tel:g(8),mail:g(9),ig:cleanUrl(g(10)),fb:cleanUrl(g(11)),web:cleanUrl(g(12)),
+    return {slug:id,n:g(1),tip:g(2),pro:/^partener/i.test(g(3)),full:/^partener|complet/i.test(norm(g(3))),desc:g(5),age:g(6),ad:g(7),tel:g(8),mail:g(9),ig:cleanUrl(g(10)),fb:cleanUrl(g(11)),web:cleanUrl(g(12)),shop:cleanUrl(g(17)),
       logo:imgUrl(g(13)),cover:imgUrl(g(14)),keys:[g(1),...g(15).split(/\n+/)].map(norm).filter(Boolean),
       svc:acts.filter(a=>slug(a(0))===id&&a(1)).map(a=>({t:a(1),d:a(2)})),
       foto:gal.filter(a=>slug(a(0))===id).map(a=>({u:imgUrl(a(1)),alt:a(2)})).filter(x=>x.u),
@@ -1306,6 +1306,7 @@ function renderOrg(sl){
       ${btn(o.ad?mapUrl(o):"","Hartă",true,"Organizator: hartă")}
       ${btn(o.ig,"Instagram",false,"Organizator: Instagram")}
       ${btn(o.fb,"Facebook",false,"Organizator: Facebook")}
+      ${btn(o.shop,"Magazin online",false,"Organizator: magazin online")}
     </div>
     <div class="org-sec"><h3>În calendar acum</h3>
       ${loadState==="loading"?'<div class="empty">Se încarcă evenimentele...</div>':ev.length?`<div class="mini">${ev.map(e=>{const d=dt(e.d);
