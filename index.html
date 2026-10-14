@@ -149,6 +149,8 @@ button{font-family:inherit}
 .draft-note{background:#FCD9B0;color:#7a3d00;border-radius:12px;padding:10px 14px;margin:10px 0 14px;font-weight:600;font-size:.9rem}
 .meta{font-size:.86rem;color:var(--muted);margin-top:3px}
 .meta.org{color:var(--head);font-weight:600}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .meta.org{color:#cfe0e5}}
+:root[data-theme="dark"] .meta.org{color:#cfe0e5}
 .meta.loc{display:flex;align-items:center;gap:4px;margin-top:2px}.meta.loc svg{flex:none;opacity:.7}
 .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
 .tag{font-size:.74rem;font-weight:600;padding:3px 8px;border-radius:6px;background:var(--chip)}
@@ -324,6 +326,23 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .art-cta b{font-family:var(--display);font-size:1.2rem;font-weight:800;line-height:1.15}
 .art-cta span{color:var(--muted)}
 .art-cta .btn{margin-top:6px}
+/* ediții speciale */
+.ed-ban{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:12px 16px;border-radius:16px;text-decoration:none;color:#fff;background:linear-gradient(120deg,var(--c1),var(--c2));box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.ed-ban-em{font-size:1.9rem;line-height:1}
+.ed-ban b{display:block;font-family:var(--display);font-size:1.15rem;font-weight:800;line-height:1.15}
+.ed-ban small{display:block;font-size:.85rem;opacity:.92}
+.ed-ban-go{margin-left:auto;font-weight:800;font-size:1.2rem}
+.ed-hero{position:relative;overflow:hidden;border-radius:22px;padding:26px 20px 20px;margin-bottom:18px;color:#fff;background:linear-gradient(135deg,var(--c1),var(--c2))}
+.ed-hero h2{font-size:clamp(1.8rem,6vw,2.6rem);font-weight:800;margin:4px 0 8px;color:#fff;padding-right:64px}
+.ed-hero p{margin:0;max-width:52ch;opacity:.95}
+.ed-em{position:absolute;right:12px;top:10px;font-size:3.4rem;opacity:.9;transform:rotate(12deg)}
+.ed-city{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;opacity:.9}
+.ed-acts{margin-top:14px}
+.ed-share{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.5)}
+.ed-filters{margin-bottom:6px}
+.ed-cta{margin-top:22px}
+.ed-empty{padding:24px 12px}
+
 .ev-guide{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--chip);color:var(--fg);text-decoration:none;font-weight:600;font-size:.92rem;line-height:1.3}
 .ev-guide small{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700}
 .ev-guide-ic{flex:none;width:32px;height:32px;border-radius:50%;background:#7fb7a4;color:#1F4E5F;display:grid;place-items:center}
@@ -392,6 +411,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
         <h2>Ce e de făcut în oraș</h2>
         <p>Apasă pe un eveniment ca să-i vezi detaliile. Îl poți pune direct în calendarul tău personal, îl poți trimite cuiva interesat sau îl poți salva în agenda ta, aici pe platformă.</p>
       </div>
+      <div id="ed-banner"></div>
       <div class="filters">
         <div class="row" id="f-per" role="group" aria-label="Perioada">
           <span class="lbl">Când</span>
@@ -467,6 +487,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 <!-- ARTICOL -->
 <section id="v-articol" class="view vwrap" hidden>
   <div class="wrap" id="art-page"></div>
+</section>
+
+<!-- EDIȚIE SPECIALĂ (Halloween, Crăciun...) -->
+<section id="v-editie" class="view vwrap" hidden>
+  <div class="wrap" id="ed-page"></div>
 </section>
 
 <!-- PAGINA ORGANIZATOR -->
@@ -803,7 +828,7 @@ function parseCSV(t){
 const slug=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40);
 // linkuri curate: doar titlul (max ~60 caractere, tăiat la cuvânt întreg); la titluri repetate se adaugă data, ex. detectivii-beta-18-octombrie
 const LUNI_SLUG=["ianuarie","februarie","martie","aprilie","mai","iunie","iulie","august","septembrie","octombrie","noiembrie","decembrie"];
-const RESERVED_IDS=new Set(["calendar","despre","recomandari","colaborari","profil","confidentialitate","formular","formular-partener","adauga-eveniment","colaborare-promovare"]);
+const RESERVED_IDS=new Set(["halloween","craciun","mos-nicolae","1-iunie","paste","calendar","despre","recomandari","colaborari","profil","confidentialitate","formular","formular-partener","adauga-eveniment","colaborare-promovare"]);
 function titleSlug(n){let x=n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");if(x.length>60){x=x.slice(0,61);x=x.includes("-")?x.slice(0,x.lastIndexOf("-")):x.slice(0,60)}return x||"eveniment"}
 const dateSlug=d=>{const p=d.split("-");return (+p[2])+"-"+LUNI_SLUG[+p[1]-1]};
 function cleanUrl(u){u=(u||"").trim();if(!/^https?:\/\//i.test(u))return"";try{const x=new URL(u);["stkn","fbclid","igsh","mibextid","utm_source","utm_medium","utm_campaign"].forEach(k=>x.searchParams.delete(k));return x.toString()}catch(_){return""}}
@@ -1005,7 +1030,7 @@ function toggleSave(id){
   if(!saved.includes(id))went=went.filter(x=>x!==id);
   store.set("saved",saved);store.set("went",went);
   toast(saved.includes(id)?"Salvat în Agenda mea":"Scos din salvate");
-  render();renderProfile();
+  render();renderProfile();if(curView==="editie")renderEd();
 }
 async function share(id){
   const e=BYID[id];track("Distribuie",id);
@@ -1017,7 +1042,7 @@ async function copyLink(id){
   try{await navigator.clipboard.writeText(t);toast("Link copiat")}catch(_){toast(t)}
 }
 document.addEventListener("click",ev=>{
-  const o=ev.target.closest("[data-open]");if(o){const id=o.dataset.open;state.open=state.open===id?null:id;if(state.open)track("Detalii eveniment",id);render();return}
+  const o=ev.target.closest("[data-open]");if(o){const id=o.dataset.open;state.open=state.open===id?null:id;if(state.open)track("Detalii eveniment",id);render();if(curView==="editie")renderEd();return}
   const s=ev.target.closest("[data-save]");if(s){toggleSave(s.dataset.save);return}
   const sh=ev.target.closest("[data-share]");if(sh){share(sh.dataset.share);return}
   const c=ev.target.closest("[data-copy]");if(c){copyLink(c.dataset.copy);return}
@@ -1336,10 +1361,68 @@ function renderRec(){
 }
 
 /* navigare */
-const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate","comunitate","org","articol","formular"];
+/* ---------- Ediții speciale (Halloween, Crăciun, 1 Iunie...) ----------
+   O ediție adună la un loc evenimentele dintr-o perioadă care au în nume, descriere sau categorie unul din cuvintele-cheie.
+   Pagina ei: cefacemcucopiii.ro/#<id>. Cât timp public:false, pagina se vede doar cu linkul (cu bandă de previzualizare)
+   și nu apare bannerul din Calendar. public:true + data de azi între „banner” și „pana” → banner sus în Calendar. */
+const EDITII=[
+  {id:"halloween",t:"Halloween cu copiii",em:"🎃",public:false,
+   intro:"Petreceri costumate, ateliere cu dovleci și povești cu fantome prietenoase. Toate petrecerile de Halloween pentru copii din Timișoara, într-un singur loc.",
+   banner:"2026-10-17",de:"2026-10-17",pana:"2026-11-02",
+   kw:/hal+ow+e+n|dovle[cg]|fantom|vr[ăa]jitoar|bal mascat|costumat|spooky|trick or treat/i,
+   c1:"#E8701A",c2:"#4B2E83"}
+];
+const ED_BY=Object.fromEntries(EDITII.map(x=>[x.id,x]));
+const ed={cur:null,day:"",age:""};
+const edEvents=x=>EV.filter(e=>e.d>=x.de&&e.d<=x.pana&&e.d>=iso(TODAY)&&x.kw.test(e.n+" "+e.desc+" "+e.c))
+  .sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
+const edLive=x=>x.public&&iso(TODAY)>=x.banner&&iso(TODAY)<=x.pana;
+function edBanner(){
+  const el=document.getElementById("ed-banner");if(!el)return;
+  const x=EDITII.find(edLive);if(!x||loadState!=="ok"){el.innerHTML="";return}
+  const n=edEvents(x).length;
+  el.innerHTML=`<a class="ed-ban" href="#${x.id}" style="--c1:${x.c1};--c2:${x.c2}"><span class="ed-ban-em" aria-hidden="true">${x.em}</span>
+    <span><b>${esc(x.t)}</b><small>${n?`${n} ${n===1?"activitate":"activități"} adunate într-un loc`:"Le adunăm acum într-un singur loc"}</small></span><span class="ed-ban-go" aria-hidden="true">→</span></a>`;
+}
+function renderEd(){
+  const el=document.getElementById("ed-page"),x=ED_BY[ed.cur];if(!el||!x)return;
+  document.title=x.t+" | Ce facem cu copiii?";
+  const prev=x.public?"":'<p class="art-prev">Previzualizare - pagina nu e încă publică (nu apare în Calendar). O vezi doar cu acest link.</p>';
+  const hero=`<header class="ed-hero" style="--c1:${x.c1};--c2:${x.c2}"><span class="ed-em" aria-hidden="true">${x.em}</span>
+    <span class="ed-city">Timișoara</span><h2>${esc(x.t)}</h2><p>${esc(x.intro)}</p>
+    <div class="ed-acts"><button class="btn ed-share" type="button" data-edshare="${x.id}">Trimite pagina unei prietene</button></div></header>`;
+  if(loadState!=="ok"){el.innerHTML=prev+hero+`<div class="empty">${loadState==="loading"?"Se încarcă...":"Calendarul nu s-a putut încărca. Reîncarcă pagina."}</div>`;return}
+  let all=edEvents(x);
+  const days=[...new Set(all.map(e=>e.d))];
+  if(ed.day&&!days.includes(ed.day))ed.day="";
+  let rows=all;
+  if(ed.age){const[lo,hi]=ed.age.split("-").map(Number);rows=rows.filter(e=>{const[a,b]=ageRange(e);return a<hi&&b>=lo})}
+  if(ed.day)rows=rows.filter(e=>e.d===ed.day);
+  const chip=(k,v,t,on)=>`<button class="chip" type="button" data-ed${k}="${v}" aria-pressed="${on}">${t}</button>`;
+  const dayLbl=k=>{const d=dt(k);return `${ZS[d.getDay()]} ${d.getDate()} ${LUNI_LUNG[d.getMonth()].slice(0,3)}.`};
+  const filters=all.length?`<div class="filters ed-filters">
+    ${days.length>1?`<div class="row" role="group" aria-label="Ziua"><span class="lbl">Când</span>${chip("day","","Toate zilele",!ed.day)}${days.map(k=>chip("day",k,dayLbl(k),ed.day===k)).join("")}</div>`:""}
+    <div class="row" role="group" aria-label="Vârsta"><span class="lbl">Vârsta</span>${chip("age","","Toate",!ed.age)}${[["0-3","0-3 ani"],["3-6","3-6 ani"],["6-12","6-12 ani"],["12-18","12+ ani"]].map(([v,t])=>chip("age",v,t,ed.age===v)).join("")}</div>
+    <div class="count">${rows.length} ${rows.length===1?"activitate":"activități"}</div></div>`:"";
+  const by={};rows.forEach(e=>(by[e.d]=by[e.d]||[]).push(e));
+  const list=Object.keys(by).map(k=>{const d=dt(k);return `<div class="dayhead"><h3>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}</h3><span>${by[k].length} ${by[k].length===1?"activitate":"activități"}</span></div><div class="evs">${by[k].map(evCard).join("")}</div>`}).join("");
+  const empty=!all.length?`<div class="empty ed-empty"><span>Adunăm acum toate petrecerile și atelierele. Revino în câteva zile sau abonează-te la newsletter și ți le trimitem pe mail.</span></div>`
+    :!rows.length?'<div class="empty">Nu am găsit nimic pentru filtrele alese.</div>':"";
+  const cta=`<div class="art-cta ed-cta"><b>Organizezi ceva de ${esc(x.t.replace(/ cu copiii$/,""))}?</b><span>Trimite-ne evenimentul și îl adăugăm aici, gratuit.</span><a class="btn btn-main" href="#adauga-eveniment">Adaugă evenimentul tău</a></div>`;
+  el.innerHTML=prev+hero+filters+list+empty+cta;
+  el.querySelectorAll(".ed-filters .row").forEach(r=>{try{hscroll(r)}catch(_){}});
+}
+document.addEventListener("click",ev=>{
+  const d=ev.target.closest("[data-edday]");if(d){ed.day=d.dataset.edday;state.open=null;renderEd();return}
+  const a=ev.target.closest("[data-edage]");if(a){ed.age=a.dataset.edage;renderEd();return}
+  const s=ev.target.closest("[data-edshare]");if(s){const x=ED_BY[s.dataset.edshare],url=`https://cefacemcucopiii.ro/${x.id}`;track("Distribuie ediție",null,{editie:x.t});
+    if(navigator.share){navigator.share({title:x.t,text:x.t+" în Timișoara - toate într-un loc:",url}).catch(()=>{})}
+    else{navigator.clipboard&&navigator.clipboard.writeText(url).then(()=>toast("Link copiat"),()=>toast(url))}}
+});
+const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate","comunitate","org","articol","formular","editie"];
 function go(v,scroll){
   VIEWS.forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
-  const nv=v==="articol"?"recomandari":v==="org"?"comunitate":v;
+  const nv=v==="articol"?"recomandari":v==="org"?"comunitate":v==="editie"?"calendar":v;
   document.querySelectorAll(".nav ul a,.tabbar a").forEach(a=>{if(a.dataset.view===nv)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
   curView=v;nlCta();
   if(scroll)window.scrollTo(0,0);
@@ -1356,6 +1439,7 @@ function route(){
   if(h==="comunitate"||h==="organizatori"){renderOrgs();go("comunitate",true);return}
   if(h==="formular-partener"){go("formular",true);return}
   if(h.startsWith("articol/")){renderArt(decodeURIComponent(h.slice(8)));go("articol",true);return}
+  if(ED_BY[h]){ed.cur=h;ed.day="";ed.age="";renderEd();go("editie",true);track("Ediție specială",null,{editie:ED_BY[h].t});return}
   if(BYID[h]){state.per="all";document.querySelectorAll("#f-per .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v==="all"?"true":"false"));state.open=h;state.day=BYID[h].d;go("calendar");render();setTimeout(()=>document.getElementById(h)?.scrollIntoView({block:"center"}),50);return}
   if(h==="adauga-eveniment"||h==="colaborare-promovare"){go("colaborari",true);openForm(h==="adauga-eveniment"?"ev":"pr",true);return}
   if(h==="newsletter"||h==="abonare"){
@@ -1483,7 +1567,7 @@ function hscroll(el){if(!el||el.parentNode.classList.contains("hs"))return;
   new MutationObserver(()=>requestAnimationFrame(upd)).observe(el,{childList:true,subtree:true});
   upd();setTimeout(upd,400)}
 ["f-per","f-age","f-cat","days"].forEach(id=>hscroll(document.getElementById(id)));
-loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();const h=location.hash.slice(1);if(BYID[h]||comRoute(h)||h==="newsletter"||h==="abonare")route();else if(h.startsWith("previzualizare/")&&ORG_BY.__prev)renderOrg("__prev")});
+loadEvents().then(()=>{buildCats();if(window.__cePending){const b=[...document.querySelectorAll("#f-cat .chip")].find(c=>c.dataset.v&&c.dataset.v.toLowerCase().startsWith(window.__cePending));if(b){state.cat=b.dataset.v;document.querySelectorAll("#f-cat .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"))}}render();renderProfile();edBanner();if(curView==="editie")renderEd();const h=location.hash.slice(1);if(BYID[h]||comRoute(h)||h==="newsletter"||h==="abonare")route();else if(h.startsWith("previzualizare/")&&ORG_BY.__prev)renderOrg("__prev")});
 </script>
 </body>
 </html>
