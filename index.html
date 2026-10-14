@@ -326,6 +326,12 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .art-cta b{font-family:var(--display);font-size:1.2rem;font-weight:800;line-height:1.15}
 .art-cta span{color:var(--muted)}
 .art-cta .btn{margin-top:6px}
+.art-box{display:flex;flex-direction:column;gap:10px;background:var(--chip);border-left:5px solid var(--accent);border-radius:14px;padding:16px 18px;margin:6px 0}
+.art-box h3.art-h{margin-top:0}
+.art-box{position:relative}
+.art-box-logo{position:absolute;top:12px;right:14px}
+.art-box-logo img{display:block;max-height:40px;max-width:96px;object-fit:contain;border-radius:8px;background:#fff;padding:3px}
+.art-box:has(.art-box-logo) h3.art-h{padding-right:100px}
 /* ediții speciale */
 .ed-ban{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:12px 16px;border-radius:16px;text-decoration:none;color:#fff;background:linear-gradient(120deg,var(--c1),var(--c2));box-shadow:0 4px 14px rgba(0,0,0,.12)}
 .ed-ban-em{font-size:1.9rem;line-height:1}
@@ -1325,7 +1331,7 @@ function renderArt(id){
   const ps=a.parts.map(p=>ORG_BY[p]).filter(o=>o&&o.live);
   el.innerHTML=`${back}${a.prev?'<p class="art-prev">Previzualizare - articolul nu e încă public. Îl vezi doar tu, cu acest link. Ca să apară pe site, pune „Publicat” în sheet.</p>':""}<article class="art-body"><span class="eyebrow">${esc(a.rub||"Recomandările noastre")}${a.data?" · "+esc(a.data):""}</span><h2>${esc(a.t)}</h2>
     ${a.rez?`<p class="art-lead">${artInline(a.rez)}</p>`:""}${a.poza?`<img class="org-photo" src="${esc(a.poza)}" alt="" loading="lazy" style="object-position:${artPoz(a.poz)}">`:""}
-    ${artText(a.text)}
+    ${artText(a.text,a.parts)}
     ${ps.length?`<div class="org-sec"><h3>Despre cine am scris</h3><div class="org-grid">${ps.map(orgCard).join("")}</div></div>`:""}
     <div class="art-cta"><b>${esc(a.fin||"Gata de o ieșire cu cei mici?")}</b><span>Vezi ce evenimente pentru copii sunt în Timișoara în perioada următoare.</span><a class="btn btn-main" href="#calendar" data-artcat="${esc(a.cat||"")}">Vezi calendarul</a></div></article>`;
   track("Articol",null,{articol:a.t});
@@ -1335,7 +1341,19 @@ function renderArt(id){
    un paragraf care începe cu **...** e un sfat (îngroșatul iese coral); un paragraf tot în *...* e o notă de final;
    rândurile noi din același paragraf rămân rânduri noi. */
 const artInline=t=>esc(t).replace(/\*\*([^*\n][^*]*?)\*\*/g,"<strong>$1</strong>").replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\w)/g,"$1<em>$2</em>").replace(/\n/g,"<br>");
-function artText(t){
+function artText(t,parts){
+  // [chenar] ... [/chenar] = casetă evidențiată (poate avea ## subtitlu, **bold**, paragrafe).
+  // [chenar id-partener] alege logo-ul unui partener; fără id, se ia primul partener cu logo din coloana H.
+  const src=String(t||"").replace(/\r/g,"");
+  if(/\[chenar[^\]]*\]/i.test(src)){
+    const bits=src.split(/\[chenar\s*([^\]]*)\]([\s\S]*?)(?:\[\/chenar\]|$)/i);
+    let html="";
+    for(let i=0;i<bits.length;i+=3){
+      html+=artText(bits[i]);
+      if(i+2<bits.length)html+=`<aside class="art-box">${artBoxLogo(bits[i+1],parts)}${artText(bits[i+2])}</aside>`;
+    }
+    return html;
+  }
   const out=[];let buf=[];
   const flush=()=>{const p=buf.join("\n").trim();buf=[];if(!p)return;
     const cls=/^\*\*/.test(p)?' class="tip"':/^\*[^*][\s\S]*\*$/.test(p)||/^data viitoare/i.test(p)?' class="next"':"";
@@ -1345,6 +1363,12 @@ function artText(t){
     if(h){flush();out.push(`<h3 class="art-h">${artInline(h[1].trim())}</h3>`)}
     else if(!l.trim())flush();else buf.push(l)});
   flush();return out.join("");
+}
+function artBoxLogo(id,parts){
+  const ids=(id||"").trim()?[slug(id.trim())]:(parts||[]);
+  const o=ids.map(p=>ORG_BY[p]).find(o=>o&&o.logo);if(!o)return"";
+  const img=`<img src="${esc(o.logo)}" alt="${esc(o.n)}" loading="lazy">`;
+  return `<span class="art-box-logo">${o.live?`<a href="#comunitate/${encodeURIComponent(o.slug)}">${img}</a>`:img}</span>`;
 }
 const artPoz=v=>({sus:"center 15%",centru:"center 50%",jos:"center 85%"})[norm(v)]||"center 30%";
 document.addEventListener("click",ev=>{const b=ev.target.closest("[data-artcat]");if(!b)return;
