@@ -300,7 +300,12 @@ function notifica_echipa(tip, c) {
   const html = '<p><strong>' + esc(n[0]) + '</strong>' + (n[5] ? '. ' + esc(n[5]) : ', primit acum pe cefacemcucopiii.ro.') + '</p><table>' + rows + '</table>' +
     '<p>Toate detaliile sunt în <a href="' + link + '">' + esc(n[3]) + '</a>.</p>' +
     '<p style="color:#888;font-size:12px">Notificare automată. O oprești din sheet-ul „Ce facem cu copiii? - Texte e-mailuri automate”, fila Notificări.</p>';
-  s.catre.split(/[,;\s]+/).filter(function (a) { return /^\S+@\S+\.\S+$/.test(a); }).forEach(function (a) { trimite_email(a, subiect, html); });
+  // Notificările pentru echipă pleacă din Gmail (contul scriptului), nu prin Brevo: altfel stau lângă newsletter
+  // (același expeditor, hello@) și Gmail le pune în Promotions. Dacă Gmail dă eroare (ex. limita zilnică), merge prin Brevo.
+  s.catre.split(/[,;\s]+/).filter(function (a) { return /^\S+@\S+\.\S+$/.test(a); }).forEach(function (a) {
+    try { MailApp.sendEmail({ to: a, subject: subiect, htmlBody: html, name: 'CFCC - notificări' }); }
+    catch (errGmail) { console.warn('Notificare din Gmail: ' + errGmail); trimite_email(a, subiect, html); }
+  });
 }
 
 /* Trimite prin Brevo, de pe hello@cefacemcucopiii.ro.
