@@ -1380,9 +1380,8 @@ const edLive=x=>x.public&&iso(TODAY)>=x.banner&&iso(TODAY)<=x.pana;
 function edBanner(){
   const el=document.getElementById("ed-banner");if(!el)return;
   const x=EDITII.find(edLive);if(!x||loadState!=="ok"){el.innerHTML="";return}
-  const n=edEvents(x).length;
   el.innerHTML=`<a class="ed-ban" href="#${x.id}" style="--c1:${x.c1};--c2:${x.c2}"><span class="ed-ban-em" aria-hidden="true">${x.em}</span>
-    <span><b>${esc(x.t)}</b><small>${n?`${n} ${n===1?"activitate":"activități"} adunate într-un loc`:"Le adunăm acum într-un singur loc"}</small></span><span class="ed-ban-go" aria-hidden="true">→</span></a>`;
+    <span><b>${esc(x.t)}</b><small>Petreceri, ateliere și spectacole, toate într-un loc</small></span><span class="ed-ban-go" aria-hidden="true">→</span></a>`;
 }
 function renderEd(){
   const el=document.getElementById("ed-page"),x=ED_BY[ed.cur];if(!el||!x)return;
