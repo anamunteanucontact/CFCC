@@ -159,9 +159,7 @@ button{font-family:inherit}
 .tag.age{background:transparent;box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--accent)}
 .tag.acc{background:transparent;box-shadow:inset 0 0 0 1.5px var(--muted);color:var(--fg)}
 .tag.saved{background:var(--galben);color:#1F4E5F}
-.tag.pro{background:#1F4E5F;color:#F4B942;font-weight:700}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tag.pro{background:#F4B942;color:#1F4E5F}}
-:root[data-theme="dark"] .tag.pro{background:#F4B942;color:#1F4E5F}
+.tag.pro{background:#F4B942;color:#1F4E5F;font-weight:700}
 .caret{align-self:center;transition:transform .2s;color:var(--muted)}
 .ev.open .caret{transform:rotate(180deg)}
 @media (prefers-reduced-motion:reduce){.caret{transition:none}}
@@ -972,7 +970,7 @@ function evCard(e){
     <button class="ev-head" type="button" data-open="${e.id}" aria-expanded="${open}">
       <div class="tm">${esc(timeLabel(e))}</div>
       <div><h3>${esc(e.n)}</h3>${(()=>{const same=sameOrgLoc(e);const L=locOf(e);return same?`<div class="meta org loc">${I.pin}${esc(L)}</div>`:(e.o?`<div class="meta org">${esc(e.o)}</div>`:"")+(L?`<div class="meta loc">${I.pin}${esc(L)}</div>`:"")})()}
-        <div class="tags">${pro?'<span class="tag pro">★ Partener CFCC</span>':""}<span class="tag">${esc(e.c)}</span>${al?`<span class="tag age">${esc(al)}</span>`:""}${isSaved?'<span class="tag saved">Salvat</span>':""}</div></div>
+        <div class="tags">${pro?'<span class="tag pro">★ Partener</span>':""}<span class="tag">${esc(e.c)}</span>${al?`<span class="tag age">${esc(al)}</span>`:""}${isSaved?'<span class="tag saved">Salvat</span>':""}</div></div>
       <span class="caret">${I.caret}</span>
     </button>
     ${open?`<div class="det">
