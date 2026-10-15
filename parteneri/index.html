@@ -24,7 +24,13 @@
  addEventListener('pagehide',bye);
  addEventListener('load',function(){setTimeout(function(){cfccTrack('deschisă',{});},1500);
    document.querySelectorAll('[data-link]').forEach(function(a){a.href=cfccLink(a.getAttribute('data-link'));});
-   if(nume){document.querySelectorAll('.pentru').forEach(function(el){el.innerHTML='';var a=document.createElement('small');a.textContent='Ofertă pregătită pentru';var c=document.createElement('b');c.textContent=nume;el.appendChild(a);el.appendChild(c);el.hidden=false;});}
+   if(nume){document.querySelectorAll('.pentru').forEach(function(el){el.innerHTML='';var a=document.createElement('small');a.textContent='Ofertă pregătită pentru';var c=document.createElement('b');c.textContent=nume;var tx=document.createElement('span');tx.className='pt';tx.appendChild(a);tx.appendChild(c);
+   var slug=nume.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+   var im=new Image();im.alt='';im.className='plogo';var ext=['png','svg','jpg'],k=0;
+   im.onload=function(){el.classList.add('cu-logo');el.insertBefore(im,el.firstChild);};
+   im.onerror=function(){k++;if(k<ext.length)im.src='/assets/oferta/'+slug+'.'+ext[k];};
+   im.src='/assets/oferta/'+slug+'.'+ext[0];
+   el.appendChild(tx);el.hidden=false;});}
  });
 })();
 </script><title>cefacemcucopiii.ro - pentru parteneri</title>
@@ -283,7 +289,7 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
 .vs-head{align-items:stretch}
 .tap{display:flex;width:fit-content}
 </style>
-<style>.pentru{display:inline-grid;gap:2px;margin-bottom:26px;padding:14px 22px;border-radius:18px;background:var(--sun);color:#1F4E5F;box-shadow:0 10px 30px -12px rgba(0,0,0,.45);max-width:100%}.pentru small{font-size:14px;font-weight:700;letter-spacing:.02em}.pentru b{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,36px);line-height:1.1;overflow-wrap:anywhere}body{margin:0}[hidden]{display:none!important}</style>
+<style>.pentru{display:inline-grid;gap:2px;margin-bottom:26px;padding:14px 22px;border-radius:18px;background:var(--sun);color:#1F4E5F;box-shadow:0 10px 30px -12px rgba(0,0,0,.45);max-width:100%}.pentru.cu-logo{grid-template-columns:auto 1fr;align-items:center;column-gap:16px}.pt{display:grid;gap:2px;min-width:0}.plogo{width:64px;height:64px;object-fit:contain;background:#fff;border-radius:12px;padding:6px}.pentru small{font-size:14px;font-weight:700;letter-spacing:.02em}.pentru b{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,36px);line-height:1.1;overflow-wrap:anywhere}body{margin:0}[hidden]{display:none!important}</style>
 </head><body>
 
 <header class="hero">
