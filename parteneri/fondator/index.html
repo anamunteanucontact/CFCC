@@ -10,12 +10,13 @@
 /* Ofertă parteneri: link personal (?pentru=Nume-Brand) + evenimente Umami */
 (function(){
  var q=new URLSearchParams(location.search), b=q.get('pentru');
+ if(!b&&location.hash.length>1){var h=decodeURIComponent(location.hash.slice(1));if(!document.getElementById(h))b=h;}
  try{ if(b) sessionStorage.setItem('cfcc_pentru',b); else b=sessionStorage.getItem('cfcc_pentru'); }catch(e){}
  b=(b||'').replace(/[^\p{L}\p{N}\- .&]/gu,'').slice(0,60);
  var nume=b.replace(/-/g,' ').trim();
  window.CFCC_OFERTA={brand:b||'(fara link personal)',nume:nume,pagina:'fondator'};
  window.cfccTrack=function(n,d){try{if(window.umami&&umami.track){var o={brand:CFCC_OFERTA.brand,pagina:CFCC_OFERTA.pagina};for(var k in d)o[k]=d[k];umami.track('Ofertă: '+n,o);}}catch(e){}};
- window.cfccLink=function(path){return path+(b?('?pentru='+encodeURIComponent(b)):'');};
+ window.cfccLink=function(path){return path+(b?('#'+encodeURIComponent(b)):'');};
  var t0=Date.now(), maxs=0, sent=false;
  addEventListener('scroll',function(){var h=document.documentElement;var p=Math.round((h.scrollTop+innerHeight)/h.scrollHeight*100);if(p>maxs)maxs=p;},{passive:true});
  function bye(){if(sent)return;sent=true;cfccTrack('timp pe pagină',{secunde:Math.round((Date.now()-t0)/1000),scroll_procent:Math.min(maxs,100)});}
