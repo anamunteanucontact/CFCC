@@ -4,7 +4,7 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-<meta name="description" content="Colaborări și parteneriate cu Ce facem cu copiii.ro">
+<meta name="description" content="Colaborări și parteneriate cu cefacemcucopiii.ro">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="d0494fa3-dbd4-4c4f-8466-9cbd233f4dd0" data-domains="cefacemcucopiii.ro,www.cefacemcucopiii.ro"></script>
 <script>
 /* Ofertă parteneri: link personal (?pentru=Nume-Brand) + evenimente Umami */
@@ -23,10 +23,10 @@
  addEventListener('pagehide',bye);
  addEventListener('load',function(){setTimeout(function(){cfccTrack('deschisă',{});},1500);
    document.querySelectorAll('[data-link]').forEach(function(a){a.href=cfccLink(a.getAttribute('data-link'));});
-   if(nume){document.querySelectorAll('.pentru').forEach(function(el){el.textContent='Ofertă pregătită pentru '+nume;el.hidden=false;});}
+   if(nume){document.querySelectorAll('.pentru').forEach(function(el){el.innerHTML='';var a=document.createElement('small');a.textContent='Ofertă pregătită pentru';var c=document.createElement('b');c.textContent=nume;el.appendChild(a);el.appendChild(c);el.hidden=false;});}
  });
 })();
-</script><title>Ce facem cu copiii.ro - pentru parteneri</title>
+</script><title>cefacemcucopiii.ro - pentru parteneri</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap">
 <style>
@@ -282,7 +282,7 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
 .vs-head{align-items:stretch}
 .tap{display:flex;width:fit-content}
 </style>
-<style>.pentru{display:block;margin-bottom:14px;font-size:14px;font-weight:700;color:var(--sun);letter-spacing:.02em}body{margin:0}[hidden]{display:none!important}</style>
+<style>.pentru{display:inline-grid;gap:2px;margin-bottom:26px;padding:14px 22px;border-radius:18px;background:var(--sun);color:#1F4E5F;box-shadow:0 10px 30px -12px rgba(0,0,0,.45);max-width:100%}.pentru small{font-size:14px;font-weight:700;letter-spacing:.02em}.pentru b{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,36px);line-height:1.1;overflow-wrap:anywhere}body{margin:0}[hidden]{display:none!important}</style>
 </head><body>
 
 <header class="hero">
@@ -294,7 +294,7 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
   </svg>
   <div class="wrap">
     <div class="pentru" hidden></div>
-    <div class="brand">Ce facem cu copiii<b>.ro</b></div>
+    <div class="brand">cefacemcucopiii<b>.ro</b></div>
     <h1>Construim împreună cel mai bun oraș pentru <em>copii</em>.</h1>
     <p class="sub">Agenda tuturor evenimentelor pentru copii din Timișoara, într-un singur loc. O construim alături de organizatorii și afacerile care cred că un oraș bun pentru copii este un oraș viu.</p>
     <div class="pills"><span class="pill">www.cefacemcucopiii.ro</span><span class="pill alt">newsletter de miercuri</span><span class="pill alt">@cefacemcucopiii</span></div>
@@ -475,7 +475,7 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
     <p class="site"><a href="https://cefacemcucopiii.ro" target="_blank" rel="noopener">www.cefacemcucopiii.ro</a></p>
   </div>
 </section>
-<footer><div class="wrap">Ce facem cu copiii.ro · Timișoara · DOING GOOD S.R.L.</div></footer>
+<footer><div class="wrap">cefacemcucopiii.ro · Timișoara · DOING GOOD S.R.L.</div></footer>
 
 <script>
 const ICON={
@@ -493,7 +493,7 @@ const COMP={
 };
 function drawVs(k){
  const c=COMP[k];
- let h=`<div class="vs-head"><div class="them"></div><div class="them">${c.name}</div><div class="us">Ce facem cu copiii.ro</div></div><div class="vs-row pay-row"><div class="crit">Plătești pentru</div><div class="pv">${c.pay}</div><div class="us pv">părinți și cifre clare</div></div>`;
+ let h=`<div class="vs-head"><div class="them"></div><div class="them">${c.name}</div><div class="us">cefacemcucopiii.ro</div></div><div class="vs-row pay-row"><div class="crit">Plătești pentru</div><div class="pv">${c.pay}</div><div class="us pv">părinți și cifre clare</div></div>`;
  CRIT.forEach((t,i)=>{h+=`<div class="vs-row"><div class="crit">${t}</div><div>${mk(c.v[i])}</div><div class="us">${mk(2)}</div></div>`});
  document.getElementById('vs').innerHTML=h;
 }
