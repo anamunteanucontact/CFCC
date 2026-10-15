@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="ro"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta name="description" content="Colaborări și parteneriate cu Ce facem cu copiii.ro">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="d0494fa3-dbd4-4c4f-8466-9cbd233f4dd0" data-domains="cefacemcucopiii.ro,www.cefacemcucopiii.ro"></script>
+<script>
+/* Ofertă parteneri: link personal (?pentru=Nume-Brand) + evenimente Umami */
+(function(){
+ var q=new URLSearchParams(location.search), b=q.get('pentru');
+ try{ if(b) sessionStorage.setItem('cfcc_pentru',b); else b=sessionStorage.getItem('cfcc_pentru'); }catch(e){}
+ b=(b||'').replace(/[^\p{L}\p{N}\- .&]/gu,'').slice(0,60);
+ var nume=b.replace(/-/g,' ').trim();
+ window.CFCC_OFERTA={brand:b||'(fara link personal)',nume:nume,pagina:'prezentare'};
+ window.cfccTrack=function(n,d){try{if(window.umami&&umami.track){var o={brand:CFCC_OFERTA.brand,pagina:CFCC_OFERTA.pagina};for(var k in d)o[k]=d[k];umami.track('Ofertă: '+n,o);}}catch(e){}};
+ window.cfccLink=function(path){return path+(b?('?pentru='+encodeURIComponent(b)):'');};
+ var t0=Date.now(), maxs=0, sent=false;
+ addEventListener('scroll',function(){var h=document.documentElement;var p=Math.round((h.scrollTop+innerHeight)/h.scrollHeight*100);if(p>maxs)maxs=p;},{passive:true});
+ function bye(){if(sent)return;sent=true;cfccTrack('timp pe pagină',{secunde:Math.round((Date.now()-t0)/1000),scroll_procent:Math.min(maxs,100)});}
+ addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')bye();});
+ addEventListener('pagehide',bye);
+ addEventListener('load',function(){setTimeout(function(){cfccTrack('deschisă',{});},1500);
+   document.querySelectorAll('[data-link]').forEach(function(a){a.href=cfccLink(a.getAttribute('data-link'));});
+   if(nume){document.querySelectorAll('.pentru').forEach(function(el){el.textContent='Ofertă pregătită pentru '+nume;el.hidden=false;});}
+ });
+})();
+</script><title>Ce facem cu copiii.ro - pentru parteneri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: o singură coloană lată de ~980px, benzi colorate pe toată lățimea pentru secțiunile-cheie, carduri doar unde marchează o alegere (pachete, comparație) */
+:root{
+  --bg:#FFF8F0; --surface:#FFFFFF; --ink:#1F2A2E; --muted:#55636A; --line:#EADFD2;
+  --petrol:#1F4E5F; --petrol-ink:#FFF8F0; --coral:#EE6C4D; --coral-ink:#B8452A; --sun:#F4B942; --sun-soft:#FCEBC4;
+  --good:#2E8B57; --dash:#C9BFB2; --tint:#F6EDE2;
+  --display:'Baloo 2', 'Trebuchet MS', system-ui, sans-serif;
+  --body:'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12262E; --surface:#183340; --ink:#F4EEE6; --muted:#B5C2C7; --line:#2A4855;
+  --petrol:#0D1D24; --petrol-ink:#FFF8F0; --coral:#F07A5D; --coral-ink:#F59A82; --sun:#F4B942; --sun-soft:#3A3420;
+  --good:#5CC48A; --dash:#4C6670; --tint:#1C3B48; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12262E; --surface:#183340; --ink:#F4EEE6; --muted:#B5C2C7; --line:#2A4855;
+  --petrol:#0D1D24; --petrol-ink:#FFF8F0; --coral:#F07A5D; --coral-ink:#F59A82; --sun:#F4B942; --sun-soft:#3A3420;
+  --good:#5CC48A; --dash:#4C6670; --tint:#1C3B48; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;margin:0}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+section{padding-block:56px}
+h1,h2,h3{font-family:var(--display);line-height:1.08;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:clamp(30px,5vw,42px);color:var(--petrol)}
+:root:not([data-theme="light"]) h2{color:inherit}
+@media (prefers-color-scheme: light){h2{color:var(--petrol)}}
+:root[data-theme="light"] h2{color:var(--petrol)}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--coral-ink);margin-bottom:8px}
+p{margin:0}
+.lead{font-size:19px;color:var(--muted);max-width:62ch;margin-top:14px}
+
+/* hero */
+.hero{background:var(--petrol);color:var(--petrol-ink);padding-block:44px 64px;overflow:hidden;position:relative}
+.brand{font-family:var(--display);font-weight:800;font-size:22px}
+.brand b{color:var(--sun)}
+.hero h1{font-size:clamp(40px,8vw,74px);margin-top:44px;max-width:15ch}
+.hero h1 em{font-style:normal;color:var(--sun)}
+.hero .sub{font-size:20px;max-width:46ch;margin-top:18px;opacity:.92}
+.pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.pill{background:var(--sun);color:#1F4E5F;font-weight:700;border-radius:999px;padding:7px 16px;font-size:15px}
+.pill.alt{background:transparent;color:var(--petrol-ink);border:1.5px solid rgba(255,248,240,.4)}
+.bubbles{position:absolute;right:-60px;top:-40px;width:320px;height:320px;pointer-events:none;opacity:.9}
+@media (max-width:640px){.bubbles{width:200px;height:200px;right:-70px;top:-50px}}
+
+/* story */
+.story{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:start}
+.story blockquote{margin:0;font-family:var(--display);font-weight:700;font-size:clamp(24px,3.6vw,32px);line-height:1.2;color:var(--coral-ink)}
+.story .txt{display:grid;gap:14px;color:var(--ink);min-width:0}
+@media (max-width:760px){.story{grid-template-columns:1fr;gap:20px}}
+
+/* audiences */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px}
+.aud{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;display:grid;gap:12px;min-width:0}
+.aud h3{font-size:24px}
+.aud dl{margin:0;display:grid;gap:10px}
+.aud dt{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.aud dd{margin:2px 0 0}
+.aud .tag{justify-self:start;font-size:13px;font-weight:700;border-radius:999px;padding:4px 12px;background:var(--sun-soft);color:var(--ink)}
+@media (max-width:700px){.duo{grid-template-columns:1fr}}
+
+/* compare */
+.band{background:var(--tint)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.chip{font:inherit;font-size:15px;font-weight:600;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--petrol);border-color:var(--petrol);color:var(--petrol-ink)}
+:root[data-theme="dark"] .chip[aria-pressed="true"]{background:var(--coral);border-color:var(--coral);color:#1F2A2E}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chip[aria-pressed="true"]{background:var(--coral);border-color:var(--coral);color:#1F2A2E}}
+.chip:focus-visible,.toggle button:focus-visible,.copy:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.vs{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.vs-head,.vs-row{display:grid;grid-template-columns:1.4fr 1fr 1fr;align-items:center}
+.vs-head div{padding:16px 18px;font-family:var(--display);font-weight:700;font-size:20px;line-height:1.1}
+.vs-head .us{background:var(--petrol);color:var(--petrol-ink)}
+.vs-head .them{color:var(--muted)}
+.vs-row{border-top:1px solid var(--line)}
+.vs-row > div{padding:13px 18px}
+.vs-row .crit{font-weight:600}
+.vs-row .us{background:color-mix(in srgb,var(--sun) 12%,transparent);height:100%;display:flex;align-items:center}
+.mark{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.dot{width:16px;height:16px;border-radius:50%;flex:none}
+.dot.yes{background:var(--good)}
+.dot.half{background:color-mix(in srgb,var(--sun) 45%,transparent);border:2px solid var(--sun)}
+.dot.no{width:16px;height:3px;border-radius:2px;background:var(--dash)}
+.pay{font-size:14px;color:var(--muted)}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+.pillar{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:6px;min-width:0;align-content:start}
+.pillar b{font-family:var(--display);font-size:20px;line-height:1.15;color:var(--coral-ink)}
+.pillar p{font-size:15px;color:var(--muted)}
+@media (max-width:760px){.pillars{grid-template-columns:1fr}}
+.vs-note{margin-top:14px;color:var(--muted);font-size:15px;max-width:62ch}
+@media (max-width:600px){.vs-head div{font-size:16px;padding:12px}.vs-row > div{padding:11px 12px;font-size:15px}.mark span{display:none}}
+
+/* collab vs partner */
+.toggle{display:inline-flex;background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:4px;margin-top:24px}
+.toggle button{font:inherit;font-weight:700;font-size:16px;border:0;background:transparent;color:var(--muted);padding:10px 20px;border-radius:999px;cursor:pointer}
+.toggle button[aria-selected="true"]{background:var(--coral);color:#1F2A2E}
+.mode{display:grid;grid-template-columns:200px 1fr;gap:28px;margin-top:24px;align-items:start}
+.mode .big{font-family:var(--display);font-weight:800;font-size:28px;line-height:1.1;color:var(--coral-ink)}
+.mode dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:12px 20px}
+.mode dt{font-weight:700}
+.mode dd{margin:0;color:var(--ink)}
+.mode-hint{margin-top:22px;padding:16px 18px;border-radius:14px;background:var(--sun-soft);max-width:62ch}
+@media (max-width:640px){.mode{grid-template-columns:1fr;gap:12px}.mode dl{grid-template-columns:1fr;gap:2px 0}.mode dd{margin-bottom:10px}}
+
+/* tiers */
+.tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px;align-items:stretch}
+.tier{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 18px;display:flex;flex-direction:column;gap:14px;min-width:0;position:relative}
+.tier.star{border:2px solid var(--coral);box-shadow:0 10px 30px -18px rgba(31,78,95,.45)}
+.badge{position:absolute;top:-12px;left:18px;background:var(--coral);color:#1F2A2E;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.tier h3{font-size:26px}
+.tier .for{font-size:14px;color:var(--muted);min-height:3em}
+.tier .price{font-family:var(--display);font-weight:700;font-size:20px;color:var(--petrol)}
+:root[data-theme="dark"] .tier .price{color:var(--sun)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tier .price{color:var(--sun)}}
+.tier ul{list-style:none;margin:0;padding:0;display:grid;gap:9px;font-size:15px}
+.tier li{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:start}
+.tier li .dot{margin-top:4px;width:14px;height:14px}
+.tier li .dot.no{margin-top:10px;width:14px}
+.tier li.off{color:var(--muted)}
+.tier .dur{margin-top:auto;font-size:13px;font-weight:700;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:900px){.tiers{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.tiers{grid-template-columns:1fr}}
+.extra{margin-top:20px;color:var(--muted);max-width:66ch}
+
+/* investitie / calculator */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;display:grid;gap:14px;min-width:0;align-content:start}
+.card h3{font-size:22px}
+.field{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;font-size:15px}
+.field input{font:inherit;font-weight:700;width:96px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);text-align:right}
+.field input:focus-visible{outline:3px solid var(--sun);outline-offset:1px}
+.result{border-radius:14px;background:var(--sun-soft);padding:14px 16px}
+.result .num{font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,38px);line-height:1;color:var(--coral-ink)}
+.result p{margin-top:6px;font-size:15px}
+.quote3{margin-top:18px;background:var(--surface);border-left:5px solid var(--coral);border-radius:0 16px 16px 0;padding:18px 20px;max-width:70ch;display:grid;gap:8px}
+.quote3 strong{font-family:var(--display);font-size:20px}
+@media (max-width:760px){.calc{grid-template-columns:1fr}}
+/* preturi */
+.tier .price{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.tier .price .now{font-size:30px;line-height:1}
+.tier .price .unit{font-family:var(--body);font-size:14px;font-weight:600;color:var(--muted)}
+.tier .price .was{font-family:var(--body);font-size:14px;font-weight:600;color:var(--muted);text-decoration:line-through;width:100%}
+.tier .grp{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.founder{display:inline-flex;gap:8px;align-items:center;margin-top:18px;background:var(--coral);color:#1F2A2E;font-weight:700;border-radius:999px;padding:8px 16px;font-size:15px}
+.addons{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.addon{background:var(--surface);border:1px dashed var(--dash);border-radius:16px;padding:16px 18px;display:grid;gap:6px;min-width:0;align-content:start}
+.addon h4{margin:0;font-family:var(--display);font-size:19px}
+.addon .p{font-weight:700;color:var(--coral-ink)}
+.addon p{font-size:15px;color:var(--muted)}
+.terms{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
+.terms span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+@media (max-width:860px){.addons{grid-template-columns:1fr}}
+
+.fnd{margin-top:28px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 24px;background:var(--surface);border:1.5px solid var(--sun);border-radius:20px;padding:22px 24px}
+.fnd-t{display:grid;gap:4px;min-width:0;flex:1 1 320px}
+.fnd-k{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral-ink)}
+.fnd-t strong{font-family:var(--display);font-size:22px;line-height:1.2}
+.fnd-t p{font-size:15px;color:var(--muted)}
+.fnd-b{background:var(--coral);color:#1F2A2E;font-weight:700;text-decoration:none;border-radius:999px;padding:12px 22px;white-space:nowrap}
+a.founder,.fnd-b{display:inline-flex;align-items:center;gap:8px}
+a.founder::before,.fnd-b::before{content:"";width:20px;height:20px;flex:none;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231F2A2E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 11V5.5a1.5 1.5 0 0 1 3 0V11'/%3E%3Cpath d='M12 10.5a1.5 1.5 0 0 1 3 0V12'/%3E%3Cpath d='M15 11.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.5a6 6 0 0 1-4.6-2.2L4.5 15.6a1.6 1.6 0 0 1 2.3-2.2L9 15.5'/%3E%3C/svg%3E")}
+.fnd-b:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+.tap{display:inline-flex;align-items:center;gap:10px;margin-top:22px;font-weight:700;font-size:15px;color:var(--coral-ink)}
+.tap::before{content:"";width:22px;height:22px;flex:none;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EE6C4D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 11V5.5a1.5 1.5 0 0 1 3 0V11'/%3E%3Cpath d='M12 10.5a1.5 1.5 0 0 1 3 0V12'/%3E%3Cpath d='M15 11.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.5a6 6 0 0 1-4.6-2.2L4.5 15.6a1.6 1.6 0 0 1 2.3-2.2L9 15.5'/%3E%3C/svg%3E")}
+.tap + .chips,.tap + .toggle,.tap + .calc{margin-top:12px}
+.field input{border:1.5px dashed var(--coral);background:var(--surface);cursor:text}
+.field input:hover{border-style:solid}
+.chip{box-shadow:0 2px 0 var(--line)}
+.chip:hover{border-color:var(--petrol)}
+@media (prefers-reduced-motion: no-preference){.chip[aria-pressed="false"]{animation:nudge 2.4s ease-in-out 1.2s 2}}
+@keyframes nudge{0%,100%{transform:none}50%{transform:translateY(-3px)}}
+.aud{align-content:start}
+.aud .tag{align-self:start;font-family:var(--display);font-size:18px;font-weight:800;padding:8px 18px;background:var(--sun);color:#1F4E5F}
+.aud + .aud .tag{background:var(--petrol);color:var(--petrol-ink)}
+.aud{border-top:5px solid var(--sun)}
+.aud + .aud{border-top-color:var(--petrol)}
+
+
+/* steps + rules */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:28px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:16px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start;counter-increment:s}
+.steps li::before{content:counter(s);font-family:var(--display);font-weight:800;font-size:20px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--sun);color:#1F4E5F}
+.steps li span{padding-top:7px}
+.rules{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.rules li{padding-left:18px;position:relative}
+.rules li::before{content:"";position:absolute;left:0;top:.6em;width:8px;height:8px;border-radius:50%;background:var(--coral)}
+.split h3{font-size:24px;margin-bottom:16px}
+@media (max-width:760px){.split{grid-template-columns:1fr}}
+
+/* contact */
+.contact{background:var(--petrol);color:var(--petrol-ink)}
+.contact h2{color:var(--petrol-ink)!important}
+.contact .lead{color:var(--petrol-ink);opacity:.85}
+.mailrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:24px}
+.mail{font-family:var(--display);font-weight:700;font-size:clamp(22px,4vw,30px);color:var(--sun);user-select:all;word-break:break-all}
+.copy{font:inherit;font-weight:700;font-size:15px;border:0;border-radius:999px;padding:10px 18px;background:var(--sun);color:#1F4E5F;cursor:pointer}
+.site{margin-top:14px;font-weight:600}
+.site a{color:var(--petrol-ink)}
+footer{padding-block:22px;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion: no-preference){.chip,.toggle button,.copy{transition:background .2s,color .2s,border-color .2s}}
+
+.mark svg{flex:none}
+.tier li{grid-template-columns:18px 1fr}
+.tier li svg{margin-top:2px;width:16px;height:16px}
+@media (min-width:861px){.addons{grid-template-columns:repeat(2,1fr)}}
+.rules li b{color:var(--ink)}
+.toggle{margin-top:22px}
+.story blockquote{font-size:clamp(28px,4vw,40px)}
+
+.aud dt{font-size:14px}
+/* aliniere carduri pachete */
+.tiers{row-gap:0}
+@supports (grid-template-rows:subgrid){
+ .tier{display:grid;grid-row:span 5;grid-template-rows:subgrid;row-gap:14px}
+ @media (max-width:520px){.tier{margin-bottom:14px}}
+ @media (min-width:521px) and (max-width:900px){.tier{margin-bottom:14px}}
+}
+.tier .for{min-height:0}
+.tier h3{align-self:end}
+.tier .price{align-self:start}
+.tier .price .was{text-decoration:none}
+.tier .price .was s{text-decoration:line-through}
+.feat{display:grid;gap:10px;align-content:start}
+.tier .dur{margin-top:0;align-self:end}
+.more{font-weight:700;color:var(--coral-ink);white-space:nowrap}
+/* oferta fondator */
+.fnd-h{font-size:clamp(26px,3.4vw,34px);color:var(--coral-ink)}
+.fnd-t .fnd-s{font-size:19px;font-weight:600}
+.fnd-t .fnd-m{font-size:14px;color:var(--muted)}
+/* cum lucram */
+.split{align-items:start}
+.split h3{margin-bottom:20px}
+.steps,.rules{gap:18px}
+.rules li{display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start;padding-left:0}
+.rules li::before{content:"";position:static;width:40px;height:40px;border-radius:50%;background:var(--coral) no-repeat center/18px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231F2A2E' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")}
+.rules li span,.steps li span{padding-top:8px}
+
+
+/* aliniere carduri publicuri */
+@supports (grid-template-rows:subgrid){
+ .duo{row-gap:0}
+ .aud{grid-row:span 6;grid-template-rows:subgrid;row-gap:12px}
+ .aud dl{display:contents}
+ @media (max-width:700px){.aud{margin-bottom:14px}}
+}
+
+.vs-head > div{display:flex;align-items:center}
+.vs-head .us{display:flex}
+.pay-row .pv{font-weight:700;font-size:15px}
+.pay-row .crit{color:var(--coral-ink)}
+.vs-head{align-items:stretch}
+.tap{display:flex;width:fit-content}
+</style>
+<style>.pentru{display:block;margin-bottom:14px;font-size:14px;font-weight:700;color:var(--sun);letter-spacing:.02em}body{margin:0}[hidden]{display:none!important}</style>
+</head><body>
+
+<header class="hero">
+  <svg class="bubbles" viewBox="0 0 320 320" aria-hidden="true">
+    <circle cx="200" cy="120" r="110" fill="#F4B942" opacity=".9"/>
+    <circle cx="90" cy="220" r="54" fill="#EE6C4D"/>
+    <circle cx="250" cy="260" r="30" fill="#FFF8F0" opacity=".25"/>
+    <text x="200" y="168" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="150" fill="#1F4E5F">?</text>
+  </svg>
+  <div class="wrap">
+    <div class="pentru" hidden></div>
+    <div class="brand">Ce facem cu copiii<b>.ro</b></div>
+    <h1>Construim împreună cel mai bun oraș pentru <em>copii</em>.</h1>
+    <p class="sub">Agenda tuturor evenimentelor pentru copii din Timișoara, într-un singur loc. O construim alături de organizatorii și afacerile care cred că un oraș bun pentru copii este un oraș viu.</p>
+    <div class="pills"><span class="pill">www.cefacemcucopiii.ro</span><span class="pill alt">newsletter de miercuri</span><span class="pill alt">@cefacemcucopiii</span></div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap story">
+    <blockquote>Totul a pornit de la nevoia reală a unei mame.</blockquote>
+    <div class="txt">
+      <div class="eyebrow">Despre noi</div>
+      <p>La început de lună, Ana petrecea ore întregi căutând prin zeci de site-uri, postări, grupuri de social media și de WhatsApp ce poate face cu copiii prin oraș, ca să prindă bilete la timp și să le treacă în calendarul familiei.</p>
+      <p>Așa a apărut www.cefacemcucopiii.ro: o agendă completă și verificată atent, făcută de un părinte pentru alți părinți. Teatru, concerte, ateliere, muzee, ieșiri, festivaluri și filme, fiecare cu vârsta potrivită, ora și locul.</p>
+      <p>Pentru părinți, platforma este și rămâne gratuită. Alături de organizatorii și afacerile pentru familii, lucrăm ca parteneri: creștem împreună.</p>
+      <p>Vrem să fim primul loc în care se uită un părinte din Timișoara și cel mai scurt drum dintre un brand și familiile care îl caută.</p>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow">Pentru cine suntem</div>
+    <h2>Două întrebări, un singur loc</h2>
+    <p class="lead">Părinții vin pentru că găsesc totul într-un singur loc.<br>Brandurile ni se alătură pentru că aici îi găsesc pe părinți.</p>
+    <div class="duo">
+      <article class="aud">
+        <span class="tag">Părinții</span>
+        <h3>„Ce facem cu copiii weekendul ăsta?”</h3>
+        <dl>
+          <div><dt>Cine sunt</dt><dd>Mame și tați din Timișoara care caută activități potrivite pentru copiii lor.</dd></div>
+          <div><dt>Problema lor</dt><dd>Timpul pierdut căutând activități pentru timpul liber și evenimentele bune aflate prea târziu, când nu mai prind bilete sau le-au ratat deja.</dd></div>
+          <div><dt>Ce găsesc</dt><dd>Programul complet al săptămânii, pe vârste, și recomandări de la părinți adevărați, care au încercat deja activitatea, spațiul sau serviciul.</dd></div>
+          <div><dt>Cât plătesc</dt><dd>Nimic.</dd></div>
+        </dl>
+      </article>
+      <article class="aud">
+        <span class="tag">Organizatorii și brandurile pentru familii</span>
+        <h3>„Cum ajung la familii, nu la toată lumea?”</h3>
+        <dl>
+          <div><dt>Cine sunt</dt><dd>Teatre, muzee, facilitatori de ateliere și cursuri, grădinițe, centre sportive, clinici, locuri de joacă, restaurante, destinații de familie.</dd></div>
+          <div><dt>Problema lor</dt><dd>Bani dați pe reclame care ajung la toată lumea, nu la familiile care chiar îi caută.</dd></div>
+          <div><dt>Ce găsesc</dt><dd>Un loc în fața părinților din oraș, într-o comunitate în care au încredere. Și cifre clare despre rezultate.</dd></div>
+          <div><dt>Cât plătesc</dt><dd>Listarea evenimentelor în calendar este și va rămâne mereu gratuită.<br>Pentru brandurile care au nevoie de mai multă expunere, am pregătit mai multe forme de parteneriat.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="eyebrow">Parteneriat, nu reclamă</div>
+    <h2>Valoarea noastră e încrederea părinților</h2>
+    <p class="lead">Părinții din Timișoara se uită la noi înainte să aleagă unde merg cu copiii.<br>Încrederea asta ne deosebește de orice alt canal și e exact ce primești când apari alături de noi.</p>
+    <div class="pillars">
+      <div class="pillar"><b>Lucrăm cu cei în care credem</b><p>Nu orice brand ne poate deveni partener. Alegem locuri în care am merge cu propriii copii, așa că prezența ta pe platforma noastră le spune deja părinților ceva bun despre tine.</p></div>
+      <div class="pillar"><b>Loc pentru fiecare partener</b><p>Păstrăm un număr mic de parteneri în fiecare domeniu, ca fiecare să primească atenția și vizibilitatea pe care le merită.</p></div>
+      <div class="pillar"><b>Transparență față de părinți</b><p>Colaborările și parteneriatele sunt marcate clar, iar recomandările rămân alegerea noastră. Așa, părinții au încredere în tot ce văd, inclusiv în tine.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">De ce noi</div>
+    <h2>Compară-ne cu ce folosești acum</h2>
+    <p class="lead">Fiecare canal de promovare e bun la un singur lucru. Noi le reunim pentru publicul care contează pentru tine, părinții, și rămânem alături de tine pe toată durata parteneriatului.</p>
+    <p class="tap">Alege canalul pe care îl folosești acum și vezi diferența</p>
+    <div class="chips" role="group" aria-label="Alege canalul cu care ne compari">
+      <button class="chip" data-k="meta" aria-pressed="true">Reclame pe Facebook și Instagram</button>
+      <button class="chip" data-k="presa" aria-pressed="false">Advertorial în presă</button>
+      <button class="chip" data-k="stradal" aria-pressed="false">Panouri și ecrane stradale</button>
+    </div>
+    <div class="vs" id="vs" aria-live="polite"></div>
+    <p class="vs-note">O reclamă pe Facebook dispare în clipa în care se termină bugetul.<br>La noi, pagina ta și articolele despre tine rămân, lângă evenimentele tale și datele de contact, iar părinții le găsesc și peste câteva luni.</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="eyebrow">Două feluri de a lucra cu noi</div>
+    <h2>Colaborare sau parteneriat?</h2>
+    <p class="lead">Află ce ți se potrivește acum.</p>
+    <p class="tap">Apasă pe fiecare variantă</p>
+    <div class="toggle" role="tablist" aria-label="Alege felul de colaborare">
+      <button role="tab" id="t-colab" aria-selected="true" aria-controls="mode">Colaborare</button>
+      <button role="tab" id="t-part" aria-selected="false" aria-controls="mode">Parteneriat</button>
+    </div>
+    <div class="mode" id="mode" role="tabpanel"></div>
+    <p class="mode-hint" id="mode-hint"></p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Promovarea e o investiție</div>
+    <h2>Ce ți se potrivește azi?</h2>
+    <p class="lead">Calculează singur ce buget de promovare ar trebui să aibă brandul tău și cât valorează pentru tine un singur client nou.</p>
+    <p class="tap">Calculator interactiv: scrie cifrele tale în căsuțe și rezultatul se schimbă pe loc</p>
+    <div class="calc">
+      <div class="card">
+        <h3>Cât valorează un client nou?</h3>
+        <label class="field">Abonamentul lunar (lei)<input id="c-ab" type="number" inputmode="numeric" min="0" value="240"></label>
+        <label class="field">Câte luni rămâne, de obicei<input id="c-luni" type="number" inputmode="numeric" min="1" max="12" value="9"></label>
+        <div class="result"><div class="num" id="r-copil">2.160 lei</div><p>atât aduce un singur client nou.</p></div>
+      </div>
+      <div class="card">
+        <h3>Cât să pui deoparte pentru promovare?</h3>
+        <label class="field">Câte grupe ai<input id="c-gr" type="number" inputmode="numeric" min="1" value="3"></label>
+        <label class="field">Copii într-o grupă<input id="c-ch" type="number" inputmode="numeric" min="1" value="12"></label>
+        <div class="result"><div class="num" id="r-buget">430-860 lei</div><p>pe lună. Afacerile mici care cresc investesc de obicei între 5% și 10% din venit în promovare.</p></div>
+      </div>
+    </div>
+    <div class="quote3">
+      <strong>„Am pus evenimentul pe Facebook și n-a venit nimeni.”</strong>
+      <p>Printr-o colaborare cu platforma noastră ajungi direct la părinții care te caută, dar încă nu te găsesc. Cu ajutorul nostru te găsesc mai ușor: pe platformă, în newsletter și pe rețelele noastre de social media, de unde poți reposta oricând. Iar la final primești un raport din partea noastră: știi exact câți au dat click pe numele brandului tău și ce poți îmbunătăți în strategia ta de comunicare și vânzări.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="pachete">
+  <div class="wrap">
+    <div class="eyebrow">Ce oferim</div>
+    <h2>Pachetele</h2>
+    <p class="lead">Listarea în calendar e și rămâne gratuită pentru orice organizator. Când vrei să ajungi mai aproape de părinți, alegi pachetul potrivit. Prețurile sunt finale, fără costuri ascunse.</p>
+    <a class="founder" onclick="cfccTrack('spre fondator',{loc:'banda de sus'})" href="/parteneri/fondator/" data-link="/parteneri/fondator/" style="text-decoration:none">Oferta de fondator: locuri limitate, până la 30 noiembrie 2026 · Vezi oferta și simulatorul →</a>
+    <div class="tiers" id="tiers"></div>
+    <div class="terms"><span>Parteneriat de minimum 3 luni, pentru Partener și Partener Strategic</span><span>10% reducere la semnarea unui contract pe 6 luni</span><span>15% reducere la semnarea unui contract pe un an, cu plata integrală</span></div>
+    <div class="addons">
+      <div class="addon" id="exclusivitate"><h4>Ce înseamnă exclusivitatea în domeniul tău</h4><div class="p">Opțiune pentru Partener Strategic</div><p>Ești singurul brand din domeniul tău care beneficiază de pachetul Partener Strategic, pe toată durata contractului. Prețul se stabilește în funcție de domeniu și îți garantează poziția de reper în domeniul tău.</p></div>
+      <div class="addon"><h4>Servicii complementare</h4><div class="p">La cerere, pe baza briefului</div><p>Oferite de echipa noastră de profesioniști: strategie de comunicare, consultanță în branding și vânzări, filmări suplimentare și realizare de materiale de promovare.</p></div>
+    </div>
+    <div class="fnd">
+      <div class="fnd-t"><h3 class="fnd-h">Oferta de fondator</h3><p class="fnd-s">Calculează în câteva secunde cât economisești dacă semnezi acum.</p><p class="fnd-m">Locuri limitate, până la 30 noiembrie 2026.</p></div>
+      <a class="fnd-b" onclick="cfccTrack('spre fondator',{loc:'chenar de jos'})" href="/parteneri/fondator/" data-link="/parteneri/fondator/">Vezi oferta și simulatorul →</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Cum lucrăm</div>
+    <h2>Simplu, clar și la vedere</h2>
+    <div class="split">
+      <div>
+        <h3>Cum începem</h3>
+        <ol class="steps">
+          <li><span>Completezi formularul de pe site sau ne scrii la hello@cefacemcucopiii.ro.</span></li>
+          <li><span>Hotărâm împreună de ce ai nevoie acum.</span></li>
+          <li><span>Primești oferta, contractul, factura și linkul de plată.</span></li>
+          <li><span>Pregătim materialele, le vezi înainte de publicare și poți cere o rundă de modificări. Apoi le publicăm.</span></li>
+          <li><span>Primești raportul de impact: după acțiune, la colaborare, sau lunar, dacă ne ești partener.</span></li>
+        </ol>
+      </div>
+      <div>
+        <h3>Principiile noastre</h3>
+        <ul class="rules">
+          <li><span><b>„Recomandarea noastră” nu se cumpără.</b> O primesc doar brandurile și evenimentele care ne-au convins, partenere sau nu.</span></li>
+          <li><span><b>Articolele sunt despre brandul tău,</b> despre serviciile tale și punctele tale forte. Nu inventăm recenzii.</span></li>
+          <li><span><b>Totul e marcat clar.</b> Pe site, colaborările și partenerii poartă fiecare eticheta lor.</span></li>
+          <li><span><b>Calendarul rămâne complet,</b> indiferent de exclusivitățile din parteneriate.</span></li>
+          <li><span><b>Șanse egale pentru toți organizatorii.</b> În descrierea evenimentelor nu menționăm prețuri, oferte, reduceri sau gratuități. Pentru bilete, înscrieri și acces există un buton dedicat.</span></li>
+          <li><span><b>Datele abonaților rămân la noi.</b> Ofertele partenerilor le trimitem noi.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact">
+  <div class="wrap">
+    <h2>Hai în comunitate</h2>
+    <p class="lead">Fă parte din orașul pe care îl construim pentru copii. Spune-ne ce faci și la cine vrei să ajungi.</p>
+    <div class="mailrow">
+      <span class="mail" id="mail">hello@cefacemcucopiii.ro</span>
+      <button class="copy" id="copy" type="button">Copiază adresa</button>
+    </div>
+    <p class="site"><a href="https://cefacemcucopiii.ro" target="_blank" rel="noopener">www.cefacemcucopiii.ro</a></p>
+  </div>
+</section>
+<footer><div class="wrap">Ce facem cu copiii.ro · Timișoara · DOING GOOD S.R.L.</div></footer>
+
+<script>
+const ICON={
+ 2:'<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="9" fill="var(--good)"/><path d="M5.2 9.3l2.4 2.3 5.2-5.2" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ 1:'<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="none" stroke="var(--sun)" stroke-width="2"/><path d="M9 1a8 8 0 0 1 0 16z" fill="var(--sun)"/></svg>',
+ 0:'<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9h10" stroke="var(--dash)" stroke-width="2.5" stroke-linecap="round"/></svg>'
+};
+const LBL=["nu","parțial","da"];
+const mk=v=>`<span class="mark">${ICON[v]}<span>${LBL[v]}</span></span>`;
+const CRIT=["Ajunge doar la părinții din oraș","Rămâne la vedere după campanie","Cifre clare despre rezultate","Conținut creat pentru tine","Câștigă încrederea părinților","Sprijin dincolo de promovare"];
+const COMP={
+ meta:{name:"Reclame pe Facebook și Instagram",pay:"afișări, la oricine",v:[1,0,2,0,0,0]},
+ presa:{name:"Advertorial în presă",pay:"un advertorial, câteva zile",v:[0,1,0,1,1,0]},
+ stradal:{name:"Panouri și ecrane stradale",pay:"un loc pe stradă",v:[0,0,0,0,0,0]}
+};
+function drawVs(k){
+ const c=COMP[k];
+ let h=`<div class="vs-head"><div class="them"></div><div class="them">${c.name}</div><div class="us">Ce facem cu copiii.ro</div></div><div class="vs-row pay-row"><div class="crit">Plătești pentru</div><div class="pv">${c.pay}</div><div class="us pv">părinți și cifre clare</div></div>`;
+ CRIT.forEach((t,i)=>{h+=`<div class="vs-row"><div class="crit">${t}</div><div>${mk(c.v[i])}</div><div class="us">${mk(2)}</div></div>`});
+ document.getElementById('vs').innerHTML=h;
+}
+document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));
+ drawVs(b.dataset.k);cfccTrack('comparație',{canal:b.dataset.k});
+}));
+drawVs('meta');
+
+const MODES={
+ colab:{big:"Un impuls pentru un eveniment.",hint:"Colaborarea e un prim pas bun. Dacă revii des, parteneriatul îți aduce mai mult pentru mai puțini bani. De aceea, după două-trei colaborări, ți-l propunem.",rows:[["Când se potrivește","Ai un atelier, un spectacol sau înscrieri de anunțat acum."],["Cum lucrăm","Completezi formularul, primești oferta și linkul de plată, iar noi ne ocupăm de rest."],["Ce primești","Eticheta „Colaborare”, un loc în newsletter și o postare pe rețelele noastre de social media, pe care o poți reposta oricând."],["Ce rămâne","Materialele rămân publicate pe platformă și pe rețelele noastre. Plus un raport cu cifre: câți părinți au văzut și câți au dat click, împreună cu câteva sugestii despre ce poți îmbunătăți la următoarele campanii, pe baza rezultatelor."],["Durată","O singură acțiune."]]},
+ part:{big:"Un loc permanent în comunitate.",hint:"Parteneriatul este o relație de încredere, pe care o prețuim și pentru care lucrăm în fiecare zi.",rows:[["Când se potrivește","Vrei ca părinții să te găsească tot anul, nu doar la un eveniment."],["Cum lucrăm","Pornim cu o întâlnire de cunoaștere, apoi ne revedem lunar într-o scurtă sesiune unu la unu și stabilim împreună ce comunici mai departe. Ai un account manager dedicat, care îți cunoaște brandul."],["Ce primești","Pagina ta în comunitate, care îți poate ține loc de website: o grijă în minus și o cheltuială în minus. Plus articole, campanii, consultanță și un raport lunar de impact."],["Ce rămâne","Pagina ta, articolele despre tine și părinții care te urmăresc. Nu dispar odată cu campania."],["Durată","Minimum 3 luni."]]}
+};
+function drawMode(k){
+ const m=MODES[k];
+ document.getElementById('mode').innerHTML=`<div class="big">${m.big}</div><dl>${m.rows.map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl>`;
+ document.getElementById('mode-hint').textContent=m.hint;
+}
+[['t-colab','colab'],['t-part','part']].forEach(([id,k])=>document.getElementById(id).addEventListener('click',()=>{
+ document.querySelectorAll('.toggle button').forEach(x=>x.setAttribute('aria-selected',x.id===id));
+ drawMode(k);cfccTrack('colaborare sau parteneriat',{varianta:k});
+}));
+drawMode('colab');
+
+const T=[
+ {n:"Listare",for:"Pentru orice organizator, oricând.",now:"0 lei",dur:"Mereu",groups:[["",["Evenimentul tău în calendar, cu pagină proprie","Poate apărea în newsletter și în programul zilei","Poate primi „Recomandarea noastră”"]]]},
+ {n:"Colaborare",for:"Pentru un eveniment, un atelier sau o perioadă de înscrieri.",now:"300 lei",was:"480 lei",unit:"o dată",dur:"O singură acțiune",groups:[["",["Eticheta „Colaborare” pe eveniment","Un loc în newsletterul de miercuri","O postare pe Instagram și Facebook","Raport de impact după acțiune"]]]},
+ {n:"Partener",for:"Pentru afacerile active tot anul.",now:"1.700 lei",was:"2.400 lei",unit:"/ lună",dur:"Minimum 3 luni",star:1,groups:[
+  ["Locul tău în comunitate",["Pagina ta în zona de comunitate, care poate ține loc de site: prezentare, poze, calendarul la zi, evenimentele anterioare, date de contact și toate articolele despre tine","Chenar, steluță și eticheta „Partener” în calendar","Kit grafic de partener, la început: materiale gata de postat pe canalele tale, ca să le spui clienților că te găsesc pe platforma noastră"]],
+  ["În fiecare lună",["Un articol despre tine","O campanie: reel sau carusel, plus story-uri","Loc în „Noutăți de la parteneri” din newsletter","O ofertă specială pentru abonați: voucher, reducere, giveaway, curs demo","Loc în edițiile speciale ale newsletterului: Halloween, Crăciun, 1 Iunie, Mărțișor","Conținut pe care îl poți folosi și pe conturile tale"]],
+  ["Consultanță",["Întâlnire de cunoaștere, la început","Sprijin pentru vânzarea online de bilete, când ai nevoie. Părinții care plătesc biletul dinainte ajung mai sigur la eveniment decât cei care doar se înscriu","Un scurt meeting lunar cu account managerul tău, online sau față în față: discutăm rezultatele și stabilim prioritățile pentru luna următoare","Raport lunar de impact, cu date reale: vizite pe platformă, rata de deschidere a newsletterului, social media"]]]},
+ {n:"Partener Strategic",for:"Pentru brandurile puternic ancorate în comunitate.",now:"3.400 lei",was:"4.600 lei",unit:"/ lună",dur:"Minimum 3 luni",groups:[
+  ["Pachetul Partener, plus",["Două articole pe lună despre tine, scrise pentru SEO","Două campanii pe lună: reel sau carusel, plus story-uri, cu materialele tale foto și video","O filmare realizată de echipa noastră profesionistă, pe baza unui brief stabilit de comun acord, la două luni","Chenar accentuat în calendar","Prioritate la exclusivitatea pe domeniu, dacă apare un concurent"]],
+  ["Opțional",["Exclusivitate în domeniul tău (prețul variază în funcție de categorie) <a class=\"more\" onclick=\"cfccTrack('exclusivitate',{})\" href=\"#exclusivitate\">Ce înseamnă ↓</a>"]]]}
+];
+const CK=ICON[2];
+document.getElementById('tiers').innerHTML=T.map(t=>`<article class="tier${t.star?' star':''}">${t.star?'<span class="badge">Recomandat</span>':''}<h3>${t.n}</h3><p class="for">${t.for}</p><div class="price"><span class="now">${t.now}</span>${t.unit?`<span class="unit">${t.unit}</span>`:''}<span class="was">${t.was?`preț de fondator, în loc de <s>${t.was}</s>`:'fără cost, mereu'}</span></div><div class="feat">${t.groups.map(g=>`${g[0]?`<div class="grp">${g[0]}</div>`:''}<ul>${g[1].map(f=>`<li>${CK}<span>${f}</span></li>`).join('')}</ul>`).join('')}</div><div class="dur">${t.dur}</div></article>`).join('');
+
+const fmt=n=>Math.round(n).toLocaleString('ro-RO');
+const val=id=>Math.max(0,parseFloat(document.getElementById(id).value)||0);
+function calc(){
+ document.getElementById('r-copil').textContent=fmt(val('c-ab')*val('c-luni'))+' lei';
+ const venit=val('c-gr')*val('c-ch')*val('c-ab'), r10=x=>Math.round(x/10)*10;
+ document.getElementById('r-buget').textContent=`${fmt(r10(venit*.05))}-${fmt(r10(venit*.10))} lei`;
+}
+['c-ab','c-luni','c-gr','c-ch'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('input',calc);el.addEventListener('change',()=>cfccTrack('calculator',{abonament:val('c-ab'),luni:val('c-luni'),grupe:val('c-gr'),copii:val('c-ch')}));});
+calc();
+
+document.getElementById('copy').addEventListener('click',async e=>{
+ const b=e.currentTarget;
+ cfccTrack('copiere e-mail',{});try{await navigator.clipboard.writeText('hello@cefacemcucopiii.ro');b.textContent='Copiat';}
+ catch(_){const r=document.createRange();r.selectNodeContents(document.getElementById('mail'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selectat, apasă Copiere';}
+ setTimeout(()=>b.textContent='Copiază adresa',2200);
+});
+</script>
+
+</body></html>
