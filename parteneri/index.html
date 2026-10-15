@@ -288,8 +288,20 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
 .pay-row .crit{color:var(--coral-ink)}
 .vs-head{align-items:stretch}
 .tap{display:flex;width:fit-content}
+
+/* mobil: comparație aliniată */
+.vs-head,.vs-row{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr)}
+.vs-head > div,.vs-row > div{min-width:0;overflow-wrap:break-word}
+@media (max-width:600px){
+ .vs-head,.vs-row{grid-template-columns:minmax(0,1fr) minmax(0,.9fr) minmax(0,1.2fr)}
+ .vs-head > div{font-size:15px;line-height:1.2;padding:12px 10px}
+ .vs-head .us{font-size:13.5px}
+ .vs-row > div{padding:12px 10px}
+ .vs-row .crit{font-size:14px}
+ .pay-row .pv{font-size:14px}
+}
 </style>
-<style>.pentru{display:inline-grid;gap:2px;margin-bottom:26px;padding:14px 22px;border-radius:18px;background:var(--sun);color:#1F4E5F;box-shadow:0 10px 30px -12px rgba(0,0,0,.45);max-width:100%}.pentru.cu-logo{grid-template-columns:auto 1fr;align-items:center;column-gap:16px}.pt{display:grid;gap:2px;min-width:0}.plogo{height:72px;width:auto;max-width:150px;object-fit:contain;background:#fff;border-radius:12px;padding:6px}.pentru small{font-size:14px;font-weight:700;letter-spacing:.02em}.pentru b{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,36px);line-height:1.1;overflow-wrap:anywhere}body{margin:0}[hidden]{display:none!important}</style>
+<style>.pentru{position:relative;z-index:2;display:inline-grid;gap:2px;margin-bottom:26px;padding:14px 22px;border-radius:18px;background:var(--sun);color:#1F4E5F;box-shadow:0 10px 30px -12px rgba(0,0,0,.45);max-width:100%}.pentru.cu-logo{grid-template-columns:auto 1fr;align-items:center;column-gap:16px}.hero .wrap{position:relative;z-index:1}@media (max-width:640px){.pentru{display:grid;width:100%}.plogo{height:60px;max-width:110px}}.pt{display:grid;gap:2px;min-width:0}.plogo{height:72px;width:auto;max-width:150px;object-fit:contain;background:#fff;border-radius:12px;padding:6px}.pentru small{font-size:14px;font-weight:700;letter-spacing:.02em}.pentru b{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,36px);line-height:1.1;overflow-wrap:anywhere}body{margin:0}[hidden]{display:none!important}</style>
 </head><body>
 
 <header class="hero">
@@ -500,7 +512,7 @@ const COMP={
 };
 function drawVs(k){
  const c=COMP[k];
- let h=`<div class="vs-head"><div class="them"></div><div class="them">${c.name}</div><div class="us">cefacemcucopiii.ro</div></div><div class="vs-row pay-row"><div class="crit">Plătești pentru</div><div class="pv">${c.pay}</div><div class="us pv">părinți și cifre clare</div></div>`;
+ let h=`<div class="vs-head"><div class="them"></div><div class="them">${c.name}</div><div class="us">cefacemcucopiii<wbr>.ro</div></div><div class="vs-row pay-row"><div class="crit">Plătești pentru</div><div class="pv">${c.pay}</div><div class="us pv">părinți și cifre clare</div></div>`;
  CRIT.forEach((t,i)=>{h+=`<div class="vs-row"><div class="crit">${t}</div><div>${mk(c.v[i])}</div><div class="us">${mk(2)}</div></div>`});
  document.getElementById('vs').innerHTML=h;
 }

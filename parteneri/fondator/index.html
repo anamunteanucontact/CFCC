@@ -273,8 +273,24 @@ td.s{font-weight:700;color:var(--coral-ink)}
 tr:last-child td{border-bottom:0}
 .back{display:inline-block;margin-top:18px;font-weight:700;color:var(--petrol-ink)}
 .toplink{color:var(--petrol-ink);font-weight:700;font-size:15px}
+
+.tbl-wrap td.pk{font-weight:700}
+.tbl-wrap .mo{display:none}
+@media (max-width:640px){.tbl-wrap .mo{display:inline}}
+@media (min-width:641px){.tbl-wrap td.pk{font-weight:400}}
+@media (max-width:640px){
+ .tbl-wrap{overflow:visible;border:0;background:transparent}
+ .tbl-wrap table{min-width:0}
+ .tbl-wrap thead{display:none}
+ .tbl-wrap table,.tbl-wrap tbody,.tbl-wrap tr,.tbl-wrap td{display:block}
+ .tbl-wrap tr{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:12px}
+ .tbl-wrap td{border:0;padding:4px 0;display:flex;justify-content:space-between;gap:12px}
+ .tbl-wrap td.pk{display:block;font-family:var(--display);font-size:19px;padding-bottom:8px}
+ .tbl-wrap td.dn{display:none}
+ .tbl-wrap td[data-l]::before{content:attr(data-l);color:var(--muted);font-size:14px}
+}
 </style>
-<style>.pentru{display:inline-grid;gap:2px;margin-bottom:26px;padding:14px 22px;border-radius:18px;background:var(--sun);color:#1F4E5F;box-shadow:0 10px 30px -12px rgba(0,0,0,.45);max-width:100%}.pentru.cu-logo{grid-template-columns:auto 1fr;align-items:center;column-gap:16px}.pt{display:grid;gap:2px;min-width:0}.plogo{height:72px;width:auto;max-width:150px;object-fit:contain;background:#fff;border-radius:12px;padding:6px}.pentru small{font-size:14px;font-weight:700;letter-spacing:.02em}.pentru b{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,36px);line-height:1.1;overflow-wrap:anywhere}body{margin:0}[hidden]{display:none!important}</style>
+<style>.pentru{position:relative;z-index:2;display:inline-grid;gap:2px;margin-bottom:26px;padding:14px 22px;border-radius:18px;background:var(--sun);color:#1F4E5F;box-shadow:0 10px 30px -12px rgba(0,0,0,.45);max-width:100%}.pentru.cu-logo{grid-template-columns:auto 1fr;align-items:center;column-gap:16px}.hero .wrap{position:relative;z-index:1}@media (max-width:640px){.pentru{display:grid;width:100%}.plogo{height:60px;max-width:110px}}.pt{display:grid;gap:2px;min-width:0}.plogo{height:72px;width:auto;max-width:150px;object-fit:contain;background:#fff;border-radius:12px;padding:6px}.pentru small{font-size:14px;font-weight:700;letter-spacing:.02em}.pentru b{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,36px);line-height:1.1;overflow-wrap:anywhere}body{margin:0}[hidden]{display:none!important}</style>
 </head><body>
 
 <header class="hero">
@@ -435,8 +451,8 @@ bind('o-pk',v=>pk=v);bind('o-du',v=>du=+v);
 
 let rows='';
 ['P','S'].forEach(k=>[3,6,12].forEach(d=>{const a=month(k,d,true),b=month(k,d,false);
- rows+=`<tr><td>${PRICE[k].n}</td><td>${d} luni</td><td>${fmt(a)} / lună</td><td>${fmt(b)} / lună</td><td class="s">${fmt((b-a)*d)}</td></tr>`;}));
-rows+=`<tr><td>Colaborare</td><td>o dată</td><td>${fmt(300)}</td><td>${fmt(480)}</td><td class="s">${fmt(180)}</td></tr>`;
+ rows+=`<tr><td class="pk">${PRICE[k].n}<span class="mo">, ${d} luni</span></td><td class="dn" data-l="Durata">${d} luni</td><td data-l="Până la 30 noiembrie">${fmt(a)} / lună</td><td data-l="După 30 noiembrie">${fmt(b)} / lună</td><td class="s" data-l="Economisești">${fmt((b-a)*d)}</td></tr>`;}));
+rows+=`<tr><td class="pk">Colaborare<span class="mo">, o dată</span></td><td class="dn" data-l="Durata">o dată</td><td data-l="Până la 30 noiembrie">${fmt(300)}</td><td data-l="După 30 noiembrie">${fmt(480)}</td><td class="s" data-l="Economisești">${fmt(180)}</td></tr>`;
 document.getElementById('tbl').innerHTML=rows;
 
 seats();render();
