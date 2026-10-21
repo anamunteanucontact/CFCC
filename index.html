@@ -630,7 +630,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
         <label for="ev-amin">Vârsta minimă recomandată<input id="ev-amin" placeholder="ex. 3 ani"></label>
         <label for="ev-amax">Vârsta maximă recomandată<input id="ev-amax" placeholder="ex. 8 ani"></label>
       </div>
-      <label for="ev-cat">Ce fel de eveniment e?<select id="ev-cat"><option value="">Alege</option><option>Teatru / spectacol</option><option>Concert</option><option>Atelier</option><option>Film</option><option>Expoziție / muzeu</option><option>Festival / târg</option><option>Sport / mișcare</option><option>Dans contemporan</option><option>Educativ / știință</option><option>Outdoor / natură</option><option>Lectură / bibliotecă</option><option>Petrecere / animație</option><option>Joc / quiz</option><option value="__alta">Altă categorie</option></select></label>
+      <label for="ev-cat">Ce fel de eveniment e?<select id="ev-cat"><option value="">Alege</option><option>Program de vacanță / tabără</option><option>Teatru / spectacol</option><option>Concert</option><option>Atelier</option><option>Film</option><option>Expoziție / muzeu</option><option>Festival / târg</option><option>Sport / mișcare</option><option>Dans contemporan</option><option>Educativ / știință</option><option>Outdoor / natură</option><option>Lectură / bibliotecă</option><option>Petrecere / animație</option><option>Joc / quiz</option><option value="__alta">Altă categorie</option></select></label>
       <label for="ev-cat-alta" id="ev-cat-alta-wrap" hidden>Care categorie? <small>(sau spune-ne în descriere)</small><input id="ev-cat-alta" placeholder="ex. dans, magie, robotică"></label>
       <label for="ev-acc">Acces<select id="ev-acc"><option value="">Alege</option><option>Gratuit</option><option>Cu înscriere</option><option>Cu bilet</option></select></label>
       <label for="ev-link" id="ev-link-wrap" hidden><span id="ev-link-lbl">Link</span><input id="ev-link" type="url" placeholder="https://"></label>
@@ -1409,13 +1409,13 @@ const EDITII=[
   {id:"vacanta",t:"Vacanța de toamnă",em:"🍂",public:false,
    intro:"Tabere urbane, programe de zi și ateliere pentru săptămâna de vacanță. Tot ce găsești în Timișoara pentru copiii care stau acasă de la școală și grădiniță, într-un singur loc.",
    banner:"2026-10-21",de:"2026-10-21",pana:"2026-11-01",
-   kw:/vacan[țţt]|tab[ăa]r[ăa]|tabere|\b(day ?)?camp\b/i,
+   kw:/vacan[țţt]|tab[ăa]r[ăa]|tabere|\b(day ?)?camp\b/i,nu:/carnavalul toamnei/i,
    c1:"#D98324",c2:"#2F6B4F",sub:"Tabere urbane și programe de zi, toate într-un loc",
    cta:"Organizezi o tabără sau un program de vacanță?",gol:"Adunăm acum taberele și programele de vacanță. Revino în câteva zile sau abonează-te la newsletter și ți le trimitem pe mail."}
 ];
 const ED_BY=Object.fromEntries(EDITII.map(x=>[x.id,x]));
 const ed={cur:null,day:"",age:""};
-const edMatch=(x,e)=>e.d>=x.de&&e.d<=x.pana&&x.kw.test(e.n+" "+e.desc+" "+e.c);
+const edMatch=(x,e)=>e.d>=x.de&&e.d<=x.pana&&x.kw.test(e.n+" "+e.desc+" "+e.c)&&!(x.nu&&x.nu.test(e.n));
 const edEvents=x=>EV.filter(e=>e.d>=iso(TODAY)&&edMatch(x,e))
   .sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
 const edLive=x=>x.public&&iso(TODAY)>=x.banner&&iso(TODAY)<=x.pana;
