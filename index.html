@@ -858,7 +858,7 @@ function toEvents(rows){
     let id=titleSlug(n);if(RESERVED_IDS.has(id))id="eveniment-"+id;
     if(seen[id]){id+="-"+dateSlug(d);if(seen[id])id+="-"+(++seen[id]);else seen[id]=1}else seen[id]=1;
     const os=g(4).split(/\s*\n\s*/).map(x=>x.trim()).filter(Boolean);
-    out.push({id,oid,d,t,te,o:os.join(", "),os,n,c:g(6)||"Altele",a1:g(7),a2:g(8),l:g(9),ad:g(10),acc:accFrom(g(11)),link:cleanUrl(g(12))||cleanUrl(g(13)),desc:g(14)});
+    out.push({id,oid,d,t,te,o:os.join(", "),os,n,c:g(6)||"Altele",a1:g(7),a2:g(8),l:g(9),ad:g(10),acc:accFrom(g(11)),link:cleanUrl(g(12))||cleanUrl(g(13)),desc:g(14),d2:(x=>x&&x>d?x:"")(isoFrom("",g(13)))});
   });
   return out;
 }
@@ -914,7 +914,11 @@ function ageLabel(e){
 }
 const firstTime=e=>(e.t.match(/\d{1,2}:\d{2}/)||[null])[0];
 const timeLabel=e=>e.t?e.t.replace(/ si /g,"\n")+(e.te&&/^\d\d:\d\d$/.test(e.te)&&e.te>e.t?"\n- "+e.te:""):"ora\nîn curând";
-const dateLong=e=>{const d=dt(e.d);return `${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}`};
+// evenimente pe mai multe zile (coloana X „Data sfârșit”): „De luni 26 până vineri 30 octombrie”
+const dateLong=e=>{const d=dt(e.d);if(!e.d2)return `${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}`;
+  const f=dt(e.d2),z=x=>ZILE[x.getDay()].toLowerCase();
+  return `De ${z(d)} ${d.getDate()}${d.getMonth()!==f.getMonth()?" "+LUNI_LUNG[d.getMonth()]:""} până ${z(f)} ${f.getDate()} ${LUNI_LUNG[f.getMonth()]}`};
+const spanTag=e=>{if(!e.d2)return"";const d=dt(e.d),f=dt(e.d2),L=m=>LUNI_LUNG[m].slice(0,3)+".";return `<span class="tag acc">${d.getDate()}${d.getMonth()!==f.getMonth()?" "+L(d.getMonth()):""}-${f.getDate()} ${L(f.getMonth())}</span>`};
 const where=e=>[locOf(e),adOf(e)].filter(Boolean).join(", ");
 
 /* link Google Calendar */
@@ -972,12 +976,12 @@ function evCard(e){
     <button class="ev-head" type="button" data-open="${e.id}" aria-expanded="${open}">
       <div class="tm">${esc(timeLabel(e))}</div>
       <div><h3>${esc(e.n)}</h3>${(()=>{const same=sameOrgLoc(e);const L=locOf(e);return same?`<div class="meta org loc">${I.pin}${esc(L)}</div>`:(e.o?`<div class="meta org">${esc(e.o)}</div>`:"")+(L?`<div class="meta loc">${I.pin}${esc(L)}</div>`:"")})()}
-        <div class="tags">${pro?'<span class="tag pro">★ Partener</span>':""}<span class="tag">${esc(e.c)}</span>${al?`<span class="tag age">${esc(al)}</span>`:""}${isSaved?'<span class="tag saved">Salvat</span>':""}</div></div>
+        <div class="tags">${pro?'<span class="tag pro">★ Partener</span>':""}${spanTag(e)}<span class="tag">${esc(e.c)}</span>${al?`<span class="tag age">${esc(al)}</span>`:""}${isSaved?'<span class="tag saved">Salvat</span>':""}</div></div>
       <span class="caret">${I.caret}</span>
     </button>
     ${open?`<div class="det">
       <dl>
-        <dt>Când</dt><dd>${esc(dateLong(e))}${e.t?", "+esc(e.t.replace(/\n/g,", ")):""}</dd>
+        <dt>Când</dt><dd>${esc(dateLong(e))}${e.t?", "+esc(e.t.replace(/\n/g,", "))+(e.d2&&e.te?" - "+esc(e.te):""):""}</dd>
         ${locOf(e)?`<dt>Unde</dt><dd>${orgLink(locOf(e))}</dd>`:""}
         ${adOf(e)?`<dt>Adresa</dt><dd>${esc(adOf(e))}</dd>`:""}
         ${e.o&&!sameOrgLoc(e)?`<dt>Organizator</dt><dd>${orgsOf(e).map(orgLink).join(", ")}</dd>`:""}
@@ -1416,7 +1420,7 @@ const EDITII=[
 const ED_BY=Object.fromEntries(EDITII.map(x=>[x.id,x]));
 const ed={cur:null,day:"",age:""};
 const edMatch=(x,e)=>e.d>=x.de&&e.d<=x.pana&&x.kw.test(e.n+" "+e.desc+" "+e.c)&&!(x.nu&&x.nu.test(e.n));
-const edEvents=x=>EV.filter(e=>e.d>=iso(TODAY)&&edMatch(x,e))
+const edEvents=x=>EV.filter(e=>(e.d2||e.d)>=iso(TODAY)&&edMatch(x,e))
   .sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
 const edLive=x=>x.public&&iso(TODAY)>=x.banner&&iso(TODAY)<=x.pana;
 function edBanner(){
