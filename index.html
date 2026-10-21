@@ -858,7 +858,7 @@ function toEvents(rows){
     let id=titleSlug(n);if(RESERVED_IDS.has(id))id="eveniment-"+id;
     if(seen[id]){id+="-"+dateSlug(d);if(seen[id])id+="-"+(++seen[id]);else seen[id]=1}else seen[id]=1;
     const os=g(4).split(/\s*\n\s*/).map(x=>x.trim()).filter(Boolean);
-    out.push({id,oid,d,t,te,o:os.join(", "),os,n,c:g(6)||"Altele",a1:g(7),a2:g(8),l:g(9),ad:g(10),acc:accFrom(g(11)),link:cleanUrl(g(12))||cleanUrl(g(13)),desc:g(14),pr:g(15),d2:(x=>x&&x>d?x:"")(isoFrom("",g(13)))});
+    out.push({id,oid,d,t,te,o:os.join(", "),os,n,c:g(6)||"Altele",a1:g(7),a2:g(8),l:g(9),ad:g(10),acc:accFrom(g(11)),link:cleanUrl(g(12))||cleanUrl(g(13)),desc:g(14),d2:(x=>x&&x>d?x:"")(isoFrom("",g(13)))});
   });
   return out;
 }
@@ -985,7 +985,6 @@ function evCard(e){
         ${locOf(e)?`<dt>Unde</dt><dd>${orgLink(locOf(e))}</dd>`:""}
         ${adOf(e)?`<dt>Adresa</dt><dd>${esc(adOf(e))}</dd>`:""}
         ${e.o&&!sameOrgLoc(e)?`<dt>Organizator</dt><dd>${orgsOf(e).map(orgLink).join(", ")}</dd>`:""}
-        ${e.pr?`<dt>Preț</dt><dd>${esc(e.pr)}</dd>`:""}
       </dl>
       ${e.desc?`<p class="desc">${esc(e.desc)}</p>`:""}
       <div class="actions">
