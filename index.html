@@ -839,7 +839,7 @@ function parseCSV(t){
 const slug=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40);
 // linkuri curate: doar titlul (max ~60 caractere, tăiat la cuvânt întreg); la titluri repetate se adaugă data, ex. detectivii-beta-18-octombrie
 const LUNI_SLUG=["ianuarie","februarie","martie","aprilie","mai","iunie","iulie","august","septembrie","octombrie","noiembrie","decembrie"];
-const RESERVED_IDS=new Set(["halloween","craciun","mos-nicolae","1-iunie","paste","calendar","despre","recomandari","colaborari","profil","confidentialitate","formular","formular-partener","adauga-eveniment","colaborare-promovare"]);
+const RESERVED_IDS=new Set(["halloween","vacanta","craciun","mos-nicolae","1-iunie","paste","calendar","despre","recomandari","colaborari","profil","confidentialitate","formular","formular-partener","adauga-eveniment","colaborare-promovare"]);
 function titleSlug(n){let x=n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");if(x.length>60){x=x.slice(0,61);x=x.includes("-")?x.slice(0,x.lastIndexOf("-")):x.slice(0,60)}return x||"eveniment"}
 const dateSlug=d=>{const p=d.split("-");return (+p[2])+"-"+LUNI_SLUG[+p[1]-1]};
 function cleanUrl(u){u=(u||"").trim();if(!/^https?:\/\//i.test(u))return"";try{const x=new URL(u);["stkn","fbclid","igsh","mibextid","utm_source","utm_medium","utm_campaign"].forEach(k=>x.searchParams.delete(k));return x.toString()}catch(_){return""}}
@@ -1405,7 +1405,13 @@ const EDITII=[
    intro:"Petreceri costumate, ateliere cu dovleci și povești cu fantome prietenoase. Toate petrecerile de Halloween pentru copii din Timișoara, într-un singur loc.",
    banner:"2026-10-14",de:"2026-10-14",pana:"2026-11-02",
    kw:/hal+ow+e+n|dovle[cg]|fantom|vr[ăa]jitoar|bal mascat|carnaval|costumat|spooky|trick or treat/i,
-   c1:"#E8701A",c2:"#4B2E83"}
+   c1:"#E8701A",c2:"#4B2E83",sub:"Petreceri, ateliere și spectacole, toate într-un loc"},
+  {id:"vacanta",t:"Vacanța de toamnă",em:"🍂",public:false,
+   intro:"Tabere urbane, programe de zi și ateliere pentru săptămâna de vacanță. Tot ce găsești în Timișoara pentru copiii care stau acasă de la școală și grădiniță, într-un singur loc.",
+   banner:"2026-10-21",de:"2026-10-21",pana:"2026-11-01",
+   kw:/vacan[țţt]|tab[ăa]r[ăa]|tabere|\b(day ?)?camp\b/i,
+   c1:"#D98324",c2:"#2F6B4F",sub:"Tabere urbane și programe de zi, toate într-un loc",
+   cta:"Organizezi o tabără sau un program de vacanță?",gol:"Adunăm acum taberele și programele de vacanță. Revino în câteva zile sau abonează-te la newsletter și ți le trimitem pe mail."}
 ];
 const ED_BY=Object.fromEntries(EDITII.map(x=>[x.id,x]));
 const ed={cur:null,day:"",age:""};
@@ -1415,9 +1421,9 @@ const edEvents=x=>EV.filter(e=>e.d>=iso(TODAY)&&edMatch(x,e))
 const edLive=x=>x.public&&iso(TODAY)>=x.banner&&iso(TODAY)<=x.pana;
 function edBanner(){
   const el=document.getElementById("ed-banner");if(!el)return;
-  const x=EDITII.find(edLive);if(!x||loadState!=="ok"){el.innerHTML="";return}
-  el.innerHTML=`<a class="ed-ban" href="#${x.id}" style="--c1:${x.c1};--c2:${x.c2}"><span class="ed-ban-em" aria-hidden="true">${x.em}</span>
-    <span><b>${esc(x.t)}</b><small>Petreceri, ateliere și spectacole, toate într-un loc</small></span><span class="ed-ban-go" aria-hidden="true">→</span></a>`;
+  const xs=EDITII.filter(edLive);if(!xs.length||loadState!=="ok"){el.innerHTML="";return}
+  el.innerHTML=xs.map(x=>`<a class="ed-ban" href="#${x.id}" style="--c1:${x.c1};--c2:${x.c2}"><span class="ed-ban-em" aria-hidden="true">${x.em}</span>
+    <span><b>${esc(x.t)}</b><small>${esc(x.sub||"Toate într-un loc")}</small></span><span class="ed-ban-go" aria-hidden="true">→</span></a>`).join("");
 }
 function renderEd(){
   const el=document.getElementById("ed-page"),x=ED_BY[ed.cur];if(!el||!x)return;
@@ -1441,9 +1447,9 @@ function renderEd(){
     <div class="count">${rows.length} ${rows.length===1?"activitate":"activități"}</div></div>`:"";
   const by={};rows.forEach(e=>(by[e.d]=by[e.d]||[]).push(e));
   const list=Object.keys(by).map(k=>{const d=dt(k);return `<div class="dayhead"><h3>${ZILE[d.getDay()]}, ${d.getDate()} ${LUNI_LUNG[d.getMonth()]}</h3><span>${by[k].length} ${by[k].length===1?"activitate":"activități"}</span></div><div class="evs">${by[k].map(evCard).join("")}</div>`}).join("");
-  const empty=!all.length?`<div class="empty ed-empty"><span>Adunăm acum toate petrecerile și atelierele. Revino în câteva zile sau abonează-te la newsletter și ți le trimitem pe mail.</span></div>`
+  const empty=!all.length?`<div class="empty ed-empty"><span>${esc(x.gol||"Adunăm acum toate petrecerile și atelierele. Revino în câteva zile sau abonează-te la newsletter și ți le trimitem pe mail.")}</span></div>`
     :!rows.length?'<div class="empty">Nu am găsit nimic pentru filtrele alese.</div>':"";
-  const cta=`<div class="art-cta ed-cta"><b>Organizezi ceva de ${esc(x.t.replace(/ cu copiii$/,""))}?</b><span>Trimite-ne evenimentul și îl adăugăm aici, gratuit.</span><a class="btn btn-main" href="#adauga-eveniment">Adaugă evenimentul tău</a></div>`;
+  const cta=`<div class="art-cta ed-cta"><b>${esc(x.cta||"Organizezi ceva de "+x.t.replace(/ cu copiii$/,"")+"?")}</b><span>Trimite-ne evenimentul și îl adăugăm aici, gratuit.</span><a class="btn btn-main" href="#adauga-eveniment">Adaugă evenimentul tău</a></div>`;
   el.innerHTML=prev+hero+filters+list+empty+cta;
   el.querySelectorAll(".ed-filters .row").forEach(r=>{try{hscroll(r)}catch(_){}});
 }
