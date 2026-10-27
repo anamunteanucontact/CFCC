@@ -409,34 +409,7 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
   </div>
 </section>
 
-<section>
-  <div class="wrap">
-    <div class="eyebrow">Promovarea e o investiție</div>
-    <h2>Ce ți se potrivește azi?</h2>
-    <p class="lead">Calculează singur cât valorează pentru tine un singur client nou și de câți clienți noi ai nevoie ca parteneriatul să se plătească singur.</p>
-    <p class="tap">Calculator interactiv: scrie cifrele tale în căsuțe și rezultatul se schimbă pe loc</p>
-    <div class="calc">
-      <div class="card">
-        <h3>Cât valorează un client nou?</h3>
-        <label class="field">Abonamentul lunar (lei)<input id="c-ab" type="number" inputmode="numeric" min="0" value="240"></label>
-        <label class="field">Câte luni rămâne, de obicei<input id="c-luni" type="number" inputmode="numeric" min="1" max="12" value="9"></label>
-        <div class="result"><div class="num" id="r-copil">2.160 lei</div><p>atât aduce un singur client nou.</p></div>
-      </div>
-      <div class="card">
-        <h3>Când se plătește singur parteneriatul?</h3>
-        <label class="field">Pachetul<select id="c-pk"><option value="1700">Partener</option><option value="3400">Partener Strategic</option></select></label>
-        <label class="field">Câte luni (minimum 3)<input id="c-dur" type="number" inputmode="numeric" min="3" max="12" value="3"></label>
-        <div class="result"><div class="num" id="r-buget">3 clienți noi</div><p id="r-buget-t">acoperă tot parteneriatul. De la următorul, e câștig.</p></div>
-      </div>
-    </div>
-    <div class="quote3">
-      <strong>„Am pus evenimentul pe Facebook și n-a venit nimeni.”</strong>
-      <p>Printr-o colaborare cu platforma noastră ajungi direct la părinții care te caută, dar încă nu te găsesc. Cu ajutorul nostru te găsesc mai ușor: pe platformă, în newsletter și pe rețelele noastre de social media, de unde poți reposta oricând. Iar la final primești un raport din partea noastră: știi exact câți au dat click pe numele brandului tău și ce poți îmbunătăți în strategia ta de comunicare și vânzări.</p>
-    </div>
-  </div>
-</section>
-
-<section class="band" id="pachete">
+<section id="pachete">
   <div class="wrap">
     <div class="eyebrow">Ce oferim</div>
     <h2>Pachetele</h2>
@@ -455,7 +428,7 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
   </div>
 </section>
 
-<section>
+<section class="band">
   <div class="wrap">
     <div class="eyebrow">Cum lucrăm</div>
     <h2>Simplu, clar și la vedere</h2>
@@ -555,18 +528,6 @@ document.getElementById('tiers').innerHTML=T.map(t=>`<article class="tier${t.sta
 
 const fmt=n=>Math.round(n).toLocaleString('ro-RO');
 const val=id=>Math.max(0,parseFloat(document.getElementById(id).value)||0);
-function calc(){
- document.getElementById('r-copil').textContent=fmt(val('c-ab')*val('c-luni'))+' lei';
- const client=val('c-ab')*val('c-luni'), luni=Math.min(12,Math.max(3,Math.round(val('c-dur'))||3));
- const red=luni>=12?.85:luni>=6?.9:1, cost=val('c-pk')*luni*red;
- const pk=document.getElementById('c-pk'), nume=pk.options[pk.selectedIndex].text;
- if(!client){document.getElementById('r-buget').textContent='-';document.getElementById('r-buget-t').textContent='Completează abonamentul și lunile din stânga.';return;}
- const n=Math.ceil(cost/client);
- document.getElementById('r-buget').textContent=n===1?'1 client nou':`${n} clienți noi`;
- document.getElementById('r-buget-t').textContent=`acoperă ${luni} luni de ${nume} (${fmt(cost)} lei${red<1?', cu reducerea pentru durată':''}). De la următorul, e câștig.`;
-}
-['c-ab','c-luni','c-pk','c-dur'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('input',calc);el.addEventListener('change',()=>cfccTrack('calculator',{abonament:val('c-ab'),luni:val('c-luni'),pachet:val('c-pk'),durata:val('c-dur')}));});
-calc();
 
 document.getElementById('copy').addEventListener('click',async e=>{
  const b=e.currentTarget;
