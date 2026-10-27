@@ -163,8 +163,9 @@ p{margin:0}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;display:grid;gap:14px;min-width:0;align-content:start}
 .card h3{font-size:22px}
 .field{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;font-size:15px}
-.field input{font:inherit;font-weight:700;width:96px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);text-align:right}
-.field input:focus-visible{outline:3px solid var(--sun);outline-offset:1px}
+.field input,.field select{font:inherit;font-weight:700;width:96px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);text-align:right}
+.field select{width:auto;max-width:100%;text-align:left}
+.field input:focus-visible,.field select:focus-visible{outline:3px solid var(--sun);outline-offset:1px}
 .result{border-radius:14px;background:var(--sun-soft);padding:14px 16px}
 .result .num{font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,38px);line-height:1;color:var(--coral-ink)}
 .result p{margin-top:6px;font-size:15px}
@@ -200,7 +201,8 @@ a.founder::before,.fnd-b::before{content:"";width:20px;height:20px;flex:none;bac
 .tap{display:inline-flex;align-items:center;gap:10px;margin-top:22px;font-weight:700;font-size:15px;color:var(--coral-ink)}
 .tap::before{content:"";width:22px;height:22px;flex:none;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EE6C4D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 11V5.5a1.5 1.5 0 0 1 3 0V11'/%3E%3Cpath d='M12 10.5a1.5 1.5 0 0 1 3 0V12'/%3E%3Cpath d='M15 11.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.5a6 6 0 0 1-4.6-2.2L4.5 15.6a1.6 1.6 0 0 1 2.3-2.2L9 15.5'/%3E%3C/svg%3E")}
 .tap + .chips,.tap + .toggle,.tap + .calc{margin-top:12px}
-.field input{border:1.5px dashed var(--coral);background:var(--surface);cursor:text}
+.field input,.field select{border:1.5px dashed var(--coral);background:var(--surface);cursor:text}
+.field select{cursor:pointer}
 .field input:hover{border-style:solid}
 .chip{box-shadow:0 2px 0 var(--line)}
 .chip:hover{border-color:var(--petrol)}
@@ -411,7 +413,7 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
   <div class="wrap">
     <div class="eyebrow">Promovarea e o investiție</div>
     <h2>Ce ți se potrivește azi?</h2>
-    <p class="lead">Calculează singur ce buget de promovare ar trebui să aibă brandul tău și cât valorează pentru tine un singur client nou.</p>
+    <p class="lead">Calculează singur cât valorează pentru tine un singur client nou și de câți clienți noi ai nevoie ca parteneriatul să se plătească singur.</p>
     <p class="tap">Calculator interactiv: scrie cifrele tale în căsuțe și rezultatul se schimbă pe loc</p>
     <div class="calc">
       <div class="card">
@@ -421,10 +423,10 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
         <div class="result"><div class="num" id="r-copil">2.160 lei</div><p>atât aduce un singur client nou.</p></div>
       </div>
       <div class="card">
-        <h3>Cât să pui deoparte pentru promovare?</h3>
-        <label class="field">Câte grupe ai<input id="c-gr" type="number" inputmode="numeric" min="1" value="3"></label>
-        <label class="field">Copii într-o grupă<input id="c-ch" type="number" inputmode="numeric" min="1" value="12"></label>
-        <div class="result"><div class="num" id="r-buget">430-860 lei</div><p>pe lună. Afacerile mici care cresc investesc de obicei între 5% și 10% din venit în promovare.</p></div>
+        <h3>Când se plătește singur parteneriatul?</h3>
+        <label class="field">Pachetul<select id="c-pk"><option value="1700">Partener</option><option value="3400">Partener Strategic</option></select></label>
+        <label class="field">Câte luni (minimum 3)<input id="c-dur" type="number" inputmode="numeric" min="3" max="12" value="3"></label>
+        <div class="result"><div class="num" id="r-buget">3 clienți noi</div><p id="r-buget-t">acoperă tot parteneriatul. De la următorul, e câștig.</p></div>
       </div>
     </div>
     <div class="quote3">
@@ -555,10 +557,15 @@ const fmt=n=>Math.round(n).toLocaleString('ro-RO');
 const val=id=>Math.max(0,parseFloat(document.getElementById(id).value)||0);
 function calc(){
  document.getElementById('r-copil').textContent=fmt(val('c-ab')*val('c-luni'))+' lei';
- const venit=val('c-gr')*val('c-ch')*val('c-ab'), r10=x=>Math.round(x/10)*10;
- document.getElementById('r-buget').textContent=`${fmt(r10(venit*.05))}-${fmt(r10(venit*.10))} lei`;
+ const client=val('c-ab')*val('c-luni'), luni=Math.min(12,Math.max(3,Math.round(val('c-dur'))||3));
+ const red=luni>=12?.85:luni>=6?.9:1, cost=val('c-pk')*luni*red;
+ const pk=document.getElementById('c-pk'), nume=pk.options[pk.selectedIndex].text;
+ if(!client){document.getElementById('r-buget').textContent='-';document.getElementById('r-buget-t').textContent='Completează abonamentul și lunile din stânga.';return;}
+ const n=Math.ceil(cost/client);
+ document.getElementById('r-buget').textContent=n===1?'1 client nou':`${n} clienți noi`;
+ document.getElementById('r-buget-t').textContent=`acoperă ${luni} luni de ${nume} (${fmt(cost)} lei${red<1?', cu reducerea pentru durată':''}). De la următorul, e câștig.`;
 }
-['c-ab','c-luni','c-gr','c-ch'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('input',calc);el.addEventListener('change',()=>cfccTrack('calculator',{abonament:val('c-ab'),luni:val('c-luni'),grupe:val('c-gr'),copii:val('c-ch')}));});
+['c-ab','c-luni','c-pk','c-dur'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('input',calc);el.addEventListener('change',()=>cfccTrack('calculator',{abonament:val('c-ab'),luni:val('c-luni'),pachet:val('c-pk'),durata:val('c-dur')}));});
 calc();
 
 document.getElementById('copy').addEventListener('click',async e=>{
