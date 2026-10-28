@@ -416,7 +416,7 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
     <p class="lead">Listarea în calendar e și rămâne gratuită pentru orice organizator. Când vrei să ajungi mai aproape de părinți, alegi pachetul potrivit. Prețurile sunt finale, fără costuri ascunse.</p>
     <a class="founder" onclick="cfccTrack('spre fondator',{loc:'banda de sus'})" href="/parteneri/fondator/" data-link="/parteneri/fondator/" style="text-decoration:none">Oferta de fondator: locuri limitate, până la 30 noiembrie 2026 · Vezi oferta și simulatorul →</a>
     <div class="tiers" id="tiers"></div>
-    <div class="terms"><span>Parteneriat de minimum 3 luni, pentru Partener și Partener Strategic</span><span>10% reducere la semnarea unui contract pe 6 luni</span><span>15% reducere la semnarea unui contract pe un an, cu plata integrală</span></div>
+    <div class="terms"><span>Parteneriat de minimum 3 luni, pentru toate pachetele de partener</span><span>10% reducere la semnarea unui contract pe 6 luni</span><span>15% reducere la semnarea unui contract pe un an, cu plata integrală</span></div>
     <div class="addons">
       <div class="addon" id="exclusivitate"><h4>Ce înseamnă exclusivitatea în domeniul tău</h4><div class="p">Opțiune pentru Partener Strategic</div><p>Ești singurul brand din domeniul tău care beneficiază de pachetul Partener Strategic, pe toată durata contractului. Prețul se stabilește în funcție de domeniu și îți garantează poziția de reper în domeniul tău.</p></div>
       <div class="addon"><h4>Servicii complementare</h4><div class="p">La cerere, pe baza briefului</div><p>Oferite de echipa noastră de profesioniști: strategie de comunicare, consultanță în branding și vânzări, filmări suplimentare și realizare de materiale de promovare.</p></div>
@@ -513,8 +513,10 @@ function drawMode(k){
 drawMode('colab');
 
 const T=[
- {n:"Listare",for:"Pentru orice organizator, oricând.",now:"0 lei",dur:"Mereu",groups:[["",["Evenimentul tău în calendar, cu pagină proprie","Poate apărea în newsletter și în programul zilei","Poate primi „Recomandarea noastră”"]]]},
  {n:"Colaborare",for:"Pentru un eveniment, un atelier sau o perioadă de înscrieri.",now:"300 lei",was:"480 lei",unit:"o dată",dur:"O singură acțiune",groups:[["",["Eticheta „Colaborare” pe eveniment","Un loc în newsletterul de miercuri","O postare pe Instagram și Facebook","Un story cu tag la tine","Raport de impact după acțiune"]]]},
+ {n:"Partener Start",for:"Pentru studiourile și atelierele mici, active tot anul.",now:"900 lei",was:"1.200 lei",unit:"/ lună",dur:"Minimum 3 luni",groups:[
+  ["Locul tău în comunitate",["Pagina ta în zona de comunitate: prezentare, poze, date de contact și calendarul la zi","Chenar, steluță și eticheta „Partener” în calendar"]],
+  ["În fiecare lună",["Două story-uri cu tag, din materialele tale","Loc în „Noutăți de la parteneri” din newsletter","Raport lunar de impact"]]]},
  {n:"Partener",for:"Pentru afacerile active tot anul.",now:"1.700 lei",was:"2.400 lei",unit:"/ lună",dur:"Minimum 3 luni",star:1,groups:[
   ["Locul tău în comunitate",["Pagina ta în zona de comunitate, care poate ține loc de site: prezentare, poze, calendarul la zi, evenimentele anterioare, date de contact și toate articolele despre tine","Chenar, steluță și eticheta „Partener” în calendar","Kit grafic de partener, la început: materiale gata de postat pe canalele tale, ca să le spui clienților că te găsesc pe platforma noastră"]],
   ["În fiecare lună",["Un articol despre tine","O campanie: reel sau carusel, plus story-uri","Loc în „Noutăți de la parteneri” din newsletter","O ofertă specială pentru abonați: voucher, reducere, giveaway, curs demo","Loc în edițiile speciale ale newsletterului: Halloween, Crăciun, 1 Iunie, Mărțișor","Conținut pe care îl poți folosi și pe conturile tale"]],

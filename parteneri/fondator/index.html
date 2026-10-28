@@ -211,7 +211,7 @@ p{margin:0}
 footer{padding-block:22px;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion: no-preference){.chip,.toggle button,.copy{transition:background .2s,color .2s,border-color .2s}}
 
-.seats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.seats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px}
 .seat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;display:grid;gap:8px;min-width:0}
 .seat .k{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .seat .n{font-family:var(--display);font-weight:800;font-size:44px;line-height:1;color:var(--coral-ink)}
@@ -224,7 +224,8 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:8px}
 .legend i{width:22px;height:8px;border-radius:4px;display:inline-block}
 .seat p{font-size:15px;color:var(--muted)}
-@media (max-width:760px){.seats{grid-template-columns:1fr}}
+@media (max-width:900px){.seats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.seats{grid-template-columns:1fr}}
 .sim{display:grid;grid-template-columns:1fr 1.15fr;gap:20px;margin-top:28px;align-items:start}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;display:grid;gap:20px;min-width:0}
 .q{display:grid;gap:10px}
@@ -319,6 +320,7 @@ tr:last-child td{border-bottom:0}
     <div class="seats">
       <div class="seat"><div class="k">Partener Strategic</div><div class="n" id="s-str">3 <small>locuri</small></div><div class="bar" id="b-str"></div><p>Pentru brandurile puternic ancorate în comunitate.</p></div>
       <div class="seat"><div class="k">Partener</div><div class="n" id="s-par">7 <small>locuri</small></div><div class="bar" id="b-par"></div><p>Pentru afacerile active tot anul.</p></div>
+      <div class="seat"><div class="k">Partener Start</div><div class="n" id="s-sta">10 <small>locuri</small></div><div class="bar" id="b-sta"></div><p>Pentru studiourile și atelierele mici, active tot anul.</p></div>
       <div class="seat"><div class="k">Colaborare</div><div class="n">∞</div><p>Fără limită de locuri. Prețul de fondator e valabil pentru orice colaborare comandată până la 30 noiembrie.</p></div>
     </div>
     <div class="legend"><span><i style="background:var(--sun)"></i>Loc ocupat</span><span><i style="background:var(--good)"></i>Loc liber</span></div>
@@ -335,6 +337,7 @@ tr:last-child td{border-bottom:0}
         <div class="q"><div class="lbl">Pachetul</div>
           <div class="opts" id="o-pk">
             <button class="opt" data-v="C" aria-pressed="false">Colaborare</button>
+            <button class="opt" data-v="T" aria-pressed="false">Partener Start</button>
             <button class="opt" data-v="P" aria-pressed="true">Partener</button>
             <button class="opt" data-v="S" aria-pressed="false">Partener Strategic</button>
           </div></div>
@@ -381,7 +384,7 @@ tr:last-child td{border-bottom:0}
         <li class="hl"><span><b>Se cumulează cu reducerile pentru durată.</b> De obicei reducerile nu se adună, la noi da: prețul de fondator plus 10% pentru 6 luni sau 15% pentru 12 luni, cu plata integrală la semnare. În total, până la 40% mai puțin decât prețul de listă.</span></li>
       </ol>
       <ol class="steps" start="4" style="counter-reset:s 3">
-        <li><span>Locurile sunt limitate: 4 pentru Partener Strategic și 8 pentru Partener.</span></li>
+        <li><span>Locurile sunt limitate: 4 pentru Partener Strategic, 8 pentru Partener și 10 pentru Partener Start.</span></li>
         <li><span>Un singur loc de fondator pe fiecare domeniu de activitate. Cine semnează primul îl păstrează.</span></li>
         <li><span>Parteneriatele au o durată de minimum 3 luni.</span></li>
       </ol>
@@ -404,14 +407,14 @@ tr:last-child td{border-bottom:0}
 
 <script>
 // Locuri rămase: actualizează aceste cifre când semnează cineva
-const SEATS={S:{total:4,left:3},P:{total:8,left:7}};
-const PRICE={C:{n:"Colaborare",now:300,later:480},P:{n:"Partener",now:1700,later:2400},S:{n:"Partener Strategic",now:3400,later:4600}};
+const SEATS={S:{total:4,left:3},P:{total:8,left:7},T:{total:10,left:10}};
+const PRICE={C:{n:"Colaborare",now:300,later:480},T:{n:"Partener Start",now:900,later:1200},P:{n:"Partener",now:1700,later:2400},S:{n:"Partener Strategic",now:3400,later:4600}};
 const DISC={3:0,6:.10,12:.15};
 const fmt=n=>Math.round(n).toLocaleString('ro-RO')+' lei';
 let pk='P',du=3;
 
 function seats(){
- [['S','s-str','b-str'],['P','s-par','b-par']].forEach(([k,n,b])=>{
+ [['S','s-str','b-str'],['P','s-par','b-par'],['T','s-sta','b-sta']].forEach(([k,n,b])=>{
   const s=SEATS[k];
   document.getElementById(n).innerHTML=`${s.left} <small>${s.left===1?'loc':'locuri'} din ${s.total}</small>`;
   document.getElementById(b).innerHTML=Array.from({length:s.total},(_,i)=>`<i class="${i<s.total-s.left?'taken':'free'}" title="${i<s.total-s.left?'Ocupat':'Liber'}"></i>`).join('');
@@ -450,7 +453,7 @@ function bind(id,set){document.querySelectorAll(`#${id} .opt`).forEach(b=>b.addE
 bind('o-pk',v=>pk=v);bind('o-du',v=>du=+v);
 
 let rows='';
-['P','S'].forEach(k=>[3,6,12].forEach(d=>{const a=month(k,d,true),b=month(k,d,false);
+['T','P','S'].forEach(k=>[3,6,12].forEach(d=>{const a=month(k,d,true),b=month(k,d,false);
  rows+=`<tr><td class="pk">${PRICE[k].n}<span class="mo">, ${d} luni</span></td><td class="dn" data-l="Durata">${d} luni</td><td data-l="Până la 30 noiembrie">${fmt(a)} / lună</td><td data-l="După 30 noiembrie">${fmt(b)} / lună</td><td class="s" data-l="Economisești">${fmt((b-a)*d)}</td></tr>`;}));
 rows+=`<tr><td class="pk">Colaborare<span class="mo">, o dată</span></td><td class="dn" data-l="Durata">o dată</td><td data-l="Până la 30 noiembrie">${fmt(300)}</td><td data-l="După 30 noiembrie">${fmt(480)}</td><td class="s" data-l="Economisești">${fmt(180)}</td></tr>`;
 document.getElementById('tbl').innerHTML=rows;
