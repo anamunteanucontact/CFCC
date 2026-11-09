@@ -122,6 +122,11 @@ p{margin:0}
 .pillar{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:6px;min-width:0;align-content:start}
 .pillar b{font-family:var(--display);font-size:20px;line-height:1.15;color:var(--coral-ink)}
 .pillar p{font-size:15px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:6px;min-width:0;align-content:start}
+.stat b{font-family:var(--display);font-weight:800;font-size:clamp(34px,5vw,48px);line-height:1;color:var(--coral-ink)}
+.stat span{font-size:15px;color:var(--muted)}
+@media (max-width:760px){.stats{grid-template-columns:1fr}}
 @media (max-width:760px){.pillars{grid-template-columns:1fr}}
 .vs-note{margin-top:14px;color:var(--muted);font-size:15px;max-width:62ch}
 @media (max-width:600px){.vs-head div{font-size:16px;padding:12px}.vs-row > div{padding:11px 12px;font-size:15px}.mark span{display:none}}
@@ -329,7 +334,6 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
       <div class="eyebrow">Despre noi</div>
       <p>La început de lună, Ana petrecea ore întregi căutând prin zeci de site-uri, postări, grupuri de social media și de WhatsApp ce poate face cu copiii prin oraș, ca să prindă bilete la timp și să le treacă în calendarul familiei.</p>
       <p>Așa a apărut www.cefacemcucopiii.ro: o agendă completă și verificată atent, făcută de un părinte pentru alți părinți. Teatru, concerte, ateliere, muzee, ieșiri, festivaluri și filme, fiecare cu vârsta potrivită, ora și locul.</p>
-      <p>Pentru părinți, platforma este și rămâne gratuită. Alături de organizatorii și afacerile pentru familii, lucrăm ca parteneri: creștem împreună.</p>
       <p>Vrem să fim primul loc în care se uită un părinte din Timișoara și cel mai scurt drum dintre un brand și familiile care îl caută.</p>
     </div>
   </div>
@@ -368,8 +372,12 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
 <section class="band">
   <div class="wrap">
     <div class="eyebrow">Parteneriat, nu reclamă</div>
-    <h2>Valoarea noastră e încrederea părinților</h2>
-    <p class="lead">Părinții din Timișoara se uită la noi înainte să aleagă unde merg cu copiii.<br>Încrederea asta ne deosebește de orice alt canal și e exact ce primești când apari alături de noi.</p>
+    <h2>Dacă vrei să te cunoască părinții din Timișoara, suntem unul dintre puținele locuri unde ajungi direct la ei, cu încredere, nu cu o reclamă.</h2>
+    <div class="stats">
+      <div class="stat"><b>1.400+</b><span>vizitatori unici pe platforma noastră în ultima lună</span></div>
+      <div class="stat"><b>60.000+</b><span>persoane ajunse pe social media</span></div>
+      <div class="stat"><b>92%</b><span>din publicul nostru are între 25 și 44 de ani</span></div>
+    </div>
     <div class="pillars">
       <div class="pillar"><b>Lucrăm cu cei în care credem</b><p>Nu orice brand ne poate deveni partener. Alegem locuri în care am merge cu propriii copii, așa că prezența ta pe platforma noastră le spune deja părinților ceva bun despre tine.</p></div>
       <div class="pillar"><b>Loc pentru fiecare partener</b><p>Păstrăm un număr mic de parteneri în fiecare domeniu, ca fiecare să primească atenția și vizibilitatea pe care le merită.</p></div>
@@ -382,7 +390,6 @@ footer{padding-block:22px;font-size:13px;color:var(--muted)}
   <div class="wrap">
     <div class="eyebrow">De ce noi</div>
     <h2>Compară-ne cu ce folosești acum</h2>
-    <p class="lead">Fiecare canal de promovare e bun la un singur lucru. Noi le reunim pentru publicul care contează pentru tine, părinții, și rămânem alături de tine pe toată durata parteneriatului.</p>
     <p class="tap">Alege canalul pe care îl folosești acum și vezi diferența</p>
     <div class="chips" role="group" aria-label="Alege canalul cu care ne compari">
       <button class="chip" data-k="meta" aria-pressed="true">Reclame pe Facebook și Instagram</button>
@@ -499,7 +506,7 @@ drawVs('meta');
 
 const MODES={
  colab:{big:"Un impuls pentru un eveniment.",hint:"Colaborarea e un prim pas bun. Dacă revii des, parteneriatul îți aduce mai mult pentru mai puțini bani. De aceea, după două-trei colaborări, ți-l propunem.",rows:[["Când se potrivește","Ai un atelier, un spectacol sau înscrieri de anunțat acum."],["Cum lucrăm","Completezi formularul, primești oferta și linkul de plată, iar noi ne ocupăm de rest."],["Ce primești","Eticheta „Colaborare”, un loc în newsletter și o postare pe rețelele noastre de social media, pe care o poți reposta oricând."],["Ce rămâne","Materialele rămân publicate pe platformă și pe rețelele noastre. Plus un raport cu cifre: câți părinți au văzut și câți au dat click, împreună cu câteva sugestii despre ce poți îmbunătăți la următoarele campanii, pe baza rezultatelor."],["Durată","O singură acțiune."]]},
- part:{big:"Un loc permanent în comunitate.",hint:"Parteneriatul este o relație de încredere, pe care o prețuim și pentru care lucrăm în fiecare zi.",rows:[["Când se potrivește","Vrei ca părinții să te găsească tot anul, nu doar la un eveniment."],["Cum lucrăm","Pornim cu o întâlnire de cunoaștere, apoi ne revedem lunar într-o scurtă sesiune unu la unu și stabilim împreună ce comunici mai departe. Ai un account manager dedicat, care îți cunoaște brandul."],["Ce primești","Pagina ta în comunitate, care îți poate ține loc de website: o grijă în minus și o cheltuială în minus. Plus articole, campanii, consultanță și un raport lunar de impact."],["Ce rămâne","Pagina ta, articolele despre tine și părinții care te urmăresc. Nu dispar odată cu campania."],["Durată","Minimum 3 luni."]]}
+ part:{big:"Un loc permanent în comunitate.",hint:"Parteneriatul este o relație de încredere, pe care o prețuim și pentru care lucrăm în fiecare zi.",rows:[["Când se potrivește","Vrei ca părinții să te găsească tot anul, nu doar pentru un singur eveniment."],["Cum lucrăm","Începem cu o întâlnire de cunoaștere, apoi ne revedem lunar într-o scurtă sesiune unu la unu și stabilim împreună ce comunici mai departe.<br>Ai un account manager dedicat, care îți cunoaște brandul."],["Ce primești","Pagina ta în comunitate, care îți poate ține loc de website: o grijă în minus și o cheltuială în minus. Plus articole, campanii, consultanță și un raport lunar de impact."],["Ce rămâne","Pagina ta, reeluri și articolele despre tine și părinții care te urmăresc.<br>Nu dispar odată cu campania."],["Durată","Minimum 3 luni."]]}
 };
 function drawMode(k){
  const m=MODES[k];
@@ -519,10 +526,10 @@ const T=[
   ["În fiecare lună",["Două story-uri cu tag, din materialele tale","Loc în „Noutăți de la parteneri” din newsletter","Raport lunar de impact"]]]},
  {n:"Partener",for:"Pentru afacerile active tot anul.",now:"1.700 lei",was:"2.400 lei",unit:"/ lună",dur:"Minimum 3 luni",star:1,groups:[
   ["Locul tău în comunitate",["Pagina ta în zona de comunitate, care poate ține loc de site: prezentare, poze, calendarul la zi, evenimentele anterioare, date de contact și toate articolele despre tine","Chenar, steluță și eticheta „Partener” în calendar","Kit grafic de partener, la început: materiale gata de postat pe canalele tale, ca să le spui clienților că te găsesc pe platforma noastră"]],
-  ["În fiecare lună",["Un articol despre tine","O campanie: reel sau carusel, plus story-uri","Loc în „Noutăți de la parteneri” din newsletter","O ofertă specială pentru abonați: voucher, reducere, giveaway, curs demo","Loc în edițiile speciale ale newsletterului: Halloween, Crăciun, 1 Iunie, Mărțișor","Conținut pe care îl poți folosi și pe conturile tale"]],
-  ["Consultanță",["Întâlnire de cunoaștere, la început","Sprijin pentru vânzarea online de bilete, când ai nevoie. Părinții care plătesc biletul dinainte ajung mai sigur la eveniment decât cei care doar se înscriu","Un scurt meeting lunar cu account managerul tău, online sau față în față: discutăm rezultatele și stabilim prioritățile pentru luna următoare","Raport lunar de impact, cu date reale: vizite pe platformă, rata de deschidere a newsletterului, social media"]]]},
+  ["În fiecare lună",["Un articol despre tine","O campanie: reel sau carusel, plus story-uri cu materialele tale","Loc în „Noutăți de la parteneri” din newsletter","O ofertă specială pentru abonați: voucher, reducere, giveaway, curs demo","Loc în edițiile speciale ale newsletterului: Halloween, Crăciun, 1 Iunie, Mărțișor","Materiale video și foto pe care le poți posta pe conturile tale"]],
+  ["Consultanță",["Întâlnire de cunoaștere, la început","Ajutor la configurarea biletelor online pentru un eveniment, la nevoie","Un scurt meeting lunar cu account managerul tău, online sau față în față: discutăm rezultatele și stabilim prioritățile pentru luna următoare","Raport lunar de impact, cu date reale: vizite pe platformă, rata de deschidere a newsletterului, social media"]]]},
  {n:"Partener Strategic",for:"Pentru brandurile puternic ancorate în comunitate.",now:"3.400 lei",was:"4.600 lei",unit:"/ lună",dur:"Minimum 3 luni",groups:[
-  ["Pachetul Partener, plus",["Două articole pe lună despre tine, scrise pentru SEO","Două campanii pe lună: reel sau carusel, plus story-uri, cu materialele tale foto și video","O filmare realizată de echipa noastră profesionistă, pe baza unui brief stabilit de comun acord, la două luni","Chenar accentuat în calendar","Prioritate la exclusivitatea pe domeniu, dacă apare un concurent"]],
+  ["Pachetul Partener, plus",["Două articole pe lună despre tine, scrise pentru SEO","Două campanii pe lună: reel sau carusel, plus story-uri, cu materialele tale foto și video","O filmare realizată de echipa noastră profesionistă, pe baza unui brief stabilit de comun acord, la fiecare două luni","Chenar accentuat în calendar","Ai prioritate la exclusivitatea în domeniul tău, înainte de oricare alt brand"]],
   ["Opțional",["Exclusivitate în domeniul tău (prețul variază în funcție de categorie) <a class=\"more\" onclick=\"cfccTrack('exclusivitate',{})\" href=\"#exclusivitate\">Ce înseamnă ↓</a>"]]]}
 ];
 const CK=ICON[2];

@@ -442,9 +442,9 @@ function render(){
  note.textContent=du===12?'La 12 luni primești în plus 15% reducere, cu plata integrală la semnare.':du===6?'La 6 luni primești în plus 10% reducere.':'Durata minimă a unui parteneriat.';
  const mn=month(pk,du,true), ml=month(pk,du,false);
  document.getElementById('r-now').innerHTML=`${fmt(mn)} <small>/ lună</small>`;
- document.getElementById('r-now-t').textContent=`${fmt(mn*du)} pentru ${du} luni`;
+ document.getElementById('r-now-t').textContent='';
  document.getElementById('r-later').innerHTML=`${fmt(ml)} <small>/ lună</small>`;
- document.getElementById('r-later-t').textContent=`${fmt(ml*du)} pentru ${du} luni`;
+ document.getElementById('r-later-t').textContent='';
  document.getElementById('r-save').textContent=fmt((ml-mn)*du);
  const pct=Math.round((1-mn/PRICE[pk].later)*100);
  document.getElementById('r-save-t').textContent=`pe toată durata contractului, adică ${pct}% mai puțin decât prețul de listă`+(du>3?`: prețul de fondator plus reducerea de ${du===12?'15':'10'}%, cumulate.`:'.');
