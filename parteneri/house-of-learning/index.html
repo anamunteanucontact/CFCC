@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ro"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>House of Learning, cefacemcucopiii.ro</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#FFF8F0;--surface:#FFFFFF;--ink:#1F2A2E;--muted:#55636A;--line:#EADFD2;--petrol:#1F4E5F;--sun:#F4B942;--coral:#EE6C4D;--coral-ink:#B8452A}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#12262E;--surface:#183340;--ink:#F4EEE6;--muted:#B5C2C7;--line:#2A4855;--petrol:#0D1D24;--coral-ink:#F59A82;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12262E;--surface:#183340;--ink:#F4EEE6;--muted:#B5C2C7;--line:#2A4855;--petrol:#0D1D24;--coral-ink:#F59A82;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:17px;line-height:1.55;margin:0;padding-block:32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.card{max-width:640px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:28px 24px;display:grid;gap:18px}
+.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.top img{width:84px;height:84px;object-fit:contain;border-radius:50%;background:#fff}
+.k{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--coral-ink)}
+h1{font-size:28px;line-height:1.15;margin:4px 0 0;color:var(--petrol)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) h1{color:var(--ink)}}
+:root[data-theme="dark"] h1{color:var(--ink)}
+p{margin:0}
+.muted{color:var(--muted);font-size:15px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:10px;min-width:0}
+legend{font-weight:700;margin-bottom:8px;font-size:16px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer}
+.opt input{margin-top:4px;width:18px;height:18px;flex:none;accent-color:var(--petrol)}
+.opt:has(input:checked){border-color:var(--petrol);background:color-mix(in srgb,var(--sun) 18%,transparent)}
+label.f{display:grid;gap:6px;font-weight:600}
+input[type=text],input[type=email],input[type=tel],textarea{font:inherit;font-weight:400;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+textarea{min-height:88px;resize:vertical}
+button{font:inherit;font-weight:700;border:0;border-radius:999px;padding:14px 22px;background:var(--coral);color:#1F2A2E;cursor:pointer;width:100%}
+button:disabled{opacity:.6;cursor:wait}
+.err{color:var(--coral-ink);font-weight:600}
+.ok{background:color-mix(in srgb,var(--sun) 25%,transparent);border-radius:14px;padding:16px;font-weight:600}
+[hidden]{display:none!important}
+</style>
+</head><body>
+<main class="card" id="card">
+  <div class="top">
+    <img src="/assets/oferta/house-of-learning.jpg" alt="House of Learning">
+    <div>
+      <div class="k">Pentru House of Learning</div>
+      <h1>Ce vă ajută cel mai mult?</h1>
+    </div>
+  </div>
+  <p class="muted">Bifați ce vi se potrivește. Ne puteți scrie și altceva, mai jos. Pe baza răspunsului vă trimitem o ofertă concretă, fără pachete care nu se potrivesc.</p>
+
+  <form id="f" novalidate style="display:grid;gap:18px">
+    <fieldset>
+      <legend>Ce aveți nevoie de la noi?</legend>
+      <label class="opt"><input type="checkbox" name="need" value="Înscrieri la curs sau atelier"> <span>Înscrieri la curs sau atelier</span></label>
+      <label class="opt"><input type="checkbox" name="need" value="Anunț pentru un open day sau eveniment"> <span>Anunț pentru un open day sau eveniment</span></label>
+      <label class="opt"><input type="checkbox" name="need" value="Vizibilitate permanentă în comunitate"> <span>Vizibilitate permanentă în comunitate</span></label>
+      <label class="opt"><input type="checkbox" name="need" value="Articol despre noi"> <span>Articol despre noi</span></label>
+      <label class="opt"><input type="checkbox" name="need" value="Postări și story-uri pe Instagram și Facebook"> <span>Postări și story-uri pe Instagram și Facebook</span></label>
+      <label class="opt"><input type="checkbox" name="need" value="Loc în newsletter"> <span>Loc în newsletter</span></label>
+      <label class="opt"><input type="checkbox" name="need" value="Ofertă specială pentru familii"> <span>Ofertă specială pentru familii</span></label>
+      <label class="opt"><input type="checkbox" name="need" value="Nu sunt sigur, vreau o discuție"> <span>Nu sunt sigur, vreau o discuție</span></label>
+    </fieldset>
+
+    <label class="f">Altceva, pe scurt <small class="muted" style="font-weight:400">(opțional)</small>
+      <textarea id="alt" placeholder="ex. un curs nou care începe în decembrie"></textarea>
+    </label>
+
+    <label class="f">Din ce lună ați vrea să începem? <small class="muted" style="font-weight:400">(opțional)</small>
+      <input type="text" id="luna" placeholder="ex. ianuarie 2027">
+    </label>
+
+    <label class="f">E-mail sau telefon de contact
+      <input type="text" id="contact" required>
+    </label>
+
+    <p class="err" id="err" hidden></p>
+    <button type="submit" id="btn">Trimite</button>
+    <p class="muted" style="font-size:13px">Folosim datele doar ca să vă contactăm despre colaborare.</p>
+  </form>
+
+  <div class="ok" id="ok" hidden>Mulțumim! Vă contactăm curând.</div>
+</main>
+
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyMalcghERr4EJrRW9luAg1HptnBazb8bGd8ZSKJMX-TU1MWHNpIgkJLUZY1wYRYKscqw/exec";
+const f=document.getElementById('f');
+f.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const err=document.getElementById('err'), ok=document.getElementById('ok'), btn=document.getElementById('btn');
+  const contact=document.getElementById('contact').value.trim();
+  if(!contact){err.textContent='Lăsați un e-mail sau un telefon, ca să vă putem răspunde.';err.hidden=false;return}
+  const bifate=[...document.querySelectorAll('input[name=need]:checked')].map(i=>i.value);
+  const alt=document.getElementById('alt').value.trim();
+  if(alt)bifate.push(alt);
+  btn.disabled=true;btn.textContent='Se trimite...';
+  try{
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tip:'colaborare',campuri:{
+      'Afacere / brand':'House of Learning',
+      'Persoană de contact':'',
+      'E-mail':contact.includes('@')?contact:'',
+      'Telefon':contact.includes('@')?'':contact,
+      'Ce au nevoie':bifate.join('; '),
+      'Din ce lună':document.getElementById('luna').value.trim(),
+      'Sursă':'pagina personală House of Learning'
+    }})});
+    err.hidden=true;ok.hidden=false;f.hidden=true;
+  }catch(_){err.textContent='Nu s-a putut trimite. Verificați internetul și încercați din nou.';err.hidden=false;btn.disabled=false;btn.textContent='Trimite'}
+});
+</script>
+</body></html>
