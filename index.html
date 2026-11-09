@@ -658,7 +658,18 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       </div>
       <label for="pr-web"><span>Website <small>(opțional)</small></span><input id="pr-web" type="url" placeholder="https://"></label>
       <label for="pr-about">Spune-ne câte ceva despre voi<textarea id="pr-about" required placeholder="Ce faceți, pentru ce vârste, de cât timp"></textarea></label>
-      <label for="pr-need">Cam ce ai nevoie de la noi?<textarea id="pr-need" placeholder="ex. promovarea unui curs nou, o postare dedicată, un reel"></textarea></label>
+      <fieldset class="needs" style="border:0;padding:0;margin:0;display:grid;gap:8px;min-width:0">
+        <legend style="font-weight:600;margin-bottom:6px">Ce ai nevoie de la noi? Bifează ce se potrivește</legend>
+        <label class="check"><input type="checkbox" name="need" value="Înscrieri la curs sau atelier"> Înscrieri la curs sau atelier</label>
+        <label class="check"><input type="checkbox" name="need" value="Anunț pentru un open day sau eveniment"> Anunț pentru un open day sau eveniment</label>
+        <label class="check"><input type="checkbox" name="need" value="Vizibilitate permanentă în comunitate"> Vizibilitate permanentă în comunitate</label>
+        <label class="check"><input type="checkbox" name="need" value="Articol despre noi"> Articol despre noi</label>
+        <label class="check"><input type="checkbox" name="need" value="Postări și story-uri pe Instagram și Facebook"> Postări și story-uri pe Instagram și Facebook</label>
+        <label class="check"><input type="checkbox" name="need" value="Loc în newsletter"> Loc în newsletter</label>
+        <label class="check"><input type="checkbox" name="need" value="Ofertă specială pentru familii"> Ofertă specială pentru familii</label>
+        <label class="check"><input type="checkbox" name="need" value="Nu sunt sigur, vreau o discuție"> Nu sunt sigur, vreau o discuție</label>
+      </fieldset>
+      <label for="pr-need"><span>Altceva, pe scurt <small>(opțional)</small></span><textarea id="pr-need" placeholder="ex. un curs nou care începe în decembrie"></textarea></label>
       <p class="note" style="margin:0">Folosim datele doar ca să te contactăm despre colaborare. Detalii în <a href="#confidentialitate">Politica de confidențialitate</a>.</p>
       <button class="btn btn-main" type="submit">Trimite</button>
       <div class="err" id="pr-err" hidden></div>
@@ -1126,7 +1137,7 @@ wireForm("form-ev",["ev-name","ev-org","ev-date","ev-time","ev-place","ev-acc","
 document.getElementById("form-ev").addEventListener("sent",()=>{linkWrap.hidden=true;catAltaWrap.hidden=true});
 wireForm("form-pr",["pr-name","pr-person","pr-mail","pr-tel","pr-about"],"pr-err","pr-ok","Mulțumim! Te contactăm curând ca să ne cunoaștem.","colaborare",()=>({
   "Afacere / brand":val("pr-name"),"Persoană de contact":val("pr-person"),"E-mail":val("pr-mail"),"Telefon":val("pr-tel"),"Instagram":val("pr-ig"),
-  "Facebook":val("pr-fb"),"Website":val("pr-web"),"Despre ei":val("pr-about"),"Ce au nevoie":val("pr-need")}));
+  "Facebook":val("pr-fb"),"Website":val("pr-web"),"Despre ei":val("pr-about"),"Ce au nevoie":[...document.querySelectorAll('input[name=need]:checked')].map(i=>i.value).concat(val("pr-need")?[val("pr-need")]:[]).join("; ")}));
 
 /* profil */
 function miniEv(e,mode){
