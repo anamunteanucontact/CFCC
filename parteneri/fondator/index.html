@@ -42,6 +42,7 @@
   --bg:#FFF8F0; --surface:#FFFFFF; --ink:#1F2A2E; --muted:#55636A; --line:#EADFD2;
   --petrol:#1F4E5F; --petrol-ink:#FFF8F0; --coral:#EE6C4D; --coral-ink:#B8452A; --sun:#F4B942; --sun-soft:#FCEBC4;
   --good:#2E8B57; --dash:#C9BFB2; --tint:#F6EDE2;
+  --k-c:#2A9D8F; --k-t:#F4B942; --k-p:#EE6C4D; --k-s:#7B5EA7;
   --display:'Baloo 2', 'Trebuchet MS', system-ui, sans-serif;
   --body:'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
@@ -279,6 +280,9 @@ tr:last-child td{border-bottom:0}
 .tbl-wrap .mo{display:none}
 @media (max-width:640px){.tbl-wrap .mo{display:inline}}
 @media (min-width:641px){.tbl-wrap td.pk{font-weight:400}}
+.tbl-wrap td.pk::before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--k);margin-right:10px;vertical-align:middle}
+@media (min-width:641px){.tbl-wrap tbody td:first-child{box-shadow:inset 6px 0 0 var(--k)}}
+@media (max-width:640px){.tbl-wrap tr{border-left:6px solid var(--k)}}
 @media (max-width:640px){
  .tbl-wrap{overflow:visible;border:0;background:transparent}
  .tbl-wrap table{min-width:0}
@@ -454,8 +458,8 @@ bind('o-pk',v=>pk=v);bind('o-du',v=>du=+v);
 
 let rows='';
 ['T','P','S'].forEach(k=>[3,6,12].forEach(d=>{const a=month(k,d,true),b=month(k,d,false);
- rows+=`<tr><td class="pk">${PRICE[k].n}<span class="mo">, ${d} luni</span></td><td class="dn" data-l="Durata">${d} luni</td><td data-l="Până la 30 noiembrie">${fmt(a)} / lună</td><td data-l="După 30 noiembrie">${fmt(b)} / lună</td><td class="s" data-l="Economisești">${fmt((b-a)*d)}</td></tr>`;}));
-rows+=`<tr><td class="pk">Colaborare<span class="mo">, o dată</span></td><td class="dn" data-l="Durata">o dată</td><td data-l="Până la 30 noiembrie">${fmt(300)}</td><td data-l="După 30 noiembrie">${fmt(480)}</td><td class="s" data-l="Economisești">${fmt(180)}</td></tr>`;
+ rows+=`<tr style="--k:var(--k-${k.toLowerCase()})"><td class="pk">${PRICE[k].n}<span class="mo">, ${d} luni</span></td><td class="dn" data-l="Durata">${d} luni</td><td data-l="Până la 30 noiembrie">${fmt(a)} / lună</td><td data-l="După 30 noiembrie">${fmt(b)} / lună</td><td class="s" data-l="Economisești">${fmt((b-a)*d)}</td></tr>`;}));
+rows+=`<tr style="--k:var(--k-c)"><td class="pk">Colaborare<span class="mo">, o dată</span></td><td class="dn" data-l="Durata">o dată</td><td data-l="Până la 30 noiembrie">${fmt(300)}</td><td data-l="După 30 noiembrie">${fmt(480)}</td><td class="s" data-l="Economisești">${fmt(180)}</td></tr>`;
 document.getElementById('tbl').innerHTML=rows;
 
 seats();render();
