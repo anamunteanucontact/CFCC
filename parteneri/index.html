@@ -122,9 +122,13 @@ p{margin:0}
 .pillar{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:6px;min-width:0;align-content:start}
 .pillar b{font-family:var(--display);font-size:20px;line-height:1.15;color:var(--coral-ink)}
 .pillar p{font-size:15px;color:var(--muted)}
-.pillar:nth-child(1){background:var(--sun-soft)}
-.pillar:nth-child(2){background:color-mix(in srgb,var(--coral) 16%,var(--surface))}
-.pillar:nth-child(3){background:color-mix(in srgb,#2A9D8F 18%,var(--surface))}
+.pillar{border-top:6px solid var(--line)}
+.pillar:nth-child(1){border-top-color:var(--sun);background:color-mix(in srgb,var(--sun) 16%,var(--surface))}
+.pillar:nth-child(2){border-top-color:var(--coral);background:color-mix(in srgb,var(--coral) 18%,var(--surface))}
+.pillar:nth-child(3){border-top-color:#2A9D8F;background:color-mix(in srgb,#2A9D8F 22%,var(--surface))}
+.pillar:nth-child(1) b{color:var(--ink)}
+.pillar:nth-child(2) b{color:var(--ink)}
+.pillar:nth-child(3) b{color:var(--ink)}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:6px;min-width:0;align-content:start}
 .stat b{font-family:var(--display);font-weight:800;font-size:clamp(34px,5vw,48px);line-height:1;color:var(--coral-ink)}
