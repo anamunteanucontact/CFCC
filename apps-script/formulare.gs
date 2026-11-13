@@ -438,7 +438,7 @@ function muta_in_calendar(filaProp, rand, publica) {
   const contact = [p['E-mail'], p['Telefon']].filter(String).join(', ');
   const primit = p['Primit la'] instanceof Date ? Utilities.formatDate(p['Primit la'], tz, 'dd.MM.yyyy HH:mm') : String(p['Primit la'] || '');
 
-  // rândul nou: coloanele B-V din „Evenimente” (coloana A e formula cu linkul de pe site)
+  // rândul nou: coloanele B-W din „Evenimente” (coloana A e formula cu linkul de pe site); E = Postare FB, gol
   const notaProp = 'Din propunerea primită pe ' + primit + '.';
   // categoria: doar dacă e din lista noastră (Liste, coloana C); altfel rămâne de ales, cu propunerea lor în „De verificat”
   const catProp = String(p['Categorie'] || '').trim();
@@ -446,7 +446,7 @@ function muta_in_calendar(filaProp, rand, publica) {
   const catOk = catLista.indexOf(catProp) >= 0 ? catProp : '';
   const lipsa = catOk ? '' : (catProp ? 'categoria (propusă de ei: ' + catProp + ')' : 'categoria');
   const nou = [
-    publica ? 'Publicat' : 'De verificat', lipsa, 'Nu', dataTxt, '', ora ? "'" + ora : '', '',
+    publica ? 'Publicat' : 'De verificat', lipsa, 'Nu', '', dataTxt, '', ora ? "'" + ora : '', '',
     p['Nume eveniment'], p['Organizator'], p['Locație'], p['Descriere'],
     p['Vârstă minimă'], p['Vârstă maximă'], catOk, p['Adresă'] || adresa_cunoscuta(ev, p['Locație']),
     bilet, p['Link bilete / înscriere'], contact, notaProp,
@@ -517,11 +517,12 @@ function sincronizeaza_propunerea(ev, rand) {
   }
 }
 
-/* ---------- „Evenimente” (The Sheet): coloanele (din 12 oct, cu „De verificat - ce lipsește” pe C) ---------- */
-// A ID (link pe site, formulă) | B Status | C De verificat - ce lipsește | D Recomandare | E Data | F Zi | G Ora start | H Ora sfârșit
-// I Nume eveniment | J Organizator | K Locație | L Descriere | M Vârstă de la | N Vârstă până la | O Categorie | P Adresă | Q Bilet
-// R Link bilete | S Contact organizator | T Alte detalii / note interne | U Adăugat de | V Data adăugării | W Ordine (formulă)
-const EV_COL = { status: 2, verificat: 3, data: 5, nume: 9, organizator: 10, locatie: 11, adresa: 16, adaugat: 22, ordine: 23 };
+/* ---------- „Evenimente” (The Sheet): coloanele (din 13 nov, cu „Postare FB” pe E) ---------- */
+// A ID (link pe site, formulă) | B Status | C De verificat - ce lipsește | D Recomandare | E Postare FB | F Data | G Zi | H Ora start
+// I Ora sfârșit | J Nume eveniment | K Organizator | L Locație | M Descriere | N Vârstă de la | O Vârstă până la | P Categorie | Q Adresă
+// R Bilet | S Link bilete | T Contact organizator | U Alte detalii / note interne | V Adăugat de | W Data adăugării | X Ordine (formulă)
+// Y Data sfârșit | Z Preț (intern)
+const EV_COL = { status: 2, verificat: 3, data: 6, nume: 10, organizator: 11, locatie: 12, adresa: 17, adaugat: 23, ordine: 24 };
 
 /** La editare în Evenimente: adresa se completează singură după locație, iar data adăugării se pune singură. */
 function la_editare_evenimente(e) {
@@ -847,7 +848,7 @@ function bun_venit_abonati_manuali() {
    și n-au primit încă mailul îl primesc o singură dată, la adresa din Contact organizator.
    Ca linkul să meargă sigur, mailul pleacă abia la a doua verificare după publicare (site-ul se actualizează în câteva minute).
    Mailul trimis se notează în „Alte detalii / note interne”. Pornire: rulează o dată porneste_mail_evenimente din editor. */
-const EV_COL_LINK = 1, EV_COL_CONTACT = 19, EV_COL_NOTE = 20, EV_COL_DE_CINE = 21;
+const EV_COL_LINK = 1, EV_COL_CONTACT = 20, EV_COL_NOTE = 21, EV_COL_DE_CINE = 22;
 const MARCA_EV_LIVE = 'mail „eveniment pe site” trimis';
 
 function porneste_mail_evenimente() {
