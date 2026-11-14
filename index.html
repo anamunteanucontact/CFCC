@@ -384,6 +384,52 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .past b{font-weight:600;font-size:.95rem}
 .past span{font-size:.82rem;color:var(--muted)}
 .det dd a{color:var(--accent)}
+
+/* HARTA COPIILOR (/hartacopiilor) */
+.hwrap{max-width:1180px;margin:0 auto;padding-inline:16px}
+.h-filt{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.h-cats{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.h-cats::-webkit-scrollbar{display:none}
+.h-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.h-row select{font:600 .9rem var(--body);color:var(--fg);background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:9px 12px;min-width:0;flex:1 1 180px;max-width:280px}
+.h-row .btn{padding:9px 14px}
+.h-count{color:var(--muted);font-size:.88rem;margin-left:auto}
+.h-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+#h-map{height:62vh;min-height:340px;scroll-margin-top:96px;border-radius:16px;border:2px solid var(--line);background:var(--chip);z-index:1}
+@media (min-width:900px){.h-grid{grid-template-columns:360px minmax(0,1fr)}.h-side{order:-1;max-height:calc(100vh - 230px);overflow-y:auto;padding-right:4px}#h-map{height:calc(100vh - 260px)}.h-grid>div:first-child{position:sticky;top:90px;align-self:start}}
+.h-list{display:flex;flex-direction:column;gap:8px}
+.h-it{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:start;text-align:left;width:100%;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:11px 13px;cursor:pointer;color:var(--fg);font:inherit}
+.h-it:hover{border-color:var(--galben)}
+.h-it.on,.h-it.pro.on{border-color:var(--fg)}
+.h-it b{font-size:.98rem;line-height:1.3}
+.h-it .m{grid-column:1/-1;color:var(--muted);font-size:.84rem;line-height:1.35}
+.h-it .d{color:var(--muted);font-size:.8rem;white-space:nowrap}
+.h-it.pro{background:linear-gradient(0deg,rgba(244,185,66,.10),rgba(244,185,66,.10)),var(--surface);border-color:var(--galben)}
+.h-tag{display:inline-block;background:var(--galben);color:#1d3640;font-size:.7rem;font-weight:800;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:2px}
+.h-more{align-self:center;margin-top:4px}
+.h-leg{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--muted);font-size:.8rem;margin-top:8px}
+.h-leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.h-note{color:var(--muted);font-size:.8rem;margin-top:12px;line-height:1.45}
+.h-pin{width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.h-pin.pro{width:34px;height:34px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--coral);border:3px solid #fff;display:grid;place-items:center;box-shadow:0 3px 8px rgba(0,0,0,.35)}
+.h-pin.pro span{transform:rotate(45deg);color:#fff;font-size:15px;line-height:1}
+.h-pop{font:14px/1.45 var(--body);color:#1d3640;min-width:210px}
+.h-pop h4{font:800 1.05rem/1.2 var(--display);margin:0 0 3px;color:#1F4E5F}
+.h-pop .k{color:#5b7079;font-size:.82rem;margin:0 0 4px}
+.h-pop p{margin:6px 0}
+.h-pop img{display:block;width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:8px;background:#f6e9d9}
+@media (max-width:899px){.h-pop img{height:96px}.h-pop p{margin:4px 0}}
+.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(31,78,95,.25)}
+.marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{background:#1F4E5F;color:#FFF8F0;font:700 12px/30px var(--body)}
+.h-pop .acts2{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.h-pop .acts2 a{flex:1 1 auto;text-align:center;text-decoration:none;font-weight:700;font-size:.85rem;padding:8px 10px;border-radius:10px;background:#f6e9d9;color:#1d3640}
+.h-pop .acts2 a.wa{background:#25D366;color:#fff}
+.h-pop .acts2 a.go{flex-basis:100%;background:#E2603F;color:#fff}
+.leaflet-popup-content{margin:12px 14px}
+.h-cta{display:flex;gap:12px;align-items:center;background:var(--surface);border:2px dashed var(--galben);border-radius:16px;padding:14px;text-decoration:none;color:var(--fg);margin-bottom:22px}
+.h-cta .ic{font-size:1.8rem}
+.h-cta b{display:block;font-family:var(--display);font-size:1.1rem}
+.h-cta span{color:var(--muted);font-size:.9rem}
 </style>
 </head>
 <body>
@@ -491,7 +537,34 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <h2>Locurile și oamenii din spatele calendarului</h2>
       <p>Fă cunoștință cu fiecare-n parte.</p>
     </div>
+    <a class="h-cta" href="#hartacopiilor"><span class="ic" aria-hidden="true">🗺️</span><div><b>Harta copiilor</b><span>Creșe, grădinițe și locuri de joacă lângă casa ta</span></div></a>
     <div id="org-grid"></div>
+  </div>
+</section>
+
+<!-- HARTA COPIILOR -->
+<section id="v-harta" class="view vwrap" hidden>
+  <div class="hwrap">
+    <div class="sec-h">
+      <span class="eyebrow">Harta copiilor</span>
+      <h2>Tot ce e pentru copii, lângă casa ta</h2>
+      <p>Creșe, grădinițe și locuri de joacă din Timișoara și din comunele din jur.</p>
+    </div>
+    <div class="h-filt">
+      <div class="h-cats" id="h-cats" role="group" aria-label="Categorie"></div>
+      <div class="h-row">
+        <select id="h-zona" aria-label="Zonă"><option value="">Toate zonele</option></select>
+        <button class="btn btn-soft" id="h-near" type="button">📍 Lângă mine</button>
+        <span class="h-count" id="h-count"></span>
+      </div>
+    </div>
+    <div class="h-grid">
+      <div><div id="h-map" role="region" aria-label="Hartă"></div>
+        <div class="h-leg" aria-hidden="true"><span><i style="background:#1F4E5F"></i>Creșe și grădinițe</span><span><i style="background:#2f7d5b"></i>Locuri de joacă</span><span><i style="background:#7a5c9e"></i>Alte locuri</span><span><i style="background:#EE6C4D"></i>★ Partener</span></div></div>
+      <div class="h-side"><div class="h-list" id="h-list"><div class="empty">Se încarcă...</div></div>
+        <p class="h-note">Ai un loc pentru copii care lipsește sau o informație greșită? Scrie-ne la <a href="mailto:hello@cefacemcucopiii.ro">hello@cefacemcucopiii.ro</a>.</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1475,10 +1548,10 @@ document.addEventListener("click",ev=>{
     if(navigator.share){navigator.share({title:x.t,text:x.t+" în Timișoara - toate într-un loc:",url}).catch(()=>{})}
     else{navigator.clipboard&&navigator.clipboard.writeText(url).then(()=>toast("Link copiat"),()=>toast(url))}}
 });
-const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate","comunitate","org","articol","formular","editie"];
+const VIEWS=["calendar","despre","recomandari","colaborari","profil","confidentialitate","comunitate","org","articol","formular","editie","harta"];
 function go(v,scroll){
   VIEWS.forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
-  const nv=v==="articol"?"recomandari":v==="org"?"comunitate":v==="editie"?"calendar":v;
+  const nv=v==="articol"?"recomandari":(v==="org"||v==="harta")?"comunitate":v==="editie"?"calendar":v;
   document.querySelectorAll(".nav ul a,.tabbar a").forEach(a=>{if(a.dataset.view===nv)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
   curView=v;nlCta();
   if(scroll)window.scrollTo(0,0);
@@ -1493,6 +1566,7 @@ function route(){
   const pv=h.match(/^previzualizare\/([a-f0-9]{16,})$/);
   if(pv){renderPrev(pv[1]);go("org",true);return}
   if(h==="comunitate"||h==="organizatori"){renderOrgs();go("comunitate",true);return}
+  if(h==="hartacopiilor"||h==="harta"){go("harta",true);setTimeout(openHarta,0);document.title="Harta copiilor - cefacemcucopiii.ro";return}
   if(h==="formular-partener"){go("formular",true);return}
   if(h.startsWith("articol/")){renderArt(decodeURIComponent(h.slice(8)));go("articol",true);return}
   if(ED_BY[h]){ed.cur=h;ed.day="";ed.age="";renderEd();go("editie",true);track("Ediție specială",null,{editie:ED_BY[h].t});return}
@@ -1608,6 +1682,104 @@ function pixel(ev,params){try{if(pixelOn&&window.fbq)fbq("track",ev,params||{})}
 })();
 render();renderProfile();route();
 renderRec();
+/* HARTA COPIILOR: datele vin din „Comunitatea CFCC”, fila „Hartă” (gid 1005). Pe hartă: doar Status = Publicat cu Lat/Lng.
+   Parteneri: coloana „Partener” = ID din fila Parteneri; cardul ia poza, descrierea și telefonul de acolo (doar dacă pagina e pe Da). */
+const H={gid:1005,rows:null,state:"idle",cat:"",zona:"",me:null,map:null,layer:null,mk:{},lim:40,libs:null};
+const H_CATS=["Creșă","Grădiniță","Loc de joacă","Ateliere și activități","Club sportiv","Sănătate","Servicii utile"];
+function hLoadJs(u){return new Promise((ok,no)=>{const x=document.createElement("script");x.src=u;x.onload=ok;x.onerror=no;document.head.appendChild(x)})}
+function hLoadCss(u){const l=document.createElement("link");l.rel="stylesheet";l.href=u;document.head.appendChild(l)}
+/* Leaflet 1.9.4 + markercluster 1.5.3, găzduite pe site (assets/vendor/leaflet), se încarcă doar când se deschide harta */
+function hLibs(){if(H.libs)return H.libs;const c="/assets/vendor/leaflet/";
+  hLoadCss(c+"leaflet.css");hLoadCss(c+"MarkerCluster.css");hLoadCss(c+"MarkerCluster.Default.css");
+  return H.libs=hLoadJs(c+"leaflet.js").then(()=>hLoadJs(c+"leaflet.markercluster.js"))}
+async function hData(){
+  if(H.rows)return;H.state="loading";
+  try{const v=Math.floor(Date.now()/60000);const r=await fetch(`https://docs.google.com/spreadsheets/d/${COM_SHEET}/gviz/tq?tqx=out:csv&headers=1&gid=${H.gid}&t=${v}`,{cache:"no-store"});
+    if(!r.ok)throw 0;const x=await r.text();if(/^\s*</.test(x))throw 0;
+    const num=v=>{v=parseFloat(String(v||"").replace(",","."));return isFinite(v)?v:null};
+    H.rows=parseCSV(x).slice(1).map((r,i)=>{const g=k=>(r[k]||"").trim();
+      return {i,st:g(0),n:g(1),cats:g(2).split(/\s*,\s*/).filter(Boolean),tip:g(3),z:g(4),ad:g(5),lat:num(g(6)),lng:num(g(7)),p:slug(g(8)),wa:g(9)}})
+      .filter(o=>/^publicat/i.test(o.st)&&o.n&&o.lat!==null&&o.lng!==null);
+    H.state="ok"}catch(_){H.state="error";H.rows=null}
+}
+const hPro=o=>{const g=o.p&&ORG_BY[o.p];return g&&g.live?g:null};
+function hDist(o){if(!H.me)return null;const R=6371,t=Math.PI/180,a=(o.lat-H.me[0])*t,b=(o.lng-H.me[1])*t;
+  const h=Math.sin(a/2)**2+Math.cos(H.me[0]*t)*Math.cos(o.lat*t)*Math.sin(b/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+const hKm=d=>d==null?"":d<1?Math.round(d*1000/50)*50+" m":d.toFixed(d<10?1:0).replace(".",",")+" km";
+function hShown(){
+  let xs=H.rows.filter(o=>(!H.cat||o.cats.includes(H.cat))&&(!H.zona||o.z===H.zona));
+  xs.forEach(o=>o.d=hDist(o));
+  return xs.sort((a,b)=>(!!hPro(b)-!!hPro(a))||(H.me?a.d-b.d:a.n.localeCompare(b.n,"ro")));
+}
+function hPhone(t){let d=String(t||"").replace(/[^\d+]/g,"");if(!d)return null;if(d.startsWith("+"))d=d.slice(1);else if(d.startsWith("00"))d=d.slice(2);else if(d.startsWith("0"))d="40"+d.slice(1);return d}
+function hPop(o){
+  const g=hPro(o),meta=[o.cats.join(", "),o.tip].filter(Boolean).join(" · ");
+  if(!g)return `<div class="h-pop"><h4>${esc(o.n)}</h4><p class="k">${esc(meta)}</p><p>${esc(o.ad||o.z)}</p></div>`;
+  const desc=(g.desc||"").split(/\n+/).find(x=>x.trim().length>40)||g.desc||"";
+  const mx=matchMedia("(max-width:899px)").matches?130:190,short=desc.length>mx?desc.slice(0,desc.lastIndexOf(" ",mx-4))+"...":desc;
+  const tel=hPhone(g.tel),wa=hPhone(o.wa||g.tel),pic=g.cover||(g.foto[0]&&g.foto[0].u)||"";
+  return `<div class="h-pop">${pic?`<img src="${esc(pic)}" alt="" loading="lazy">`:""}<h4>${esc(o.n)} <span class="h-tag">★ Partener</span></h4><p class="k">${esc(meta)}</p>
+    <p>${esc(short)}</p><p class="k">${esc(o.ad||g.ad||"")}</p>
+    <div class="acts2">${wa?`<a class="wa" href="https://wa.me/${wa}" target="_blank" rel="noopener" data-h="WhatsApp">WhatsApp</a>`:""}${tel?`<a href="tel:+${tel}" data-h="Telefon">Sună</a>`:""}
+    <a class="go" href="#comunitate/${g.slug}" data-h="Pagina partenerului">Vezi pagina →</a></div></div>`;
+}
+function hIcon(o){const pro=hPro(o);
+  const col=o.cats.includes("Loc de joacă")?"#2f7d5b":o.cats.some(c=>/Creș|Grădini/.test(c))?"#1F4E5F":"#7a5c9e";
+  return L.divIcon(pro?{className:"",html:`<div class="h-pin pro"><span>★</span></div>`,iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[0,-30]}
+    :{className:"",html:`<div class="h-pin" style="background:${col}"></div>`,iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-6]})}
+function hTrack(n,o,x){track("Hartă: "+n,null,Object.assign(o?{loc:o.n,categorie:o.cats.join(", "),zona:o.z,partener:o.p||""}:{},x||{}))}
+function hRender(){
+  const L_=document.getElementById("h-list"),cnt=document.getElementById("h-count");
+  if(H.state!=="ok"){L_.innerHTML=`<div class="empty">${H.state==="error"?"Harta nu s-a putut încărca. Reîncarcă pagina.":"Se încarcă..."}</div>`;return}
+  const xs=hShown();cnt.textContent=xs.length+(xs.length===1?" loc":" locuri");
+  if(H.map){H.layer.clearLayers();H.mk={};
+    const pro=[];xs.forEach(o=>{const m=L.marker([o.lat,o.lng],{icon:hIcon(o),zIndexOffset:hPro(o)?1000:0,title:o.n}).bindPopup(()=>hPop(o),{maxWidth:280,autoPanPaddingTopLeft:[10,14],autoPanPaddingBottomRight:[10,10]});
+      m.on("popupopen",()=>{hTrack(hPro(o)?"card partener":"pin",o);hMark(o.i)});H.mk[o.i]=m;(hPro(o)?pro:[]).push(m);if(!hPro(o))H.layer.addLayer(m)});
+    H.proLayer.clearLayers();pro.forEach(m=>H.proLayer.addLayer(m));
+    if(xs.length&&(H.cat||H.zona))H.map.fitBounds(L.latLngBounds(xs.map(o=>[o.lat,o.lng])).pad(.15),{maxZoom:15})}
+  L_.innerHTML=xs.length?xs.slice(0,H.lim).map(o=>{const pro=hPro(o);
+    return `<button type="button" class="h-it${pro?" pro":""}" data-i="${o.i}"><b>${esc(o.n)}${pro?'<span class="h-tag">★ Partener</span>':""}</b><span class="d">${hKm(o.d)}</span>
+      <span class="m">${esc([o.cats.join(", "),o.tip].filter(Boolean).join(" · "))}${o.z?" · "+esc(o.z):""}</span></button>`}).join("")
+    +(xs.length>H.lim?`<button type="button" class="btn btn-soft h-more" id="h-more">Arată mai multe (${xs.length-H.lim})</button>`:"")
+    :`<div class="empty">Nu am găsit locuri pentru filtrele alese.</div>`;
+}
+function hMark(i){document.querySelectorAll(".h-it.on").forEach(x=>x.classList.remove("on"));const b=document.querySelector(`.h-it[data-i="${i}"]`);if(b)b.classList.add("on")}
+function hFilters(){
+  const used=new Set(H.rows.flatMap(o=>o.cats)),cats=H_CATS.filter(c=>used.has(c));
+  document.getElementById("h-cats").innerHTML=[["","Toate"],...cats.map(c=>[c,c])].map(([v,t])=>`<button type="button" class="chip" data-v="${esc(v)}" aria-pressed="${v===H.cat}">${esc(t)}</button>`).join("");
+  const zs=[...new Set(H.rows.map(o=>o.z).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ro"));
+  document.getElementById("h-zona").innerHTML=`<option value="">Toate zonele</option>`+zs.map(z=>`<option${z===H.zona?" selected":""}>${esc(z)}</option>`).join("");
+}
+async function openHarta(){
+  if(H.state==="idle"){
+    const q=new URLSearchParams(location.search);H.cat=q.get("categorie")||"";H.zona=q.get("zona")||"";
+    document.getElementById("h-cats").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;H.cat=b.dataset.v;H.lim=40;
+      document.querySelectorAll("#h-cats .chip").forEach(c=>c.setAttribute("aria-pressed",c===b?"true":"false"));hRender();hTrack("filtru categorie",null,{categorie:H.cat||"Toate"})});
+    document.getElementById("h-zona").addEventListener("change",e=>{H.zona=e.target.value;H.lim=40;hRender();hTrack("filtru zonă",null,{zona:H.zona||"Toate"})});
+    document.getElementById("h-list").addEventListener("click",e=>{
+      if(e.target.id==="h-more"){H.lim+=40;hRender();return}
+      const b=e.target.closest(".h-it");if(!b||!H.map)return;const m=H.mk[b.dataset.i];if(!m)return;
+      const show=()=>{m.openPopup()};
+      if(H.layer.hasLayer(m))H.layer.zoomToShowLayer(m,show);else{H.map.setView(m.getLatLng(),15,{animate:false});setTimeout(show,50)}
+      if(matchMedia("(max-width:899px)").matches)document.getElementById("h-map").scrollIntoView({block:"start"})});
+    document.getElementById("h-map").addEventListener("click",e=>{const a=e.target.closest("a[data-h]");if(a)hTrack(a.dataset.h,null,{link:a.getAttribute("href")})});
+    document.getElementById("h-near").addEventListener("click",()=>{
+      if(!navigator.geolocation){toast("Telefonul nu permite aflarea locației.");return}
+      const b=document.getElementById("h-near");b.disabled=true;
+      navigator.geolocation.getCurrentPosition(p=>{b.disabled=false;H.me=[p.coords.latitude,p.coords.longitude];H.zona="";document.getElementById("h-zona").value="";
+        if(H.map){if(H.meMk)H.meMk.remove();H.meMk=L.circleMarker(H.me,{radius:8,color:"#fff",weight:3,fillColor:"#3b6ea5",fillOpacity:1}).addTo(H.map);H.map.setView(H.me,14)}
+        hRender();hTrack("lângă mine")},
+        ()=>{b.disabled=false;toast("Nu am putut afla locația. Verifică permisiunea în browser.")},{enableHighAccuracy:false,timeout:10000,maximumAge:300000})});
+    await Promise.all([hData(),orgState==="loading"?loadCom():null].filter(Boolean));
+    if(H.state==="ok")hFilters();hRender();
+    try{await hLibs()}catch(_){document.getElementById("h-map").innerHTML='<div class="empty">Harta nu s-a putut încărca. Lista de mai jos merge în continuare.</div>';return}
+    H.map=L.map("h-map",{zoomControl:true,scrollWheelZoom:true,tap:false}).setView([45.755,21.23],12);H.map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,subdomains:"abc",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}).addTo(H.map);
+    H.layer=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:45,spiderfyOnMaxZoom:true});H.map.addLayer(H.layer);
+    H.proLayer=L.layerGroup().addTo(H.map);
+    hRender();
+  }else if(H.map)setTimeout(()=>H.map.invalidateSize(),60);
+}
 const comRoute=h=>/^(comunitate|organizatori|org\/|articol\/)/.test(h);
 loadCom().then(()=>{renderRec();if(comRoute(location.hash.slice(1)))route();if(loadState==="ok")render()});
 /* derulare orizontală: estompare la margini, săgeți pe desktop, rotița mouse-ului derulează lateral */
