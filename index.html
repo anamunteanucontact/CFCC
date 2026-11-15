@@ -221,7 +221,7 @@ textarea{min-height:90px;resize:vertical}
 .msg{border-radius:12px;padding:12px 14px;font-weight:600;font-size:.9rem;background:var(--galben);color:#1F4E5F}
 .err{color:var(--accent);font-size:.86rem;font-weight:600}
 .rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
-.rules.trei{grid-template-columns:1fr 1fr 1fr}
+@media (min-width:900px){.rules.trei{grid-template-columns:1fr 1fr 1fr}}
 .rule[hidden]{display:none!important}
 @media (max-width:620px){.rules{grid-template-columns:1fr}}
 .rule{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border-radius:16px;padding:16px;border:2px solid var(--line);display:flex;flex-direction:column;gap:6px;color:var(--fg);font-family:var(--body)}
