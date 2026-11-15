@@ -7,10 +7,14 @@
  * cu excepția celulelor goale Lat, Lng și Zonă.
  * O singură dată, din editor: rulează porneste_harta (completează coordonatele în fiecare noapte, la 5:00)
  * și harta_import_osm (aduce creșele, grădinițele și locurile de joacă din OpenStreetMap). */
-const HARTA = { fila: 'Hartă', liste: 'Liste hartă', bbox: [45.68, 21.08, 45.83, 21.36] };
-const HARTA_COMUNE = { 'dumbravita': 'Dumbrăvița', 'ghiroda': 'Ghiroda', 'giarmata vii': 'Ghiroda',
-  'giroc': 'Giroc - Chișoda', 'chisoda': 'Giroc - Chișoda', 'mosnita noua': 'Moșnița Nouă',
-  'mosnita veche': 'Moșnița Nouă', 'sacalaz': 'Săcălaz' };
+// bbox = Timișoara + zona periurbană (Sânandrei, Giarmata, Remetea Mare, Urseni, Sânmihaiu Român)
+const HARTA = { fila: 'Hartă', liste: 'Liste hartă', bbox: [45.66, 21.04, 45.88, 21.42] };
+// Localitățile periurbane și zona lor pe hartă. Ordinea contează: „giarmata-vii” înainte de „giarmata”.
+const HARTA_COMUNE = { 'dumbravita': 'Dumbrăvița', 'ghiroda': 'Ghiroda',
+  'giarmata-vii': 'Giarmata-Vii', 'giarmata vii': 'Giarmata-Vii', 'giarmata': 'Giarmata', 'remetea mare': 'Remetea Mare',
+  'giroc': 'Giroc - Chișoda', 'chisoda': 'Giroc - Chișoda',
+  'mosnita noua': 'Moșnița Nouă', 'mosnita veche': 'Moșnița Veche', 'urseni': 'Urseni',
+  'sacalaz': 'Săcălaz', 'sanmihaiu roman': 'Sânmihaiu Român', 'utvin': 'Sânmihaiu Român', 'sanandrei': 'Sânandrei' };
 
 function harta_norm_(s) {
   return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
