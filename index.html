@@ -221,6 +221,8 @@ textarea{min-height:90px;resize:vertical}
 .msg{border-radius:12px;padding:12px 14px;font-weight:600;font-size:.9rem;background:var(--galben);color:#1F4E5F}
 .err{color:var(--accent);font-size:.86rem;font-weight:600}
 .rules{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.rules.trei{grid-template-columns:1fr 1fr 1fr}
+.rule[hidden]{display:none!important}
 @media (max-width:620px){.rules{grid-template-columns:1fr}}
 .rule{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border-radius:16px;padding:16px;border:2px solid var(--line);display:flex;flex-direction:column;gap:6px;color:var(--fg);font-family:var(--body)}
 .rule:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
@@ -421,6 +423,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .h-test .sw{display:inline-flex;gap:6px;margin-top:8px}
 .h-test .sw button{font:700 .8rem var(--body);border:0;border-radius:999px;padding:5px 11px;background:rgba(255,248,240,.18);color:#FFF8F0;cursor:pointer}
 .h-test .sw button[aria-pressed="true"]{background:#F4B942;color:#1F4E5F}
+.h-add{display:flex;align-items:center;gap:12px;background:#F4B942;color:#1F4E5F;border-radius:16px;padding:12px 14px;margin-bottom:14px;text-decoration:none;box-shadow:0 4px 14px rgba(31,78,95,.12)}
+.h-add .ic{flex:0 0 34px;height:34px;border-radius:50%;background:#1F4E5F;color:#FFF8F0;display:grid;place-items:center;font-size:1.3rem;font-weight:800}
+.h-add b{display:block;font-family:var(--display);font-size:1.02rem;line-height:1.2;margin-bottom:2px}
+.h-add span{font-size:.88rem;line-height:1.35}
+.h-add .go{margin-left:auto;font-size:1.4rem;font-weight:800}
 .h-leg{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--muted);font-size:.8rem;margin-top:8px}
 .h-leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
 .h-note{color:var(--muted);font-size:.8rem;margin-top:12px;line-height:1.45}
@@ -575,6 +582,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <h2>Tot ce e pentru copii, lângă casa ta</h2>
       <p>Creșe, grădinițe, parcuri, locuri de joacă, teatre și muzee din Timișoara și din comunele din jur.</p>
     </div>
+    <a class="h-add" href="#adauga-loc" data-h2="CTA adaugă loc"><span class="ic" aria-hidden="true">＋</span><span><b>Ai sau știi un spațiu pentru copii care nu e pe hartă?</b>Completează formularul și îl adăugăm.</span><span class="go" aria-hidden="true">→</span></a>
     <div class="h-filt">
       <div class="h-cats" id="h-cats" role="group" aria-label="Categorie"></div>
       <div class="h-row">
@@ -587,7 +595,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <div><div id="h-map" role="region" aria-label="Hartă"></div>
         <div class="h-leg" aria-hidden="true"><span><i style="background:#1F4E5F"></i>Creșe și grădinițe</span><span><i style="background:#F4B942"></i>Parcuri</span><span><i style="background:#7FB8C4"></i>Locuri de joacă</span><span><i style="background:#FFF8F0;box-shadow:0 0 0 2px #1F4E5F"></i>Teatre, muzee, concerte</span><span><i style="background:#EE6C4D"></i>★ Partener</span></div></div>
       <div class="h-side"><div class="h-list" id="h-list"><div class="empty">Se încarcă...</div></div>
-        <p class="h-note">Ai un loc pentru copii care lipsește sau o informație greșită? Scrie-ne la <a href="mailto:hello@cefacemcucopiii.ro">hello@cefacemcucopiii.ro</a>.</p>
+        <p class="h-note">O informație e greșită? Scrie-ne la <a href="mailto:hello@cefacemcucopiii.ro">hello@cefacemcucopiii.ro</a>.</p>
       </div>
     </div>
   </div>
@@ -713,6 +721,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     <div class="rules" id="f-type" role="group" aria-label="Ce vrei să ne trimiți">
       <button class="rule" type="button" data-v="ev" aria-pressed="false"><span class="who">Evenimente cu dată</span><h3>Adaug un eveniment în calendar</h3><span class="note">Spectacole, ateliere, lansări, ieșiri, concerte, lecturi. Listarea în calendar este și rămâne gratuită.</span><span class="pick">Completează formularul</span></button>
       <button class="rule" type="button" data-v="pr" aria-pressed="false"><span class="who">Cursuri, cluburi, abonamente, branduri</span><h3>Vreau să colaborăm</h3><span class="note">Înainte de orice trebuie să ne cunoaștem, apoi alegem împreună varianta cea mai faină de colaborare în funcție de nevoile brandului tău.</span><span class="pick">Completează formularul</span></button>
+      <button class="rule m-harta" hidden type="button" data-v="loc" aria-pressed="false"><span class="who">Creșe, grădinițe, parcuri, locuri de joacă</span><h3>Adaug un loc pe Harta copiilor</h3><span class="note">Ai sau știi un spațiu pentru copii care lipsește de pe hartă? Spune-ne unde e și îl adăugăm. Apariția pe hartă este gratuită.</span><span class="pick">Completează formularul</span></button>
     </div>
 
     <form id="form-ev" novalidate hidden>
@@ -773,9 +782,33 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <div class="err" id="pr-err" hidden></div>
       <div class="msg" id="pr-ok" hidden></div>
     </form>
+
+    <form id="form-loc" novalidate hidden>
+      <label for="loc-name">Numele locului<input id="loc-name" required placeholder="ex. Grădinița Albinuțele, Parcul Rozelor"></label>
+      <label for="loc-cat">Ce fel de loc e?<select id="loc-cat" required>
+        <option value="">Alege</option><option>Creșă</option><option>Grădiniță</option><option>Parc</option><option>Loc de joacă (indoor)</option>
+        <option>Teatru, muzeu, cultură</option><option>Ateliere și activități</option><option>Club sportiv</option>
+        <option>Sănătate (pediatrie, stomatologie, logopedie)</option><option>Servicii (frizerie pentru copii, petreceri)</option><option>Altceva</option></select></label>
+      <label for="loc-addr">Adresa<input id="loc-addr" required placeholder="Strada, numărul, localitatea"></label>
+      <label for="loc-web"><span>Website, Instagram sau Facebook <small>(opțional)</small></span><input id="loc-web" placeholder="https:// sau @"></label>
+      <label for="loc-about"><span>Câteva cuvinte despre loc <small>(opțional)</small></span><textarea id="loc-about" placeholder="ex. pentru ce vârste e, program, dacă e de stat sau privat"></textarea></label>
+      <label for="loc-who">Tu cine ești?<select id="loc-who" required>
+        <option value="">Alege</option><option>Lucrez acolo / e locul meu</option><option>Părinte, îl știu sau am fost</option><option>Altcineva</option></select></label>
+      <div class="fr">
+        <label for="loc-person"><span>Numele tău <small>(opțional)</small></span><input id="loc-person"></label>
+        <label for="loc-mail">E-mail<input id="loc-mail" type="email" required></label>
+      </div>
+      <label for="loc-tel"><span>Telefon <small>(opțional)</small></span><input id="loc-tel" type="tel"></label>
+      <label class="check" id="loc-pro-wrap" hidden><input type="checkbox" id="loc-pro"> Vreau să aflu cum poate apărea locul nostru evidențiat, ca partener (cu poză, descriere și butoane de contact)</label>
+      <p class="note" style="margin:0">Datele tale de contact nu apar pe hartă. Le folosim doar ca să te întrebăm, dacă e nevoie, despre loc. Detalii în <a href="#confidentialitate">Politica de confidențialitate</a>.</p>
+      <button class="btn btn-main" type="submit">Trimite</button>
+      <div class="err" id="loc-err" hidden></div>
+      <div class="msg" id="loc-ok" hidden></div>
+    </form>
   </div>
 </section>
 
+<!-- (formularul „Adaug un loc pe hartă” e în Colaborări, mai sus) -->
 <!-- PROFIL -->
 <section id="v-profil" class="view vwrap" hidden>
   <div class="wrap">
@@ -1190,8 +1223,8 @@ const RIC={
 /* formulare colaborari */
 function openForm(v,scroll){
   document.querySelectorAll("#f-type .rule").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===v?"true":"false"));
-  document.getElementById("form-ev").hidden=v!=="ev";document.getElementById("form-pr").hidden=v!=="pr";
-  if(v&&scroll)setTimeout(()=>document.getElementById(v==="ev"?"form-ev":"form-pr").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}),60);
+  ["ev","pr","loc"].forEach(k=>document.getElementById("form-"+k).hidden=v!==k);
+  if(v&&scroll)setTimeout(()=>document.getElementById("form-"+v).scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}),60);
 }
 document.getElementById("f-type").addEventListener("click",ev=>{const b=ev.target.closest(".rule");if(!b)return;openForm(b.dataset.v,true)});
 async function sendForm(tip,campuri){
@@ -1208,7 +1241,7 @@ function wireForm(fid,req,errId,okId,okText,tip,build){
     const err=document.getElementById(errId),ok=document.getElementById(okId);
     if(missing.length||badMail){err.textContent=badMail?"Verifică adresa de e-mail.":"Completează câmpurile obligatorii.";err.hidden=false;ok.hidden=true;document.getElementById(missing[0]||mailEl.id).focus();return}
     const btn=form.querySelector('button[type=submit]');btn.disabled=true;const lbl=btn.textContent;btn.textContent="Se trimite...";
-    try{await sendForm(tip,build());track(tip==="eveniment"?"Formular eveniment trimis":"Formular colaborare trimis");err.hidden=true;ok.textContent=okText;ok.hidden=false;form.reset();form.dispatchEvent(new Event("sent"))}
+    try{await sendForm(tip,build());track(tip==="eveniment"?"Formular eveniment trimis":tip==="loc"?"Formular loc hartă trimis":"Formular colaborare trimis");err.hidden=true;ok.textContent=okText;ok.hidden=false;form.reset();form.dispatchEvent(new Event("sent"))}
     catch(_){err.textContent="Nu s-a putut trimite. Verifică internetul și încearcă din nou.";err.hidden=false;ok.hidden=true}
     finally{btn.disabled=false;btn.textContent=lbl}
   });
@@ -1236,6 +1269,14 @@ document.getElementById("form-ev").addEventListener("sent",()=>{linkWrap.hidden=
 wireForm("form-pr",["pr-name","pr-person","pr-mail","pr-tel","pr-about"],"pr-err","pr-ok","Mulțumim! Te contactăm curând ca să ne cunoaștem.","colaborare",()=>({
   "Afacere / brand":val("pr-name"),"Persoană de contact":val("pr-person"),"E-mail":val("pr-mail"),"Telefon":val("pr-tel"),"Instagram":val("pr-ig"),
   "Facebook":val("pr-fb"),"Website":val("pr-web"),"Despre ei":val("pr-about"),"Ce au nevoie":[...document.querySelectorAll('input[name=need]:checked')].map(i=>i.value).concat(val("pr-need")?[val("pr-need")]:[]).join("; ")}));
+
+/* formularul „Adaug un loc pe hartă” (tip „loc” în Apps Script, fila „Propuneri locuri hartă” din CFCC - Onboarding parteneri) */
+document.getElementById("loc-who").addEventListener("change",e=>{document.getElementById("loc-pro-wrap").hidden=!/lucrez/i.test(e.target.value)});
+document.getElementById("form-loc").addEventListener("sent",()=>{document.getElementById("loc-pro-wrap").hidden=true});
+wireForm("form-loc",["loc-name","loc-cat","loc-addr","loc-who","loc-mail"],"loc-err","loc-ok","Mulțumim! Verificăm locul și îl adăugăm pe hartă.","loc",()=>({
+  "Nume":val("loc-name"),"Ce fel de loc":val("loc-cat"),"Adresă":val("loc-addr"),"Website / Instagram":val("loc-web"),"Despre loc":val("loc-about"),
+  "Cine trimite":val("loc-who"),"Persoană de contact":val("loc-person"),"E-mail":val("loc-mail"),"Telefon":val("loc-tel"),
+  "Vrea să fie partener":document.getElementById("loc-pro").checked&&!document.getElementById("loc-pro-wrap").hidden?"Da":""}));
 
 /* profil */
 function miniEv(e,mode){
@@ -1598,6 +1639,7 @@ function route(){
   if(ED_BY[h]){ed.cur=h;ed.day="";ed.age="";renderEd();go("editie",true);track("Ediție specială",null,{editie:ED_BY[h].t});return}
   if(BYID[h]){state.per="all";document.querySelectorAll("#f-per .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v==="all"?"true":"false"));state.open=h;state.day=BYID[h].d;go("calendar");render();setTimeout(()=>document.getElementById(h)?.scrollIntoView({block:"center"}),50);return}
   if(h==="adauga-eveniment"||h==="colaborare-promovare"){go("colaborari",true);openForm(h==="adauga-eveniment"?"ev":"pr",true);return}
+  if(h==="adauga-loc"){go("colaborari",true);openForm("loc",true);return}
   if(h==="newsletter"||h==="abonare"){
     const on=!!(sub&&sub.email);go(on?"profil":"calendar",true);
     setTimeout(()=>{const t=document.getElementById(on?"nl-title":"nl-cta");if(t){t.scrollIntoView({behavior:"smooth",block:"center"});if(!on){t.classList.add("nl-hi");setTimeout(()=>t.classList.remove("nl-hi"),2400)}}},250);
@@ -1748,7 +1790,7 @@ function hShown(){
 function hPhone(t){let d=String(t||"").replace(/[^\d+]/g,"");if(!d)return null;if(d.startsWith("+"))d=d.slice(1);else if(d.startsWith("00"))d=d.slice(2);else if(d.startsWith("0"))d="40"+d.slice(1);return d}
 const hVer=o=>H.test&&/^de verificat/i.test(o.st)?'<span class="h-tag h-ver">De verificat</span>':"";
 function hMeniu(){let on=false;try{on=localStorage.getItem("cfcc_harta_test")==="1"}catch(_){}
-  document.querySelectorAll(".m-harta").forEach(x=>x.hidden=!on);document.querySelectorAll(".tabbar").forEach(t=>t.classList.toggle("cu-harta",on))}
+  document.querySelectorAll(".m-harta").forEach(x=>x.hidden=!on);document.getElementById("f-type").classList.toggle("trei",on);document.querySelectorAll(".tabbar").forEach(t=>t.classList.toggle("cu-harta",on))}
 function hNoIndex(){if(!document.querySelector('meta[name="robots"]')){const m=document.createElement("meta");m.name="robots";m.content="noindex, nofollow";document.head.appendChild(m)}}
 function hPop(o){
   const g=hPro(o),meta=[o.cats.join(", "),/^(in|out)door$/i.test(o.tip)?"":o.tip].filter(Boolean).join(" · ");

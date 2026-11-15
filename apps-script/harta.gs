@@ -206,3 +206,23 @@ function porneste_harta() {
   ScriptApp.newTrigger('harta_completeaza').timeBased().everyDays(1).atHour(5).create();
   harta_completeaza();
 }
+
+/* ===================== FORMULARUL „ADAUG UN LOC PE HARTĂ” (Colaborări, tip „loc”) =====================
+ * Formularul de pe site trimite { tip: 'loc', campuri } la același doPost din Code.gs. Aici doar adăugăm tipul nou
+ * în listele din Code.gs (FILE, NOTIF, TEXTE_REZERVA, ETICHETE_CONFIRMARE), ca să nu modificăm fișierul acela.
+ * Răspunsurile intră în „CFCC - Onboarding parteneri” → fila „Propuneri locuri hartă” (se creează singură),
+ * NU în fila Hartă: acolo sheet-ul e public, iar datele de contact ale celui care trimite nu au voie să ajungă public.
+ * Atenție: formularul merge pe site abia după Deploy → Manage deployments → Edit → New version. */
+FILE.loc = {
+  nume: 'Propuneri locuri hartă', fisier: 'onboarding', status: 'Nou', rosu: true,
+  coloane: [['Primit la'], ['Status'], ['Nume loc', 'Nume'], ['Ce fel de loc'], ['Adresă'], ['Website / Instagram'], ['Despre loc'],
+    ['Cine trimite'], ['Persoană de contact'], ['E-mail'], ['Telefon'], ['Vrea să fie partener'], ['Note']]
+};
+NOTIF.loc = ['Loc propus pentru hartă', function (c) { return c['Nume'] || ''; },
+  ['Nume', 'Ce fel de loc', 'Adresă', 'Cine trimite', 'Vrea să fie partener', 'Persoană de contact', 'E-mail', 'Telefon'],
+  'CFCC - Onboarding parteneri → Propuneri locuri hartă', ONBOARDING_ID];
+TEXTE_REZERVA.loc = ['Am primit locul propus: {pagina}',
+  'Bună!\n\nMulțumim că ne-ai scris despre {pagina}. Îl verificăm și, dacă se potrivește, îl adăugăm pe Harta copiilor de pe {site}.\n\n' +
+  'Dacă ai întrebări sau vrei să ne spui ceva în plus, răspunde la acest e-mail.\n\nCu drag,\nEchipa cefacemcucopiii.ro'];
+ETICHETE_CONFIRMARE.loc = 'am primit locul';
+CAND_PLEACA.loc = 'Cineva trimite un loc pentru Harta copiilor (Colaborări → Adaug un loc pe hartă)';
