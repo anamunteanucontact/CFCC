@@ -48,11 +48,20 @@ function harta_import_osm() {
     'nwr["amenity"~"^(kindergarten|childcare)$"](' + b + ');' +
     'nwr["leisure"~"^(playground|indoor_play)$"](' + b + ');' +
     ');out center tags;';
-  const r = UrlFetchApp.fetch('https://overpass-api.de/api/interpreter', {
-    method: 'post', payload: { data: q }, muteHttpExceptions: true,
-    headers: { 'User-Agent': 'cefacemcucopiii.ro (hello@cefacemcucopiii.ro)' } });
-  if (r.getResponseCode() !== 200) throw new Error('OpenStreetMap nu a răspuns (' + r.getResponseCode() + '). Mai încearcă peste câteva minute.');
-  const el = JSON.parse(r.getContentText()).elements || [];
+  // Serverul principal (Germania), apoi două copii de rezervă (Austria, Germania), dacă primul e ocupat.
+  const servere = ['https://overpass-api.de', 'https://overpass.private.coffee', 'https://overpass.kumi.systems'];
+  let el = null, erori = [];
+  for (let i = 0; i < servere.length && !el; i++) {
+    try {
+      const r = UrlFetchApp.fetch(servere[i] + '/api/interpreter', {
+        method: 'post', payload: { data: q }, muteHttpExceptions: true,
+        headers: { 'User-Agent': 'cefacemcucopiii.ro (hello@cefacemcucopiii.ro)' } });
+      const t = r.getContentText();
+      if (r.getResponseCode() === 200 && t.charAt(0) === '{') el = JSON.parse(t).elements || [];
+      else erori.push(servere[i] + ': ' + r.getResponseCode());
+    } catch (e) { erori.push(servere[i] + ': ' + e.message); }
+  }
+  if (!el) throw new Error('OpenStreetMap nu a răspuns (' + erori.join(' · ') + '). Mai încearcă peste câteva minute.');
   const ultim = fila.getLastRow();
   const exist = {};
   if (ultim > 1) fila.getRange(2, 12, ultim - 1, 1).getValues().forEach(function (x) { if (x[0]) exist[String(x[0]).trim()] = 1; });
