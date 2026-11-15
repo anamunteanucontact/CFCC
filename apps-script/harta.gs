@@ -13,7 +13,7 @@ const HARTA_COMUNE = { 'dumbravita': 'Dumbrăvița', 'ghiroda': 'Ghiroda', 'giar
   'mosnita veche': 'Moșnița Nouă', 'sacalaz': 'Săcălaz' };
 
 function harta_norm_(s) {
-  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 }
 
 /** Zonele din „Liste hartă” (C) cu centrul lor aproximativ (D: „lat, lng”). */
