@@ -569,7 +569,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 <!-- HARTA COPIILOR -->
 <section id="v-harta" class="view vwrap" hidden>
   <div class="hwrap">
-    <div class="h-test" id="h-test" hidden><b>Pagină de test.</b> Nu e publică și nu apare în meniu. Vezi și locurile „De verificat” (eticheta gri); în card scrie rândul din fila Hartă.<br><span class="sw" id="h-sw">Fundal: <button type="button" data-st="brand" aria-pressed="true">Pe brand</button><button type="button" data-st="osm" aria-pressed="false">Original</button></span></div>
+    <div class="h-test" id="h-test" hidden><b>Pagină de test.</b> Nu e publică și nu apare în meniu. Vezi și locurile „De verificat” (eticheta gri); în card scrie rândul din fila Hartă.<br><span class="sw" id="h-sw">Fundal: <button type="button" data-st="brand" aria-pressed="true">Pe brand</button><button type="button" data-st="osm" aria-pressed="false">Original</button></span> <span class="sw" id="h-gr">Pinuri grupate: <button type="button" data-gr="da" aria-pressed="true">Da</button><button type="button" data-gr="nu" aria-pressed="false">Nu</button></span></div>
     <div class="sec-h">
       <span class="eyebrow">Harta copiilor</span>
       <h2>Tot ce e pentru copii, lângă casa ta</h2>
@@ -1818,7 +1818,7 @@ async function openHarta(){
       if(e.target.id==="h-more"){H.lim+=40;hRender();return}
       const b=e.target.closest(".h-it");if(!b||!H.map)return;const m=H.mk[b.dataset.i];if(!m)return;
       const show=()=>{m.openPopup()};
-      if(H.layer.hasLayer(m)){H.layer.zoomToShowLayer(m,show);setTimeout(()=>{if(!m.isPopupOpen()){H.map.setView(m.getLatLng(),19,{animate:false});setTimeout(show,150)}},1500)}else{H.map.setView(m.getLatLng(),15,{animate:false});setTimeout(show,50)}
+      if(H.layer===H.cl&&H.layer.hasLayer(m)){H.layer.zoomToShowLayer(m,show);setTimeout(()=>{if(!m.isPopupOpen()){H.map.setView(m.getLatLng(),19,{animate:false});setTimeout(show,150)}},1500)}else{H.map.setView(m.getLatLng(),15,{animate:false});setTimeout(show,50)}
       if(matchMedia("(max-width:899px)").matches)document.getElementById("h-map").scrollIntoView({block:"start"})});
     document.getElementById("h-map").addEventListener("click",e=>{const a=e.target.closest("a[data-h]");if(!a)return;
       hTrack(a.dataset.h,null,{link:a.getAttribute("href")});
@@ -1841,7 +1841,11 @@ async function openHarta(){
       document.querySelectorAll("#h-sw button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"))});
     H.map=L.map("h-map",{zoomControl:true,scrollWheelZoom:true,tap:false}).setView([45.755,21.23],12);H.map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,subdomains:"abc",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}).addTo(H.map);
-    H.layer=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:45,spiderfyOnMaxZoom:true});H.map.addLayer(H.layer);
+    H.cl=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:45,spiderfyOnMaxZoom:true});H.flat=L.layerGroup();
+    H.layer=H.cl;H.map.addLayer(H.layer);
+    document.getElementById("h-gr").addEventListener("click",e=>{const b=e.target.closest("button[data-gr]");if(!b)return;
+      const want=b.dataset.gr==="da"?H.cl:H.flat;if(want!==H.layer){H.map.removeLayer(H.layer);H.layer=want;H.map.addLayer(H.layer);hRender()}
+      document.querySelectorAll("#h-gr button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"))});
     H.proLayer=L.layerGroup().addTo(H.map);
     hRender();
   }else if(H.map)setTimeout(()=>H.map.invalidateSize(),60);
