@@ -1569,7 +1569,7 @@ function route(){
   if(pv){renderPrev(pv[1]);go("org",true);return}
   if(h==="comunitate"||h==="organizatori"){renderOrgs();go("comunitate",true);return}
   /* Harta copiilor: deocamdată doar în test (link direct, fără meniu, noindex). Publică = adaugă aici „hartacopiilor” cu H.test=false. */
-  if(h==="hartacopiilor-test"){H.test=true;go("harta",true);setTimeout(openHarta,0);document.title="Harta copiilor (test)";hNoIndex();return}
+  if(h==="hartacopiilor-test"){go("harta",true);setTimeout(()=>{H.test=true;openHarta()},0);document.title="Harta copiilor (test)";hNoIndex();return}
   if(h==="formular-partener"){go("formular",true);return}
   if(h.startsWith("articol/")){renderArt(decodeURIComponent(h.slice(8)));go("articol",true);return}
   if(ED_BY[h]){ed.cur=h;ed.day="";ed.age="";renderEd();go("editie",true);track("Ediție specială",null,{editie:ED_BY[h].t});return}
