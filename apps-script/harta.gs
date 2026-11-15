@@ -26,9 +26,10 @@ function harta_zone_(com) {
   }).filter(Boolean);
 }
 
-/** Zona: comuna din adresă, dacă e una din cele știute; altfel cartierul cu centrul cel mai apropiat. */
+/** Zona: comuna din adresă (doar localitatea, după ultima virgulă), altfel cartierul cu centrul cel mai apropiat.
+ *  Așa „Calea Girocului, Timișoara” rămâne în Timișoara, nu în Giroc. */
 function harta_zona_(zone, lat, lng, adresa) {
-  const a = harta_norm_(adresa);
+  const a = harta_norm_(String(adresa || '').split(',').pop());
   for (const k in HARTA_COMUNE) if (a.indexOf(k) >= 0) return HARTA_COMUNE[k];
   if (!lat || !lng) return '';
   let best = null, d = 1e9;
@@ -86,8 +87,8 @@ function harta_import_osm() {
     }
     const strada = [t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' ');
     const loc = t['addr:city'] || t['addr:place'] || '';
-    const adresa = [strada, loc || (strada ? 'Timișoara' : '')].filter(Boolean).join(', ');
-    rows.push(['De verificat', nume, cat, tip, harta_zona_(zone, lat, lng, loc || adresa), adresa,
+    const adresa = [strada, loc].filter(Boolean).join(', '); // fără adresă: o completează harta_completeaza din coordonate
+    rows.push(['De verificat', nume, cat, tip, harta_zona_(zone, lat, lng, loc), adresa,
       Math.round(lat * 1e6) / 1e6, Math.round(lng * 1e6) / 1e6, '', '', '', id]);
   });
   if (rows.length) fila.getRange(ultim + 1, 1, rows.length, 12).setValues(rows);
@@ -102,9 +103,11 @@ function harta_completeaza() {
   const com = SpreadsheetApp.openById(COMUNITATE_ID), fila = com.getSheetByName(HARTA.fila);
   const ultim = fila.getLastRow();
   if (ultim < 2) return;
-  const v = fila.getRange(2, 1, ultim - 1, 8).getValues(), zone = harta_zone_(com), b = HARTA.bbox;
+  const v = fila.getRange(2, 1, ultim - 1, 12).getValues(), zone = harta_zone_(com), b = HARTA.bbox;
   const start = Date.now();
-  let coord = 0, zon = 0, gresit = [], ramase = 0;
+  let coord = 0, zon = 0, adr = 0, gresit = [], ramase = 0;
+  const dubluri = harta_dubluri_(v);
+  dubluri.forEach(function (i) { fila.getRange(i + 2, 1).setValue('Ascuns'); v[i][0] = 'Ascuns'; });
   for (let i = 0; i < v.length; i++) {
     const rand = i + 2, adresa = String(v[i][5]).trim();
     let lat = v[i][6], lng = v[i][7];
@@ -122,14 +125,61 @@ function harta_completeaza() {
         fila.getRange(rand, 7, 1, 2).setValues([[lat, lng]]); coord++;
       } else { gresit.push(rand); continue; }
     }
+    // Fără adresă, dar cu coordonate: adresa din coordonate (doar rândurile încă nepublicate).
+    let adresaNoua = adresa;
+    if (!adresa && lat !== '' && lng !== '' && v[i][0] !== 'Ascuns') {
+      if (Date.now() - start > 300000) { ramase++; continue; }
+      const a = harta_adresa_(+String(lat).replace(',', '.'), +String(lng).replace(',', '.'));
+      if (a) {
+        adresaNoua = a.adresa;
+        fila.getRange(rand, 6).setValue(a.adresa); adr++;
+        const nume = String(v[i][1]).trim();
+        if (/^(loc de joac[aă]|loc de joac[aă] indoor|cre[sș][aă]|gr[aă]dini[tț][aă])$/i.test(nume) && a.strada)
+          fila.getRange(rand, 2).setValue(nume + ' - ' + a.strada);
+        if (a.localitate) { const z0 = harta_zona_(zone, null, null, a.localitate); if (z0) { fila.getRange(rand, 5).setValue(z0); v[i][4] = z0; } }
+      }
+    }
     if (!String(v[i][4]).trim() && lat !== '' && lng !== '') {
-      const z = harta_zona_(zone, +lat, +lng, adresa);
+      const z = harta_zona_(zone, +String(lat).replace(',', '.'), +String(lng).replace(',', '.'), adresaNoua);
       if (z) { fila.getRange(rand, 5).setValue(z); zon++; }
     }
   }
-  harta_mesaj_('Coordonate completate: ' + coord + ' · zone completate: ' + zon +
+  harta_mesaj_('Coordonate completate: ' + coord + ' · adrese din coordonate: ' + adr + ' · zone completate: ' + zon +
+    (dubluri.length ? ' · dubluri ascunse: ' + dubluri.length : '') +
     (gresit.length ? ' · adrese negăsite (rândurile ' + gresit.slice(0, 15).join(', ') + (gresit.length > 15 ? '...' : '') + ') - scrie coordonatele de mână' : '') +
     (ramase ? ' · au mai rămas ' + ramase + ', mai pornește o dată' : ''), 'Hartă', 15);
+}
+
+/** Adresa unui punct (OpenStreetMap): { adresa: 'Strada X 5, Timișoara', strada: 'Strada X', localitate: 'Timișoara' }. */
+function harta_adresa_(lat, lng) {
+  const r = UrlFetchApp.fetch('https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&accept-language=ro&lat=' + lat + '&lon=' + lng,
+    { muteHttpExceptions: true, headers: { 'User-Agent': 'cefacemcucopiii.ro (hello@cefacemcucopiii.ro)' } });
+  Utilities.sleep(1100);
+  if (r.getResponseCode() !== 200) return null;
+  const a = (JSON.parse(r.getContentText()) || {}).address || {};
+  const strada = a.road || a.pedestrian || a.footway || a.park || a.square || '';
+  const localitate = a.city || a.town || a.village || a.municipality || '';
+  if (!strada && !localitate) return null;
+  return { adresa: [[strada, a.house_number].filter(Boolean).join(' '), localitate].filter(Boolean).join(', '), strada: strada, localitate: localitate };
+}
+
+/** Locurile de joacă fără nume, din OpenStreetMap, aflate la mai puțin de 40 m de alt loc de joacă din listă,
+ *  sunt de obicei bucăți din același loc. Le ascundem (Status = Ascuns), doar dacă sunt încă „De verificat”. */
+function harta_dubluri_(v) {
+  const out = [], pastrate = [];
+  const num = function (x) { return +String(x).replace(',', '.'); };
+  for (let i = 0; i < v.length; i++) {
+    const cat = String(v[i][2]), lat = num(v[i][6]), lng = num(v[i][7]);
+    if (cat.indexOf('Loc de joac') < 0 || !lat || !lng || v[i][0] === 'Ascuns') continue;
+    const faraNume = /^loc de joac[aă]( indoor)?$/i.test(String(v[i][1]).trim());
+    const aproape = pastrate.some(function (p) {
+      const dx = (p[1] - lng) * 111320 * Math.cos(lat * Math.PI / 180), dy = (p[0] - lat) * 110540;
+      return dx * dx + dy * dy < 1600;
+    });
+    if (aproape && faraNume && v[i][0] === 'De verificat' && /^osm:/.test(String(v[i][11]))) out.push(i);
+    else pastrate.push([lat, lng]);
+  }
+  return out;
 }
 
 /** Mesaj în sheet dacă e deschis; altfel doar în jurnalul execuției (rulare automată). */
