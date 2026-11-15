@@ -74,9 +74,10 @@ function harta_import_osm() {
     if (!lat || !lng) return;
     let cat, tip = '', nume = (t.name || '').trim();
     if (t.leisure) {
-      cat = 'Loc de joacă';
+      // În aer liber = „Parc”; „Loc de joacă” = locurile de joacă indoor, private (decizia Anei, 15 nov)
       tip = (t.leisure === 'indoor_play' || t.indoor === 'yes') ? 'Indoor' : 'Outdoor';
-      if (!nume) nume = tip === 'Indoor' ? 'Loc de joacă indoor' : 'Loc de joacă';
+      cat = tip === 'Indoor' ? 'Loc de joacă' : 'Parc';
+      if (!nume) nume = cat;
     } else {
       if (!nume) return; // creșe și grădinițe fără nume nu sunt utile pe hartă
       const n = harta_norm_(nume), cresa = t.amenity === 'childcare' || /cres[ae]/.test(n), grad = /gradinit/.test(n);
@@ -138,7 +139,7 @@ function harta_completeaza() {
         adresaNoua = a.adresa;
         fila.getRange(rand, 6).setValue(a.adresa); adr++;
         const nume = String(v[i][1]).trim();
-        if (/^(loc de joac[aă]|loc de joac[aă] indoor|cre[sș][aă]|gr[aă]dini[tț][aă])$/i.test(nume) && a.strada)
+        if (/^(parc|loc de joac[aă]|loc de joac[aă] indoor|cre[sș][aă]|gr[aă]dini[tț][aă])$/i.test(nume) && a.strada)
           fila.getRange(rand, 2).setValue(nume + ' - ' + a.strada);
         if (a.localitate) { const z0 = harta_zona_(zone, null, null, a.localitate); if (z0) { fila.getRange(rand, 5).setValue(z0); v[i][4] = z0; } }
       }
@@ -175,8 +176,8 @@ function harta_dubluri_(v) {
   const num = function (x) { return +String(x).replace(',', '.'); };
   for (let i = 0; i < v.length; i++) {
     const cat = String(v[i][2]), lat = num(v[i][6]), lng = num(v[i][7]);
-    if (cat.indexOf('Loc de joac') < 0 || !lat || !lng || v[i][0] === 'Ascuns') continue;
-    const faraNume = /^loc de joac[aă]( indoor)?$/i.test(String(v[i][1]).trim());
+    if ((cat.indexOf('Loc de joac') < 0 && cat.indexOf('Parc') < 0) || !lat || !lng || v[i][0] === 'Ascuns') continue;
+    const faraNume = /^(parc|loc de joac[aă]( indoor)?)$/i.test(String(v[i][1]).trim());
     const aproape = pastrate.some(function (p) {
       const dx = (p[1] - lng) * 111320 * Math.cos(lat * Math.PI / 180), dy = (p[0] - lat) * 110540;
       return dx * dx + dy * dy < 1600;
