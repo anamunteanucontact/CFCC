@@ -409,19 +409,25 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 .h-test{background:#1F4E5F;color:#FFF8F0;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:.9rem;line-height:1.4}
 .h-tag{display:inline-block;background:var(--galben);color:#1d3640;font-size:.7rem;font-weight:800;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:2px}
 .h-more{align-self:center;margin-top:4px}
+.h-brand .leaflet-tile-pane{filter:grayscale(1) sepia(.35) hue-rotate(-12deg) saturate(.9) brightness(1.06) contrast(.88)}
+#h-map.h-brand{background:#f3ece2}
+.h-test .sw{display:inline-flex;gap:6px;margin-top:8px}
+.h-test .sw button{font:700 .8rem var(--body);border:0;border-radius:999px;padding:5px 11px;background:rgba(255,248,240,.18);color:#FFF8F0;cursor:pointer}
+.h-test .sw button[aria-pressed="true"]{background:#F4B942;color:#1F4E5F}
 .h-leg{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--muted);font-size:.8rem;margin-top:8px}
 .h-leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
 .h-note{color:var(--muted);font-size:.8rem;margin-top:12px;line-height:1.45}
-.h-pin{width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.4)}
-.h-pin.pro{width:34px;height:34px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--coral);border:3px solid #fff;display:grid;place-items:center;box-shadow:0 3px 8px rgba(0,0,0,.35)}
-.h-pin.pro span{transform:rotate(45deg);color:#fff;font-size:15px;line-height:1}
+.h-pin{width:28px;height:28px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);border:2px solid #FFF8F0;display:grid;place-items:center;box-shadow:0 2px 5px rgba(31,78,95,.35)}
+.h-pin svg{width:15px;height:15px;transform:rotate(45deg)}
+.h-pin.pro{width:38px;height:38px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--coral);border:3px solid #fff;display:grid;place-items:center;box-shadow:0 3px 8px rgba(0,0,0,.35)}
+.h-pin.pro span{transform:rotate(45deg);color:#fff;font-size:18px;line-height:1}
 .h-pop{font:14px/1.45 var(--body);color:#1d3640;min-width:210px}
 .h-pop h4{font:800 1.05rem/1.2 var(--display);margin:0 0 3px;color:#1F4E5F}
 .h-pop .k{color:#5b7079;font-size:.82rem;margin:0 0 4px}
 .h-pop p{margin:6px 0}
 .h-pop img{display:block;width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:8px;background:#f6e9d9}
 @media (max-width:899px){.h-pop img{height:96px}.h-pop p{margin:4px 0}}
-#h-map .marker-cluster-small,#h-map .marker-cluster-medium,#h-map .marker-cluster-large{background:rgba(31,78,95,.25)}
+#h-map .marker-cluster-small,#h-map .marker-cluster-medium,#h-map .marker-cluster-large{background:rgba(238,108,77,.28)}
 #h-map .marker-cluster-small div,#h-map .marker-cluster-medium div,#h-map .marker-cluster-large div{background:#1F4E5F;color:#FFF8F0;font:700 12px/30px var(--body)}
 .h-pop .acts2{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .h-pop .acts2 a{flex:1 1 auto;text-align:center;text-decoration:none;font-weight:700;font-size:.85rem;padding:8px 10px;border-radius:10px;background:#f6e9d9;color:#1d3640}
@@ -546,7 +552,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
 <!-- HARTA COPIILOR -->
 <section id="v-harta" class="view vwrap" hidden>
   <div class="hwrap">
-    <div class="h-test" id="h-test" hidden><b>Pagină de test.</b> Nu e publică și nu apare în meniu. Vezi și locurile „De verificat” (eticheta gri); în card scrie rândul din fila Hartă.</div>
+    <div class="h-test" id="h-test" hidden><b>Pagină de test.</b> Nu e publică și nu apare în meniu. Vezi și locurile „De verificat” (eticheta gri); în card scrie rândul din fila Hartă.<br><span class="sw" id="h-sw">Fundal: <button type="button" data-st="brand" aria-pressed="true">Pe brand</button><button type="button" data-st="osm" aria-pressed="false">Original</button></span></div>
     <div class="sec-h">
       <span class="eyebrow">Harta copiilor</span>
       <h2>Tot ce e pentru copii, lângă casa ta</h2>
@@ -562,7 +568,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     </div>
     <div class="h-grid">
       <div><div id="h-map" role="region" aria-label="Hartă"></div>
-        <div class="h-leg" aria-hidden="true"><span><i style="background:#1F4E5F"></i>Creșe și grădinițe</span><span><i style="background:#2f7d5b"></i>Locuri de joacă</span><span><i style="background:#7a5c9e"></i>Alte locuri</span><span><i style="background:#EE6C4D"></i>★ Partener</span></div></div>
+        <div class="h-leg" aria-hidden="true"><span><i style="background:#1F4E5F"></i>Creșe și grădinițe</span><span><i style="background:#F4B942"></i>Locuri de joacă</span><span><i style="background:#4F7F8F"></i>Alte locuri</span><span><i style="background:#EE6C4D"></i>★ Partener</span></div></div>
       <div class="h-side"><div class="h-list" id="h-list"><div class="empty">Se încarcă...</div></div>
         <p class="h-note">Ai un loc pentru copii care lipsește sau o informație greșită? Scrie-ne la <a href="mailto:hello@cefacemcucopiii.ro">hello@cefacemcucopiii.ro</a>.</p>
       </div>
@@ -1729,10 +1735,19 @@ function hPop(o){
     <div class="acts2">${wa?`<a class="wa" href="https://wa.me/${wa}" target="_blank" rel="noopener" data-h="WhatsApp">WhatsApp</a>`:""}${tel?`<a href="tel:+${tel}" data-h="Telefon">Sună</a>`:""}
     <a class="go" href="#comunitate/${g.slug}" data-h="Pagina partenerului">Vezi pagina →</a></div></div>`;
 }
-function hIcon(o){const pro=hPro(o);
-  const col=o.cats.includes("Loc de joacă")?"#2f7d5b":o.cats.some(c=>/Creș|Grădini/.test(c))?"#1F4E5F":"#7a5c9e";
-  return L.divIcon(pro?{className:"",html:`<div class="h-pin pro"><span>★</span></div>`,iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[0,-30]}
-    :{className:"",html:`<div class="h-pin" style="background:${col}"></div>`,iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-6]})}
+/* Pinuri pe brand: picătură cu iconiță albă. Petrol = creșe și grădinițe, galben = locuri de joacă,
+   petrol deschis = altele; coral mare cu stea = partener. */
+const H_ICO={
+  joaca:'<path d="M4 21V5M20 21V5M3 5h18" fill="none"/><path d="M8 5v8M16 5v8M7 13h10v2H7z"/>',
+  cresa:'<circle cx="12" cy="8" r="4" fill="none"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7" fill="none"/><circle cx="12" cy="8" r="1.2"/>',
+  gradi:'<path d="M4 21V10l8-6 8 6v11z" fill="none"/><path d="M10 21v-6h4v6"/><path d="M12 4V1h4" fill="none"/>',
+  alt:'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z" fill="none"/>'};
+function hKind(o){return o.cats.includes("Loc de joacă")?"joaca":o.cats.includes("Creșă")&&!o.cats.includes("Grădiniță")?"cresa":o.cats.some(c=>/Creș|Grădini/.test(c))?"gradi":"alt"}
+const H_COL={joaca:"#F4B942",cresa:"#1F4E5F",gradi:"#1F4E5F",alt:"#4F7F8F"};
+function hIcon(o){const pro=hPro(o),k=hKind(o);
+  if(pro)return L.divIcon({className:"",html:`<div class="h-pin pro"><span>★</span></div>`,iconSize:[38,38],iconAnchor:[19,38],popupAnchor:[0,-34]});
+  const ink=k==="joaca"?"#1F4E5F":"#FFF8F0";
+  return L.divIcon({className:"",html:`<div class="h-pin" style="background:${H_COL[k]}"><svg viewBox="0 0 24 24" stroke="${ink}" fill="${ink}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${H_ICO[k]}</svg></div>`,iconSize:[28,28],iconAnchor:[14,28],popupAnchor:[0,-26]})}
 function hTrack(n,o,x){track("Hartă: "+n,null,Object.assign(o?{loc:o.n,categorie:o.cats.join(", "),zona:o.z,partener:o.p||""}:{},x||{}))}
 function hRender(){
   const L_=document.getElementById("h-list"),cnt=document.getElementById("h-count");
@@ -1780,6 +1795,10 @@ async function openHarta(){
     await Promise.all([hData(),orgState==="loading"?loadCom():null].filter(Boolean));
     if(H.state==="ok")hFilters();hRender();
     try{await hLibs()}catch(_){document.getElementById("h-map").innerHTML='<div class="empty">Harta nu s-a putut încărca. Lista de mai jos merge în continuare.</div>';return}
+    document.getElementById("h-map").classList.add("h-brand");
+    document.getElementById("h-sw").addEventListener("click",e=>{const b=e.target.closest("button[data-st]");if(!b)return;
+      document.getElementById("h-map").classList.toggle("h-brand",b.dataset.st==="brand");
+      document.querySelectorAll("#h-sw button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"))});
     H.map=L.map("h-map",{zoomControl:true,scrollWheelZoom:true,tap:false}).setView([45.755,21.23],12);H.map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,subdomains:"abc",attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}).addTo(H.map);
     H.layer=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:45,spiderfyOnMaxZoom:true});H.map.addLayer(H.layer);
