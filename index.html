@@ -1752,7 +1752,7 @@ function hPop(o){
   const rand=H.test?`<p class="k">Rândul ${o.i+2} în fila Hartă${o.z?" · "+esc(o.z):""}</p>`:"";
   if(!g){const inst=hOrg(o),ev=o.cats.includes("Cultură")||inst?hEvents(o):[];
     const evs=ev.length?`<div class="h-evs"><b>Următoarele evenimente</b>${ev.slice(0,3).map(e=>{const d=dt(e.d);
-      return `<a href="#${e.id}" data-h="Eveniment din hartă">${ZILE[d.getDay()].slice(0,3)}. ${d.getDate()} ${LUNI_LUNG[d.getMonth()].slice(0,3)}${e.t?" · "+esc(e.t.split("\n")[0]):""}<span>${esc(e.n)}</span></a>`}).join("")}</div>`
+      return `<a href="#${e.id}" data-h="Eveniment din hartă">${ZILE[d.getDay()].length>3?ZILE[d.getDay()].slice(0,3)+".":ZILE[d.getDay()]} ${d.getDate()} ${["ian","feb","mar","apr","mai","iun","iul","aug","sep","oct","nov","dec"][d.getMonth()]}${e.t?" · "+esc(e.t.split("\n")[0]):""}<span>${esc(e.n)}</span></a>`}).join("")}</div>`
       :(o.cats.includes("Cultură")?`<p class="k">Deocamdată nu au evenimente pentru copii în calendar.</p>`:"");
     const more=inst?`<div class="acts2"><a class="go" href="#comunitate/${inst.slug}" data-h="Pagina instituției">${ev.length>3?`Toate evenimentele (${ev.length}) →`:"Mai multe despre ei →"}</a></div>`:"";
     return `<div class="h-pop"><h4>${esc(o.n)}${hVer(o)}</h4><p class="k">${esc(meta)}</p><p>${esc(o.ad||o.z)}</p>${evs}${more}${rand}</div>`}
@@ -1818,7 +1818,7 @@ async function openHarta(){
       if(e.target.id==="h-more"){H.lim+=40;hRender();return}
       const b=e.target.closest(".h-it");if(!b||!H.map)return;const m=H.mk[b.dataset.i];if(!m)return;
       const show=()=>{m.openPopup()};
-      if(H.layer.hasLayer(m))H.layer.zoomToShowLayer(m,show);else{H.map.setView(m.getLatLng(),15,{animate:false});setTimeout(show,50)}
+      if(H.layer.hasLayer(m)){H.layer.zoomToShowLayer(m,show);setTimeout(()=>{if(!m.isPopupOpen()){H.map.setView(m.getLatLng(),19,{animate:false});setTimeout(show,150)}},1500)}else{H.map.setView(m.getLatLng(),15,{animate:false});setTimeout(show,50)}
       if(matchMedia("(max-width:899px)").matches)document.getElementById("h-map").scrollIntoView({block:"start"})});
     document.getElementById("h-map").addEventListener("click",e=>{const a=e.target.closest("a[data-h]");if(!a)return;
       hTrack(a.dataset.h,null,{link:a.getAttribute("href")});
