@@ -108,11 +108,15 @@ function harta_completeaza() {
   let coord = 0, zon = 0, adr = 0, gresit = [], ramase = 0;
   const dubluri = harta_dubluri_(v);
   dubluri.forEach(function (i) { fila.getRange(i + 2, 1).setValue('Ascuns'); v[i][0] = 'Ascuns'; });
+  SpreadsheetApp.flush();
+  // Google oprește orice rulare după 6 minute și pierde ce nu e salvat: salvăm la fiecare 10 rânduri
+  // și ne oprim singuri după 4 minute. Ce rămâne se face la rularea următoare (sau noaptea, la 5:00).
   for (let i = 0; i < v.length; i++) {
+    if (i % 10 === 0) SpreadsheetApp.flush();
     const rand = i + 2, adresa = String(v[i][5]).trim();
     let lat = v[i][6], lng = v[i][7];
     if ((lat === '' || lng === '') && adresa) {
-      if (Date.now() - start > 300000) { ramase++; continue; }
+      if (Date.now() - start > 240000) { ramase++; continue; }
       const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ro&bounded=1' +
         '&viewbox=' + [b[1], b[2], b[3], b[0]].join(',') +
         '&q=' + encodeURIComponent(/timi[sș]oara|dumbr|ghiroda|giroc|chi[sș]oda|mo[sș]ni|s[aă]c[aă]laz|giarmata/i.test(adresa) ? adresa : adresa + ', Timișoara');
@@ -128,7 +132,7 @@ function harta_completeaza() {
     // Fără adresă, dar cu coordonate: adresa din coordonate (doar rândurile încă nepublicate).
     let adresaNoua = adresa;
     if (!adresa && lat !== '' && lng !== '' && v[i][0] !== 'Ascuns') {
-      if (Date.now() - start > 300000) { ramase++; continue; }
+      if (Date.now() - start > 240000) { ramase++; continue; }
       const a = harta_adresa_(+String(lat).replace(',', '.'), +String(lng).replace(',', '.'));
       if (a) {
         adresaNoua = a.adresa;
@@ -144,10 +148,11 @@ function harta_completeaza() {
       if (z) { fila.getRange(rand, 5).setValue(z); zon++; }
     }
   }
+  SpreadsheetApp.flush();
   harta_mesaj_('Coordonate completate: ' + coord + ' · adrese din coordonate: ' + adr + ' · zone completate: ' + zon +
     (dubluri.length ? ' · dubluri ascunse: ' + dubluri.length : '') +
     (gresit.length ? ' · adrese negăsite (rândurile ' + gresit.slice(0, 15).join(', ') + (gresit.length > 15 ? '...' : '') + ') - scrie coordonatele de mână' : '') +
-    (ramase ? ' · au mai rămas ' + ramase + ', mai pornește o dată' : ''), 'Hartă', 15);
+    (ramase ? ' · au mai rămas ' + ramase + ' - rulează harta_completeaza încă o dată (sau se fac singure la noapte)' : ''), 'Hartă', 15);
 }
 
 /** Adresa unui punct (OpenStreetMap): { adresa: 'Strada X 5, Timișoara', strada: 'Strada X', localitate: 'Timișoara' }. */
