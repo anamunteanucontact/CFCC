@@ -1803,7 +1803,7 @@ function hNoIndex(){if(!document.querySelector('meta[name="robots"]')){const m=d
 function hPop(o){
   const g=hPro(o),meta=[o.cats.join(", "),/^(in|out)door$/i.test(o.tip)?"":o.tip].filter(Boolean).join(" · ");
   const rand=H.test?`<p class="k">Rândul ${o.i+2} în fila Hartă${o.z?" · "+esc(o.z):""}</p>`:"";
-  if(!g){const inst=hOrg(o),ev=o.cats.includes("Cultură")||inst?hEvents(o):[];
+  if(!g){const inst=hOrg(o),ev=o.cats.includes("Cultură")||inst||(o.al&&o.al.length)?hEvents(o):[]; // evenimente și la orice loc cu „Nume în calendar”
     const evs=ev.length?`<div class="h-evs"><b>Următoarele evenimente</b>${ev.slice(0,3).map(e=>{const d=dt(e.d);
       return `<a href="#${e.id}" data-h="Eveniment din hartă">${ZILE[d.getDay()].length>3?ZILE[d.getDay()].slice(0,3)+".":ZILE[d.getDay()]} ${d.getDate()} ${["ian","feb","mar","apr","mai","iun","iul","aug","sep","oct","nov","dec"][d.getMonth()]}${e.t?" · "+esc(e.t.split("\n")[0]):""}<span>${esc(e.n)}</span></a>`}).join("")}</div>`
       :(o.cats.includes("Cultură")?`<p class="k">Deocamdată nu au evenimente pentru copii în calendar.</p>`:"");
