@@ -1791,7 +1791,8 @@ function hDist(o){if(!H.me)return null;const R=6371,t=Math.PI/180,a=(o.lat-H.me[
   const h=Math.sin(a/2)**2+Math.cos(H.me[0]*t)*Math.cos(o.lat*t)*Math.sin(b/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 const hKm=d=>d==null?"":d<1?Math.round(d*1000/50)*50+" m":d.toFixed(d<10?1:0).replace(".",",")+" km";
 function hShown(){
-  let xs=H.rows.filter(o=>(!H.cat||o.cats.includes(H.cat))&&(!H.zona||o.z===H.zona));
+  const ZI="Ieșiri de o zi",ziOn=H.cat===ZI||H.zona==="În județ";/* ieșirile de o zi apar doar când sunt alese explicit */
+  let xs=H.rows.filter(o=>(!H.cat||o.cats.includes(H.cat))&&(!H.zona||o.z===H.zona)&&(ziOn||!o.cats.includes(ZI)));
   xs.forEach(o=>o.d=hDist(o));
   return xs.sort((a,b)=>(!!hPro(b)-!!hPro(a))||(H.me?a.d-b.d:a.n.localeCompare(b.n,"ro")));
 }
