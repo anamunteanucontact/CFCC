@@ -599,7 +599,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
     </div>
     <div class="h-grid">
       <div><div id="h-map" role="region" aria-label="Hartă"></div>
-        <div class="h-leg" aria-hidden="true"><span><i style="background:#1F4E5F"></i>Creșe și grădinițe</span><span><i style="background:#F4B942"></i>Parcuri</span><span><i style="background:#7FB8C4"></i>Locuri de joacă</span><span><i style="background:#FFF8F0;box-shadow:0 0 0 2px #1F4E5F"></i>Teatre, muzee, concerte</span><span><i style="background:#EE6C4D"></i>★ Partener</span></div></div>
+        <div class="h-leg" aria-hidden="true"><span><i style="background:#1F4E5F"></i>Creșe și grădinițe</span><span><i style="background:#F4B942"></i>Parcuri</span><span><i style="background:#7FB8C4"></i>Locuri de joacă</span><span><i style="background:#4F7F8F"></i>Afterschool</span><span><i style="background:#FFF8F0;box-shadow:0 0 0 2px #1F4E5F"></i>Teatre, muzee, concerte</span><span><i style="background:#EE6C4D"></i>★ Partener</span></div></div>
       <div class="h-side"><div class="h-list" id="h-list"><div class="empty">Se încarcă...</div></div>
         <p class="h-note">O informație e greșită? Scrie-ne la <a href="mailto:hello@cefacemcucopiii.ro">hello@cefacemcucopiii.ro</a>.</p>
       </div>
@@ -1761,7 +1761,7 @@ renderRec();
 /* HARTA COPIILOR: datele vin din „Comunitatea CFCC”, fila „Hartă” (gid 1005). Pe hartă: doar Status = Publicat cu Lat/Lng.
    Parteneri: coloana „Partener” = ID din fila Parteneri; cardul ia poza, descrierea și telefonul de acolo (doar dacă pagina e pe Da). */
 const H={ct:null,test:false,gid:1005,rows:null,state:"idle",cat:"",zona:"",me:null,map:null,layer:null,mk:{},lim:40,libs:null};
-const H_CATS=["Creșă","Grădiniță","Parc","Loc de joacă","Cultură","Ateliere și activități","Club sportiv","Sănătate","Servicii utile"];
+const H_CATS=["Creșă","Grădiniță","Afterschool","Parc","Loc de joacă","Cultură","Ateliere și activități","Club sportiv","Sănătate","Servicii utile"];
 function hLoadJs(u){return new Promise((ok,no)=>{const x=document.createElement("script");x.src=u;x.onload=ok;x.onerror=no;document.head.appendChild(x)})}
 function hLoadCss(u){const l=document.createElement("link");l.rel="stylesheet";l.href=u;document.head.appendChild(l)}
 /* Leaflet 1.9.4 + markercluster 1.5.3, găzduite pe site (assets/vendor/leaflet), se încarcă doar când se deschide harta */
@@ -1830,12 +1830,14 @@ const H_ICO={
   joaca:'<path d="M4 21V5M20 21V5M3 5h18" fill="none"/><path d="M8 5v8M16 5v8M7 13h10v2H7z"/>',
   // mască de teatru
   cult:'<path d="M4 4h16v6.5C20 16 16.4 20 12 20S4 16 4 10.5z" fill="none"/><path d="M8.2 9.2h2.2M13.6 9.2h2.2" fill="none"/><path d="M8.5 13.2c1 1.6 2.2 2.3 3.5 2.3s2.5-.7 3.5-2.3" fill="none"/>',
+  // ghiozdan / carte deschisă pentru afterschool
+  after:'<path d="M12 6.5C10 5 7 4.6 3.5 5v13c3.5-.4 6.5 0 8.5 1.5 2-1.5 5-1.9 8.5-1.5V5c-3.5-.4-6.5 0-8.5 1.5z" fill="none"/><path d="M12 6.5v13" fill="none"/>',
   alt:'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z" fill="none"/>'};
-function hKind(o){return o.cats.some(c=>/Creș|Grădini/.test(c))?"bib":o.cats.includes("Parc")?"parc":o.cats.includes("Loc de joacă")?"joaca":o.cats.includes("Cultură")?"cult":"alt"}
-const H_COL={bib:"#1F4E5F",parc:"#F4B942",joaca:"#7FB8C4",cult:"#FFF8F0",alt:"#C9BBA8"};
+function hKind(o){return o.cats.some(c=>/Creș|Grădini/.test(c))?"bib":o.cats.includes("Parc")?"parc":o.cats.includes("Loc de joacă")?"joaca":o.cats.includes("Cultură")?"cult":o.cats.includes("Afterschool")?"after":"alt"}
+const H_COL={bib:"#1F4E5F",parc:"#F4B942",joaca:"#7FB8C4",cult:"#FFF8F0",after:"#4F7F8F",alt:"#C9BBA8"};
 function hIcon(o){const pro=hPro(o),k=hKind(o);
   if(pro)return L.divIcon({className:"",html:`<div class="h-pin pro"><span>★</span></div>`,iconSize:[38,38],iconAnchor:[19,38],popupAnchor:[0,-34]});
-  const ink=k==="bib"?"#FFF8F0":k==="cult"?"#E2603F":"#1F4E5F";
+  const ink=k==="bib"||k==="after"?"#FFF8F0":k==="cult"?"#E2603F":"#1F4E5F";
   return L.divIcon({className:"",html:`<div class="h-pin${k==="cult"?" cult":""}" style="background:${H_COL[k]}"><svg viewBox="0 0 24 24" stroke="${ink}" fill="${ink}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${H_ICO[k]}</svg></div>`,iconSize:[32,32],iconAnchor:[16,32],popupAnchor:[0,-30]})}
 function hTrack(n,o,x){track("Hartă: "+n,null,Object.assign(o?{loc:o.n,categorie:o.cats.join(", "),zona:o.z,partener:o.p||""}:{},x||{}))}
 function hRender(){
