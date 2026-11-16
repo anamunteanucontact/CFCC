@@ -794,7 +794,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-betw
       <label for="loc-cat">Ce fel de loc e?<select id="loc-cat" required>
         <option value="">Alege</option><option>Creșă</option><option>Grădiniță</option><option>Școală</option><option>Afterschool</option><option>Parc</option><option>Loc de joacă (indoor)</option>
         <option>Teatru, muzeu, cultură</option><option>Ateliere și activități</option><option>Sport</option>
-        <option>Sănătate (pediatrie, stomatologie, logopedie)</option><option>Servicii (frizerie pentru copii, petreceri)</option><option>Altceva</option></select></label>
+        <option>Sănătate (pediatrie, stomatologie, logopedie)</option><option>Servicii (frizerie pentru copii, petreceri)</option><option>Ieșire de o zi în județ (ferme, ponei, natură)</option><option>Altceva</option></select></label>
       <label for="loc-addr">Adresa<input id="loc-addr" required placeholder="Strada, numărul, localitatea"></label>
       <label for="loc-web"><span>Website, Instagram sau Facebook <small>(opțional)</small></span><input id="loc-web" placeholder="https:// sau @"></label>
       <label for="loc-about"><span>Câteva cuvinte despre loc <small>(opțional)</small></span><textarea id="loc-about" placeholder="ex. pentru ce vârste e, program, dacă e de stat sau privat"></textarea></label>
@@ -1761,7 +1761,7 @@ renderRec();
 /* HARTA COPIILOR: datele vin din „Comunitatea CFCC”, fila „Hartă” (gid 1005). Pe hartă: doar Status = Publicat cu Lat/Lng.
    Parteneri: coloana „Partener” = ID din fila Parteneri; cardul ia poza, descrierea și telefonul de acolo (doar dacă pagina e pe Da). */
 const H={ct:null,test:false,gid:1005,rows:null,state:"idle",cat:"",zona:"",me:null,map:null,layer:null,mk:{},lim:40,libs:null};
-const H_CATS=["Creșă","Grădiniță","Școală","Afterschool","Parc","Loc de joacă","Cultură","Ateliere și activități","Sport","Sănătate","Servicii utile"];
+const H_CATS=["Creșă","Grădiniță","Școală","Afterschool","Parc","Loc de joacă","Cultură","Ateliere și activități","Sport","Sănătate","Servicii utile","Ieșiri de o zi"];
 function hLoadJs(u){return new Promise((ok,no)=>{const x=document.createElement("script");x.src=u;x.onload=ok;x.onerror=no;document.head.appendChild(x)})}
 function hLoadCss(u){const l=document.createElement("link");l.rel="stylesheet";l.href=u;document.head.appendChild(l)}
 /* Leaflet 1.9.4 + markercluster 1.5.3, găzduite pe site (assets/vendor/leaflet), se încarcă doar când se deschide harta */
@@ -1832,9 +1832,11 @@ const H_ICO={
   cult:'<path d="M4 4h16v6.5C20 16 16.4 20 12 20S4 16 4 10.5z" fill="none"/><path d="M8.2 9.2h2.2M13.6 9.2h2.2" fill="none"/><path d="M8.5 13.2c1 1.6 2.2 2.3 3.5 2.3s2.5-.7 3.5-2.3" fill="none"/>',
   // ghiozdan / carte deschisă pentru afterschool
   after:'<path d="M12 6.5C10 5 7 4.6 3.5 5v13c3.5-.4 6.5 0 8.5 1.5 2-1.5 5-1.9 8.5-1.5V5c-3.5-.4-6.5 0-8.5 1.5z" fill="none"/><path d="M12 6.5v13" fill="none"/>',
+  // soare pentru ieșiri de o zi în județ
+  zi:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" fill="none"/>',
   alt:'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z" fill="none"/>'};
-function hKind(o){return o.cats.some(c=>/Creș|Grădini/.test(c))?"bib":o.cats.includes("Parc")?"parc":o.cats.includes("Loc de joacă")?"joaca":o.cats.includes("Cultură")?"cult":o.cats.some(c=>c==="Afterschool"||c==="Școală")?"after":"alt"}
-const H_COL={bib:"#1F4E5F",parc:"#F4B942",joaca:"#7FB8C4",cult:"#FFF8F0",after:"#4F7F8F",alt:"#C9BBA8"};
+function hKind(o){return o.cats.some(c=>/Creș|Grădini/.test(c))?"bib":o.cats.includes("Parc")?"parc":o.cats.includes("Loc de joacă")?"joaca":o.cats.includes("Cultură")?"cult":o.cats.some(c=>c==="Afterschool"||c==="Școală")?"after":o.cats.includes("Ieșiri de o zi")?"zi":"alt"}
+const H_COL={bib:"#1F4E5F",parc:"#F4B942",joaca:"#7FB8C4",cult:"#FFF8F0",after:"#4F7F8F",zi:"#F6A58E",alt:"#C9BBA8"};
 function hIcon(o){const pro=hPro(o),k=hKind(o);
   if(pro)return L.divIcon({className:"",html:`<div class="h-pin pro"><span>★</span></div>`,iconSize:[38,38],iconAnchor:[19,38],popupAnchor:[0,-34]});
   const ink=k==="bib"||k==="after"?"#FFF8F0":k==="cult"?"#E2603F":"#1F4E5F";
